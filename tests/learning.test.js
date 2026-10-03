@@ -130,6 +130,23 @@ test("real PostgreSQL learning workflows preserve ownership, private keys, froze
       ).rows[0].n,
       1,
     );
+    const duplicateReport = {...report, fingerprint: "b".repeat(64)};
+    await db.exec(buildImportSql(duplicateReport, {...localPayload,book:{...localPayload.book,title:"Second local draft"}}));
+    assert.equal((await db.query("select count(*)::int n from public.questions")).rows[0].n,1);
+    assert.equal((await db.query("select skipped_count from public.import_jobs where fingerprint=$1",[duplicateReport.fingerprint])).rows[0].skipped_count,1);
+    await assert.rejects(db.exec(buildImportSql({...report,fingerprint:"c".repeat(64)}, {...localPayload,book:{...localPayload.book,title:"Conflict draft"},topics:[{title:"Topic",questions:[{...q,correctAnswer:0}]}]})),/conflicting answer keys/);
+    await db.exec("rollback");
+    assert.equal((await db.query("select count(*)::int n from public.books where title='Conflict draft'")).rows[0].n,0);
+    await assert.rejects(db.exec("set role anon;select * from public.local_question_imports"));
+    await db.exec("reset role");
+    const vocabularyPayload={title:"Local vocabulary",published:false,sets:[{title:"Set 1",words:[{word:"Supplied",definition:"Provided in the local file"}]}]};
+    const vocabularyReport={...report,fingerprint:"d".repeat(64),source_type:"vocabulary",detected_questions:0,detected_vocabulary_sets:1};
+    await db.exec(buildImportSql(vocabularyReport,vocabularyPayload));
+    await db.exec(buildImportSql(vocabularyReport,vocabularyPayload));
+    assert.equal((await db.query("select count(*)::int n from public.vocabulary_books where title='Local vocabulary' and not published")).rows[0].n,1);
+    const stimulusQuestion={...q,stimulus:"Distinct supplied stimulus"};
+    await db.exec(buildImportSql({...report,fingerprint:"e".repeat(64)}, {...localPayload,book:{...localPayload.book,title:"Distinct stimulus draft"},topics:[{title:"Topic",questions:[stimulusQuestion]}]}));
+    assert.equal((await db.query("select count(*)::int n from public.questions")).rows[0].n,2);
     await role(admin);
     const imported = await call(
       "import_book_content",

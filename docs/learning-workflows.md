@@ -27,13 +27,11 @@ npm run import:apply                  # prepare private SQL files only
 npm run import:apply -- --apply       # execute against the verified linked project
 ```
 
-Inspection reads only relevant files directly on `~/Desktop` and files directly inside `~/Desktop/Books`. It does not traverse Projects or other personal folders. `pdftotext` must be installed for PDFs. PDF/TXT extraction and existing book JSON are supported; DOCX/EPUB files are reported for review until an extraction adapter is supplied.
+Inspection reads **only `~/Desktop/Books` (capital B) and its subfolders**. Symlinks and paths escaping that root are rejected. It never downloads content or extraction tools. Installed Poppler (`pdftotext`, `pdfimages`) and Python's standard library handle PDF, DOCX and EPUB extraction. Unsupported semantic structures are reported for review.
 
-Artifacts live in ignored `local-imports/`: SHA-256 source fingerprints, intermediate JSON, validation reports and private SQL. The importer verifies the source hash again, validates JSON, checks that the linked project is exactly `ileffhbbaomfimwulvpw`, and imports through the authenticated Supabase CLI. No service-role key is used or stored. Each source imports transactionally and duplicate payloads reuse the existing book. Large or ambiguous extracts stay unimported; validated topic imports can be split into batches of at most 500 questions.
+Private artifacts and per-source resume checkpoints live in ignored `local-imports/`. Source and intermediate hashes are rechecked before draft import; completed sources are skipped. Cached Supabase CLI commands run with `--offline` and verify project `ileffhbbaomfimwulvpw`. Per-source transactions, exact-content deduplication and conflicting-key rollback prevent partial or duplicate question content. Imports remain draft; no PDFs or extracted text are committed or exposed as downloads.
 
-The initial run found 27 PDFs. **Ultimate Grammar Book** imported as an unpublished draft with 18 topics and 41 questions. All 41 question numbers, four choices, answer keys and worked solutions agreed. Difficulty remains **unclassified** rather than inferred. The other 26 sources, including Vocabook, need review for columns, keys, diagrams, or OCR. Detected counts on review reports are candidates, not verified question inventories. No vocabulary source was automatically inserted.
-
-Review the grammar draft under Admin → Books before publishing it. Keep source attribution and resolve uncertain extraction before importing other files. Source PDFs are neither committed nor uploaded. No public export or download feature exists.
+See [book-import-report.md](book-import-report.md) for actual outcomes and [CODEX_HANDOFF.md](CODEX_HANDOFF.md) for resume commands and limits. The grammar adapter validates all keys against worked solutions; the Rules-To-Results adapter separates PDF columns and matches explicit printed keys. Essential unresolved visuals, underlines, paired text, and missing keys are marked `NEEDS_REVIEW` and excluded. Unclassified difficulty is kept rather than inferred. Vocabulary JSON is supported; automatic extraction of Vocabook's word tables remains under review.
 
 ## Vocabulary JSON
 

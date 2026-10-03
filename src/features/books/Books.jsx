@@ -37,6 +37,9 @@ export default function Books({ admin = false }) {
         </label>
         {admin && (
           <div className="button-row">
+            <Link className="button button-secondary" to="/admin/imports">
+              Import status
+            </Link>
             <button className="button" onClick={() => setCreating(true)}>
               Create book
             </button>

@@ -13,7 +13,8 @@
     "test": "node --test tests/*.test.js",
     "test:e2e": "playwright test",
     "import:inspect": "node scripts/imports/local-books.js",
-    "import:apply": "node scripts/imports/apply-local-imports.js"
+    "import:apply": "node scripts/imports/apply-local-imports.js",
+    "import:check": "node scripts/imports/sample-check.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

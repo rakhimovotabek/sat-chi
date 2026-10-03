@@ -289,3 +289,27 @@ test("admin practice keeps the admin layout and student attempts open read-only"
     page.getByRole("button", { name: "Submit practice" }),
   ).toHaveCount(0);
 });
+
+test('admin import status exposes review evidence and refreshes without source downloads', async ({page})=>{
+ await learningFixture(page,'admin');
+ let requests=0;
+ await page.route('**/rest/v1/import_jobs**',route=>{
+  requests++;
+  return route.fulfill({contentType:'application/json',body:JSON.stringify([{
+   id:'import-status',title:'Supplied book',source_file:'Source.pdf',source_path:'nested/Source.pdf',status:'imported',source_type:'book',category:'Reading & Writing',
+   detected_topics:2,detected_questions:12,detected_vocabulary_sets:0,imported_count:10,skipped_count:2,needs_review_count:2,warnings:['Visual preservation required.'],errors:[],
+   source_metadata:{review_items:[{number:7,page:3,reasons:['Essential diagram missing.']}]}
+  }])});
+ });
+ await page.goto('/admin/imports');
+ await expect(page.getByRole('heading',{name:'Import status',exact:true})).toBeVisible();
+ await expect(page.getByText('nested/Source.pdf',{exact:true})).toBeVisible();
+ await expect(page.getByText('10 imported · 2 skipped')).toBeVisible();
+ await expect(page.getByText('2 questions need review')).toBeVisible();
+ await page.getByText('Question review evidence').click();
+ await expect(page.getByText('Question 7 · PDF page 3: Essential diagram missing.')).toBeVisible();
+ const initialRequests=requests;
+ await page.getByRole('button',{name:'Refresh import reports'}).click();
+ await expect.poll(()=>requests).toBeGreaterThan(initialRequests);
+ await expect(page.locator('a[href$=".pdf"]')).toHaveCount(0);
+});
