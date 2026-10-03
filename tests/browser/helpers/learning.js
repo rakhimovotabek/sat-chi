@@ -77,7 +77,7 @@ export async function learningFixture(page, role = "student") {
       },
     ]);
   const regex =
-    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|import_vocabulary))(\?|$)/;
+    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
   await page.route(regex, async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
@@ -292,6 +292,89 @@ export async function learningFixture(page, role = "student") {
       }
       return json(store.progress);
     }
+    if (table === "vocabulary_summary")
+      return json({
+        total: store.words.length,
+        learned: store.progress.filter((p) => p.mastery_state !== "new").length,
+        mastered: 0,
+        due: 0,
+        starred: store.progress.filter((p) => p.starred).length,
+        successful: store.progress.reduce(
+          (n, p) => n + (p.successful_recalls || 0),
+          0,
+        ),
+        failed: store.progress.reduce((n, p) => n + (p.failed_recalls || 0), 0),
+        study_seconds: 0,
+        sets: store.sets.map((s) => ({
+          set_id: s.id,
+          total: store.words.filter((w) => w.set_id === s.id).length,
+          learned: 0,
+          mastered: 0,
+          reviewing: 0,
+          new: store.words.filter((w) => w.set_id === s.id).length,
+        })),
+      });
+    if (table === "vocabulary_pool") {
+      const words = store.words
+        .filter(
+          (w) =>
+            (!body.p_sets.length || body.p_sets.includes(w.set_id)) &&
+            (!body.p_search ||
+              (w.word + " " + w.definition).includes(body.p_search)),
+        )
+        .map((w) => ({
+          ...w,
+          progress: store.progress.find((p) => p.word_id === w.id),
+          source_sets: [w.set_id],
+          set_title: store.sets.find((s) => s.id === w.set_id)?.title,
+        }))
+        .filter(
+          (w) =>
+            body.p_filter === "all" ||
+            (body.p_filter === "starred" && w.progress?.starred) ||
+            (body.p_filter === "due" && w.progress?.next_review) ||
+            (body.p_filter === "weak" && w.progress?.failed_recalls >= 2),
+        );
+      return json({
+        total: words.length,
+        words: words.slice(body.p_page * 100, body.p_page * 100 + 100),
+      });
+    }
+    if (table === "star_vocabulary") {
+      let p = store.progress.find((p) => p.word_id === body.p_word);
+      if (!p) {
+        p = { word_id: body.p_word, mastery_state: "new" };
+        store.progress.push(p);
+      }
+      p.starred = body.p_starred;
+      return json(null);
+    }
+    if (table === "review_vocabulary") {
+      let p = store.progress.find((p) => p.word_id === body.p_word);
+      if (!p) {
+        p = {
+          word_id: body.p_word,
+          review_count: 0,
+          successful_recalls: 0,
+          failed_recalls: 0,
+        };
+        store.progress.push(p);
+      }
+      const word = store.words.find((w) => w.id === body.p_word);
+      const correct =
+        body.p_mode === "typed"
+          ? body.p_answer.trim().toLowerCase() === word.word.toLowerCase()
+          : ["good", "easy", "know"].includes(body.p_rating);
+      p.mastery_state = correct ? "learning" : "review";
+      p.review_count = (p.review_count || 0) + 1;
+      const recallField = correct ? "successful_recalls" : "failed_recalls";
+      p[recallField] = (p[recallField] || 0) + 1;
+      p.next_review = new Date(Date.now() + 86400000).toISOString();
+      p.study_seconds = (p.study_seconds || 0) + body.p_seconds;
+      return json({ progress: p, correct });
+    }
+    if (table === "start_vocabulary_practice")
+      return json(start("vocabulary", "Selected sets · Test"));
     if (table === "start_vocabulary_test")
       return json(start("vocabulary", "Set 1 · Test"));
     if (table === "import_vocabulary") {

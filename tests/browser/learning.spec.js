@@ -131,7 +131,7 @@ test("question bank filters server results and creates a stable session with mat
   ).toBeChecked();
   expect(store.items.map((i) => i.id)).toEqual(ids);
 });
-test("vocabulary flashcards persist known/review, highlight supplied passage, and start tests", async ({
+test("vocabulary flashcards persist recall ratings, highlight supplied passage, and start tests", async ({
   page,
 }) => {
   const store = await learningFixture(page);
@@ -143,17 +143,18 @@ test("vocabulary flashcards persist known/review, highlight supplied passage, an
   await expect(
     page.getByRole("heading", { name: "become less intense", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Know", exact: true }).click();
+  await page.getByRole("button", { name: "Good", exact: true }).click();
   await expect.poll(() => store.progress.length).toBe(1);
-  await page.getByRole("button", { name: "Need Review", exact: true }).click();
+  await page.getByRole("button", { name: "Again", exact: true }).click();
   await expect.poll(() => store.progress.length).toBe(2);
   await page.getByRole("button", { name: "Read in Context" }).click();
   await page.getByRole("button", { name: "candid", exact: true }).click();
   await expect(page.locator(".word-definition")).toContainText("honest");
   await page.reload();
-  await page.getByRole("button", { name: "Word list", exact: true }).click();
-  await expect(page.locator(".vocab-word").first()).toContainText("known");
+  await page.getByRole("button", { name: "Words", exact: true }).click();
+  await expect(page.locator(".vocab-word").first()).toContainText("learning");
   await page.getByRole("button", { name: "Test", exact: true }).click();
+  await page.getByRole("button", { name: "Start test", exact: true }).click();
   await expect(
     page.getByText("Question 1 of 3", { exact: true }),
   ).toBeVisible();
@@ -290,26 +291,113 @@ test("admin practice keeps the admin layout and student attempts open read-only"
   ).toHaveCount(0);
 });
 
-test('admin import status exposes review evidence and refreshes without source downloads', async ({page})=>{
- await learningFixture(page,'admin');
- let requests=0;
- await page.route('**/rest/v1/import_jobs**',route=>{
-  requests++;
-  return route.fulfill({contentType:'application/json',body:JSON.stringify([{
-   id:'import-status',title:'Supplied book',source_file:'Source.pdf',source_path:'nested/Source.pdf',status:'imported',source_type:'book',category:'Reading & Writing',
-   detected_topics:2,detected_questions:12,detected_vocabulary_sets:0,imported_count:10,skipped_count:2,needs_review_count:2,warnings:['Visual preservation required.'],errors:[],
-   source_metadata:{review_items:[{number:7,page:3,reasons:['Essential diagram missing.']}]}
-  }])});
- });
- await page.goto('/admin/imports');
- await expect(page.getByRole('heading',{name:'Import status',exact:true})).toBeVisible();
- await expect(page.getByText('nested/Source.pdf',{exact:true})).toBeVisible();
- await expect(page.getByText('10 imported · 2 skipped')).toBeVisible();
- await expect(page.getByText('2 questions need review')).toBeVisible();
- await page.getByText('Question review evidence').click();
- await expect(page.getByText('Question 7 · PDF page 3: Essential diagram missing.')).toBeVisible();
- const initialRequests=requests;
- await page.getByRole('button',{name:'Refresh import reports'}).click();
- await expect.poll(()=>requests).toBeGreaterThan(initialRequests);
- await expect(page.locator('a[href$=".pdf"]')).toHaveCount(0);
+test("admin import status exposes review evidence and refreshes without source downloads", async ({
+  page,
+}) => {
+  await learningFixture(page, "admin");
+  let requests = 0;
+  await page.route("**/rest/v1/import_jobs**", (route) => {
+    requests++;
+    return route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify([
+        {
+          id: "import-status",
+          title: "Supplied book",
+          source_file: "Source.pdf",
+          source_path: "nested/Source.pdf",
+          status: "imported",
+          source_type: "book",
+          category: "Reading & Writing",
+          detected_topics: 2,
+          detected_questions: 12,
+          detected_vocabulary_sets: 0,
+          imported_count: 10,
+          skipped_count: 2,
+          needs_review_count: 2,
+          warnings: ["Visual preservation required."],
+          errors: [],
+          source_metadata: {
+            review_items: [
+              { number: 7, page: 3, reasons: ["Essential diagram missing."] },
+            ],
+          },
+        },
+      ]),
+    });
+  });
+  await page.goto("/admin/imports");
+  await expect(
+    page.getByRole("heading", { name: "Import status", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("nested/Source.pdf", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("10 imported · 2 skipped")).toBeVisible();
+  await expect(page.getByText("2 questions need review")).toBeVisible();
+  await page.getByText("Question review evidence").click();
+  await expect(
+    page.getByText("Question 7 · PDF page 3: Essential diagram missing."),
+  ).toBeVisible();
+  const initialRequests = requests;
+  await page.getByRole("button", { name: "Refresh import reports" }).click();
+  await expect.poll(() => requests).toBeGreaterThan(initialRequests);
+  await expect(page.locator('a[href$=".pdf"]')).toHaveCount(0);
+});
+
+test("vocabulary accordion, favorites, search and strict typed recall persist real actions", async ({
+  page,
+}) => {
+  const store = await learningFixture(page);
+  await page.goto("/vocabulary/vbook/sets/vset");
+  const word = page.locator(".vocab-word").first();
+  await word.locator("summary").click();
+  await expect(word).toHaveAttribute("open", "");
+  await word.getByRole("button", { name: "Star abate", exact: true }).click();
+  await expect.poll(() => store.progress[0]?.starred).toBe(true);
+  await page.getByLabel("Search words and definitions").fill("honest");
+  await expect(page.locator(".vocab-word")).toHaveCount(1);
+  await expect(page.locator(".vocab-word")).toContainText("candid");
+  await page.getByLabel("Search words and definitions").fill("");
+  await page
+    .getByRole("button", { name: "Type the Word", exact: true })
+    .click();
+  await page.getByLabel("Type the word", { exact: true }).fill("abait");
+  await page.getByRole("button", { name: "Check answer" }).click();
+  await expect(page.getByRole("status")).toContainText("Needs review");
+  await expect
+    .poll(
+      () => store.progress.find((p) => p.word_id === "word-0")?.failed_recalls,
+    )
+    .toBe(1);
+});
+test("multiple sets can be selected, cleared and combined with original set labels", async ({
+  page,
+}) => {
+  const store = await learningFixture(page);
+  store.sets.push({
+    id: "second",
+    book_id: "vbook",
+    title: "Set 2",
+    position: 1,
+  });
+  store.words.push({
+    id: "second-word",
+    set_id: "second",
+    word: "foster",
+    definition: "encourage",
+    position: 0,
+  });
+  await page.goto("/vocabulary/vbook");
+  await page.getByRole("button", { name: "Select All", exact: true }).click();
+  await expect(page.getByLabel("Select Set 1", { exact: true })).toBeChecked();
+  await expect(page.getByLabel("Select Set 2", { exact: true })).toBeChecked();
+  await page.getByRole("button", { name: "Clear Selection" }).click();
+  await expect(
+    page.getByRole("button", { name: "Study Selected Sets" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Select All", exact: true }).click();
+  await page.getByRole("button", { name: "Study Selected Sets" }).click();
+  await expect(page).toHaveURL(/sets=vset,second/);
+  await expect(page.locator(".vocab-word")).toHaveCount(5);
 });

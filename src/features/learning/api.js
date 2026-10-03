@@ -119,14 +119,56 @@ export async function vocabSet(id) {
     : [];
   return { set, words, passages, progress };
 }
+export const reviewVocab = (
+  word,
+  rating,
+  seconds,
+  event,
+  mode = "cards",
+  answer = null,
+) =>
+  rpc("review_vocabulary", {
+    p_word: word,
+    p_rating: rating,
+    p_seconds: seconds,
+    p_event: event,
+    p_mode: mode,
+    p_answer: answer,
+  });
 export const saveVocabProgress = (student, word, status) =>
+  reviewVocab(
+    word,
+    status === "known" ? "know" : "need_review",
+    0,
+    crypto.randomUUID(),
+    "learn",
+  );
+export const starVocab = (word, starred) =>
+  rpc("star_vocabulary", { p_word: word, p_starred: starred });
+export const vocabSummary = (book = null) =>
+  rpc("vocabulary_summary", { p_book: book });
+export const vocabPool = (sets = [], filter = "all", search = "", page = 0) =>
+  rpc("vocabulary_pool", {
+    p_sets: sets,
+    p_filter: filter,
+    p_search: search,
+    p_page: page,
+  });
+export const startVocabPool = (sets, mode, count, filter = "all") =>
+  rpc("start_vocabulary_practice", {
+    p_sets: sets,
+    p_mode: mode,
+    p_count: count,
+    p_filter: filter,
+  });
+export const vocabPassages = (sets, page = 0) =>
   checked(
-    supabase.from("vocabulary_progress").upsert({
-      student_id: student,
-      word_id: word,
-      status,
-      updated_at: new Date().toISOString(),
-    }),
+    supabase
+      .from("vocabulary_passages")
+      .select("*")
+      .in("set_id", sets)
+      .order("id")
+      .range(page * 10, page * 10 + 9),
   );
 export const deleteVocabBook = (id) =>
   checked(supabase.from("vocabulary_books").delete().eq("id", id));

@@ -2,14 +2,17 @@ import { useState } from "react";
 import useAction from "./useAction.js";
 import { validateVocabulary } from "./vocabulary-validation.js";
 import * as api from "./api.js";
-export default function VocabImport({ reload }) {
+export default function VocabImport({ reload, bookId }) {
   const [text, setText] = useState(""),
     [preview, setPreview] = useState(null),
     [error, setError] = useState(""),
     action = useAction();
   function inspect() {
     try {
-      const payload = JSON.parse(text),
+      const input = JSON.parse(text),
+        payload = bookId
+          ? { title: "Set import", sets: [input] }
+          : { ...input, published: false },
         errors = validateVocabulary(payload);
       setPreview({ payload, errors });
       setError("");
@@ -19,7 +22,7 @@ export default function VocabImport({ reload }) {
   }
   return (
     <section className="card learning-panel learning-form">
-      <h2>Import vocabulary book</h2>
+      <h2>Import vocabulary {bookId ? "set" : "book"}</h2>
       <p className="page-description">
         Use title, source, published, and sets. Each set contains title, words,
         optional passage, and optional questions. Words have word, definition,
@@ -91,7 +94,12 @@ export default function VocabImport({ reload }) {
                 disabled={action.busy}
                 onClick={() =>
                   action.run(async () => {
-                    await api.importVocab(preview.payload);
+                    if (bookId)
+                      await api.rpc("import_vocabulary_set", {
+                        p_book: bookId,
+                        p_set: preview.payload.sets[0],
+                      });
+                    else await api.importVocab(preview.payload);
                     setPreview(null);
                     setText("");
                     reload();

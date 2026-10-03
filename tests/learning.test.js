@@ -130,23 +130,100 @@ test("real PostgreSQL learning workflows preserve ownership, private keys, froze
       ).rows[0].n,
       1,
     );
-    const duplicateReport = {...report, fingerprint: "b".repeat(64)};
-    await db.exec(buildImportSql(duplicateReport, {...localPayload,book:{...localPayload.book,title:"Second local draft"}}));
-    assert.equal((await db.query("select count(*)::int n from public.questions")).rows[0].n,1);
-    assert.equal((await db.query("select skipped_count from public.import_jobs where fingerprint=$1",[duplicateReport.fingerprint])).rows[0].skipped_count,1);
-    await assert.rejects(db.exec(buildImportSql({...report,fingerprint:"c".repeat(64)}, {...localPayload,book:{...localPayload.book,title:"Conflict draft"},topics:[{title:"Topic",questions:[{...q,correctAnswer:0}]}]})),/conflicting answer keys/);
+    const duplicateReport = { ...report, fingerprint: "b".repeat(64) };
+    await db.exec(
+      buildImportSql(duplicateReport, {
+        ...localPayload,
+        book: { ...localPayload.book, title: "Second local draft" },
+      }),
+    );
+    assert.equal(
+      (await db.query("select count(*)::int n from public.questions")).rows[0]
+        .n,
+      1,
+    );
+    assert.equal(
+      (
+        await db.query(
+          "select skipped_count from public.import_jobs where fingerprint=$1",
+          [duplicateReport.fingerprint],
+        )
+      ).rows[0].skipped_count,
+      1,
+    );
+    await assert.rejects(
+      db.exec(
+        buildImportSql(
+          { ...report, fingerprint: "c".repeat(64) },
+          {
+            ...localPayload,
+            book: { ...localPayload.book, title: "Conflict draft" },
+            topics: [
+              { title: "Topic", questions: [{ ...q, correctAnswer: 0 }] },
+            ],
+          },
+        ),
+      ),
+      /conflicting answer keys/,
+    );
     await db.exec("rollback");
-    assert.equal((await db.query("select count(*)::int n from public.books where title='Conflict draft'")).rows[0].n,0);
-    await assert.rejects(db.exec("set role anon;select * from public.local_question_imports"));
+    assert.equal(
+      (
+        await db.query(
+          "select count(*)::int n from public.books where title='Conflict draft'",
+        )
+      ).rows[0].n,
+      0,
+    );
+    await assert.rejects(
+      db.exec("set role anon;select * from public.local_question_imports"),
+    );
     await db.exec("reset role");
-    const vocabularyPayload={title:"Local vocabulary",published:false,sets:[{title:"Set 1",words:[{word:"Supplied",definition:"Provided in the local file"}]}]};
-    const vocabularyReport={...report,fingerprint:"d".repeat(64),source_type:"vocabulary",detected_questions:0,detected_vocabulary_sets:1};
-    await db.exec(buildImportSql(vocabularyReport,vocabularyPayload));
-    await db.exec(buildImportSql(vocabularyReport,vocabularyPayload));
-    assert.equal((await db.query("select count(*)::int n from public.vocabulary_books where title='Local vocabulary' and not published")).rows[0].n,1);
-    const stimulusQuestion={...q,stimulus:"Distinct supplied stimulus"};
-    await db.exec(buildImportSql({...report,fingerprint:"e".repeat(64)}, {...localPayload,book:{...localPayload.book,title:"Distinct stimulus draft"},topics:[{title:"Topic",questions:[stimulusQuestion]}]}));
-    assert.equal((await db.query("select count(*)::int n from public.questions")).rows[0].n,2);
+    const vocabularyPayload = {
+      title: "Local vocabulary",
+      published: false,
+      sets: [
+        {
+          title: "Set 1",
+          words: [
+            { word: "Supplied", definition: "Provided in the local file" },
+          ],
+        },
+      ],
+    };
+    const vocabularyReport = {
+      ...report,
+      fingerprint: "d".repeat(64),
+      source_type: "vocabulary",
+      detected_questions: 0,
+      detected_vocabulary_sets: 1,
+    };
+    await db.exec(buildImportSql(vocabularyReport, vocabularyPayload));
+    await db.exec(buildImportSql(vocabularyReport, vocabularyPayload));
+    assert.equal(
+      (
+        await db.query(
+          "select count(*)::int n from public.vocabulary_books where title='Local vocabulary' and not published",
+        )
+      ).rows[0].n,
+      1,
+    );
+    const stimulusQuestion = { ...q, stimulus: "Distinct supplied stimulus" };
+    await db.exec(
+      buildImportSql(
+        { ...report, fingerprint: "e".repeat(64) },
+        {
+          ...localPayload,
+          book: { ...localPayload.book, title: "Distinct stimulus draft" },
+          topics: [{ title: "Topic", questions: [stimulusQuestion] }],
+        },
+      ),
+    );
+    assert.equal(
+      (await db.query("select count(*)::int n from public.questions")).rows[0]
+        .n,
+      2,
+    );
     await role(admin);
     const imported = await call(
       "import_book_content",
@@ -427,10 +504,160 @@ test("real PostgreSQL learning workflows preserve ownership, private keys, froze
       (await db.query("select * from public.vocabulary_questions")).rows.length,
       0,
     );
+    await assert.rejects(
+      db.query(
+        "insert into public.vocabulary_progress(student_id,word_id,status)values($1,$2,'known')",
+        [student, word],
+      ),
+    );
+    const event = "e1000000-0000-0000-0000-000000000001";
+    const review = (rating, id, mode = "cards", answer = null) =>
+      call(
+        "review_vocabulary",
+        [word, rating, 30, id, mode, answer],
+        ["uuid", "text", "integer", "uuid", "text", "text"],
+      );
+    const first = await review("good", event);
+    assert.equal(first.progress.mastery_state, "learning");
+    assert.equal(first.progress.review_count, 1);
+    assert.equal(first.progress.interval_days, 1);
+    assert.equal(
+      (await review("good", event)).progress.review_count,
+      1,
+      "retry must not double credit",
+    );
+    await call("star_vocabulary", [word, true], ["uuid", "boolean"]);
+    assert.equal((await call("vocabulary_summary", [], [])).starred, 1);
+    assert.equal(
+      (
+        await call(
+          "vocabulary_pool",
+          [[set], "starred", "", 0],
+          ["uuid[]", "text", "text", "integer"],
+        )
+      ).total,
+      1,
+    );
+    const miss = await review(
+      "good",
+      "e1000000-0000-0000-0000-000000000002",
+      "typed",
+      "unrelated",
+    );
+    assert.equal(miss.correct, false);
+    assert.equal(miss.progress.mastery_state, "review");
+    assert.equal(miss.progress.interval_days, 0);
+    assert.equal(miss.progress.failed_recalls, 1);
+    assert.equal(miss.progress.study_seconds, 60);
+    const actual = (
+      await db.query("select word from public.vocabulary_words where id=$1", [
+        word,
+      ])
+    ).rows[0].word;
+    const typed = await review(
+      "again",
+      "e1000000-0000-0000-0000-000000000003",
+      "typed",
+      actual.toUpperCase(),
+    );
+    assert.equal(typed.correct, true);
+    assert.equal(typed.progress.mastery_state, "learning");
+    await assert.rejects(
+      review("mastered", "e1000000-0000-0000-0000-000000000004"),
+    );
+    const repeated = await review(
+      "easy",
+      "e1000000-0000-0000-0000-000000000005",
+    );
+    assert.equal(
+      repeated.progress.mastery_state,
+      "learning",
+      "same-day clicks must not master a word",
+    );
+    assert.equal(
+      repeated.progress.interval_days,
+      typed.progress.interval_days,
+      "same-day repetitions cannot postpone reviews",
+    );
+    await db.exec("reset role");
     await db.query(
-      "insert into public.vocabulary_progress(student_id,word_id,status)values($1,$2,'known')",
+      "update public.vocabulary_progress set successful_recalls=4,review_count=4,successful_days=2,consecutive_successes=2,first_success=now()-interval '8 days',last_success=now()-interval '1 day',next_review=now()-interval '1 minute',interval_days=4 where student_id=$1 and word_id=$2",
       [student, word],
     );
+    await role(student);
+    const mastered = await review(
+      "good",
+      "e1000000-0000-0000-0000-000000000006",
+    );
+    assert.equal(mastered.progress.mastery_state, "mastered");
+    assert.equal(mastered.progress.interval_days, 8);
+    const forgotten = await review(
+      "again",
+      "e1000000-0000-0000-0000-000000000007",
+    );
+    assert.equal(forgotten.progress.mastery_state, "review");
+    assert.equal(forgotten.progress.consecutive_successes, 0);
+    assert.ok(
+      new Date(forgotten.progress.next_review) -
+        new Date(forgotten.progress.last_reviewed) <=
+        600001,
+    );
+    await assert.rejects(
+      db.query(
+        "update public.vocabulary_progress set mastery_state='mastered' where word_id=$1",
+        [word],
+      ),
+    );
+    await role(admin);
+    const individual = {
+      title: "Source Set 2",
+      words: [{ ...words[0], source_page: 12, antonym: "Opposite supplied" }],
+    };
+    const secondSet = await call(
+      "import_vocabulary_set",
+      [vbid, JSON.stringify(individual)],
+      ["uuid", "jsonb"],
+    );
+    await assert.rejects(
+      call(
+        "import_vocabulary_set",
+        [vbid, JSON.stringify(individual)],
+        ["uuid", "jsonb"],
+      ),
+    );
+    await role(student);
+    const combined = await call(
+      "vocabulary_pool",
+      [[set, secondSet], "all", "", 0],
+      ["uuid[]", "text", "text", "integer"],
+    );
+    assert.equal(combined.total, 4);
+    assert.equal(
+      combined.words.find((w) => w.word === words[0].word).source_sets.length,
+      2,
+    );
+
+    const multi = await call(
+      "start_vocabulary_practice",
+      [[set], "reverse", 10, "all"],
+      ["uuid[]", "text", "integer", "text"],
+    );
+    const multiItems = (
+      await db.query(
+        "select question from public.book_practice_items where session_id=$1",
+        [multi],
+      )
+    ).rows;
+    assert.equal(multiItems.length, 4);
+    assert.equal(multiItems[0].question.set_id, set);
+    assert.equal(multiItems[0].question.options.length, 4);
+    await assert.rejects(call("review_book_practice", [multi], ["uuid"]));
+    await role(other);
+    assert.equal(
+      (await db.query("select * from public.vocabulary_reviews")).rows.length,
+      0,
+    );
+    await role(student);
     await assert.rejects(
       db.query(
         "insert into public.vocabulary_progress(student_id,word_id,status)values($1,$2,'known')",

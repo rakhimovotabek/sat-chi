@@ -246,3 +246,18 @@ npm run import:apply -- --apply
 ```
 
 The importer scans only relevant Desktop files and `Desktop/Books`, validates intermediate JSON, verifies the linked project, and leaves uncertain extraction unimported. Private artifacts remain under ignored `local-imports/`. Imported local books are drafts until an administrator reviews and publishes them.
+
+### Vocabulary and importer checkpoints
+
+The Vocabulary studio supports original source sets, combined study pools, word accordions, favorites, deterministic spaced reviews, strict typed recall, source passages and saved tests. Automatically extracted content remains draft until admin review. See [learning workflows](docs/learning-workflows.md), [source inventory](docs/book-import-report.md), and [resume instructions](docs/CODEX_HANDOFF.md).
+
+```bash
+npm run lint
+npm run format:check
+npm run import:report
+npm run import:check-vocabulary
+node --test tests/vocabulary-model.test.js
+npm run test:e2e -- tests/browser/learning.spec.js
+```
+
+Source discovery is restricted to `~/Desktop/Books` and its subdirectories. Source PDFs, extracted text, SQL payloads and local checkpoints stay in ignored `local-imports/`; they must never be committed.

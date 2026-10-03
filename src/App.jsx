@@ -30,6 +30,9 @@ const Groups = lazy(() => import("./features/learning/Groups.jsx"));
 const Homework = lazy(() => import("./features/learning/Homework.jsx"));
 const QuestionBank = lazy(() => import("./features/learning/QuestionBank.jsx"));
 const Vocabulary = lazy(() => import("./features/learning/Vocabulary.jsx"));
+const VocabularyStudy = lazy(
+  () => import("./features/learning/VocabularyStudy.jsx"),
+);
 const VocabularySet = lazy(
   () => import("./features/learning/VocabularySet.jsx"),
 );
@@ -88,6 +91,7 @@ export default function App() {
             <Route path="/homework" element={<Homework />} />
             <Route path="/question-bank" element={<QuestionBank />} />
             <Route path="/vocabulary" element={<Vocabulary />} />
+            <Route path="/vocabulary/study" element={<VocabularyStudy />} />
             <Route path="/vocabulary/:bookId" element={<Vocabulary />} />
             <Route
               path="/vocabulary/:bookId/sets/:setId"

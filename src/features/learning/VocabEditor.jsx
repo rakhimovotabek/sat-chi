@@ -45,6 +45,20 @@ export default function VocabEditor({ words, passages, reload, setId }) {
           Translation
           <input name="translation" maxLength={6000} />
         </label>
+        {[
+          ["part_of_speech", "Part of speech"],
+          ["additional_definitions", "Additional meanings"],
+          ["antonym", "Antonyms"],
+          ["notes", "Notes"],
+        ].map(([name, label]) => (
+          <label key={name}>
+            {label}
+            <input
+              name={name}
+              maxLength={name === "part_of_speech" ? 100 : 6000}
+            />
+          </label>
+        ))}
         <button className="button" disabled={action.busy}>
           Add word
         </button>
@@ -69,16 +83,60 @@ export default function VocabEditor({ words, passages, reload, setId }) {
           }}
         >
           <strong>{w.word}</strong>
-          <label>
-            Definition for {w.word}
-            <input name="definition" required defaultValue={w.definition} />
-          </label>
-          <label>
-            Example for {w.word}
-            <input name="example" defaultValue={w.example} />
-          </label>
+          {w.source_page && (
+            <small>
+              Source page {w.source_page} · Extraction:{" "}
+              {w.extraction_confidence || "Unclassified"}
+            </small>
+          )}
+          {[
+            ["word", "Word"],
+            ["definition", "Definition"],
+            ["part_of_speech", "Part of speech"],
+            ["additional_definitions", "Additional meanings"],
+            ["example", "Example"],
+            ["synonym", "Synonyms"],
+            ["antonym", "Antonyms"],
+            ["translation", "Translation"],
+            ["notes", "Notes"],
+          ].map(([name, label]) => (
+            <label key={name}>
+              {label} for {w.word}
+              <input
+                name={name}
+                required={["word", "definition"].includes(name)}
+                maxLength={
+                  name === "word" || name === "part_of_speech"
+                    ? 100
+                    : name === "definition"
+                      ? 2000
+                      : 6000
+                }
+                defaultValue={w[name] || ""}
+              />
+            </label>
+          ))}
           <button className="button button-secondary" disabled={action.busy}>
             Save word
+          </button>
+          <button
+            type="button"
+            className="button button-danger"
+            disabled={action.busy}
+            onClick={() => {
+              if (
+                window.confirm(`Delete ${w.word} and its vocabulary progress?`)
+              )
+                action.run(async () => {
+                  const { supabase } = await import("../../lib/supabase.js");
+                  await api.checked(
+                    supabase.from("vocabulary_words").delete().eq("id", w.id),
+                  );
+                  reload();
+                });
+            }}
+          >
+            Delete word
           </button>
         </form>
       ))}

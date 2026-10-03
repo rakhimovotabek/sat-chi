@@ -340,3 +340,27 @@
     font-size: 26px;
   }
 }
+/* Vocabulary uses compact rows; content appears only when requested. */
+.vocabulary-toolbar, .vocabulary-selection { display:flex; align-items:end; flex-wrap:wrap; gap:16px; margin:20px 0; }
+.vocabulary-toolbar label, .vocabulary-global-search { display:grid; gap:6px; font-size:13px; color:var(--text-muted); }
+.vocabulary-global-search { margin:20px 0; max-width:560px; }
+.vocabulary-toolbar input, .vocabulary-toolbar select, .vocabulary-global-search input { min-height:40px; padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:white; color:var(--text); max-width:100%; }
+.vocabulary-selection { justify-content:space-between; padding:16px 0; border-block:1px solid var(--border); }
+.vocabulary-stat-row { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:16px; margin:20px 0; }
+.vocabulary-stat-row strong { display:block; font-size:24px; }
+.vocabulary-stat-row small { display:block; color:var(--text-muted); }
+.vocab-word { display:block; }
+.vocab-word summary { display:flex; justify-content:space-between; align-items:center; gap:14px; cursor:pointer; padding:6px 0; }
+.vocab-word summary strong { font-size:17px; }
+.word-meaning { display:block; font-size:14px; margin-top:4px; color:var(--text-muted); }
+.vocab-word[open] summary { margin-bottom:14px; }
+.vocab-word p { margin:10px 0; }
+.vocab-word .button-row { margin-top:12px; }
+.vocabulary-lesson { max-width:640px; margin:24px auto; text-align:left; }
+.vocabulary-lesson h2 { font-size:34px; }
+.context-passage { white-space:pre-wrap; }
+.vocabulary-overview { margin-bottom:24px; }
+.vocabulary-overview h2 { margin-bottom:6px; }
+.vocabulary-overview .section-heading p { margin:0; }
+progress { width:100%; height:6px; accent-color:var(--primary); }
+@media(max-width:700px) { .vocabulary-stat-row { grid-template-columns:repeat(3,minmax(0,1fr)); } .vocabulary-toolbar label { width:100%; } .vocab-word summary { align-items:start; } .vocab-word summary .subtle-badge { white-space:nowrap; } }

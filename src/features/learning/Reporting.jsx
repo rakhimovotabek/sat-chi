@@ -4,13 +4,23 @@ import useAuth from "../../hooks/useAuth.js";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
-import { metrics, standings, overview, checked } from "./api.js";
+import { metrics, standings, overview, checked, vocabSummary } from "./api.js";
 import { supabase } from "../../lib/supabase.js";
 import { getPractice } from "../books/api.js";
 import { formatTime, sectionResults } from "./homework-model.js";
 import { practiceSummary } from "../player/model.js";
 import DashboardWork from "./DashboardWork.jsx";
 import SectionAccuracy from "./SectionAccuracy.jsx";
+import VocabularyStats from "./VocabularyStats.jsx";
+function VocabularyOverview() {
+  const state = useContent(() => vocabSummary());
+  return (
+    <>
+      <ContentState {...state} onRetry={state.reload} />
+      <VocabularyStats data={state.data} />
+    </>
+  );
+}
 const percent = (correct, total) =>
   total ? `${Math.round((correct / total) * 100)}%` : "—";
 export function MetricCards({ data }) {
@@ -24,7 +34,7 @@ export function MetricCards({ data }) {
           "Homework completed",
           `${data.homework_completed} / ${data.homework_total}`,
         ],
-        ["Vocabulary known", data.vocabulary_known],
+        ["Vocabulary mastered", data.vocabulary_known],
         ["Current streak", `${data.streak || 0} days`],
       ].map(([name, value]) => (
         <article className="card metric-card" key={name}>
@@ -109,6 +119,7 @@ export function StudentDashboard() {
           <MetricCards data={state.data} />
           <SectionAccuracy data={state.data} />
           <DashboardWork />
+          <VocabularyOverview />
           <div className="learning-columns">
             <section className="card learning-panel">
               <h2>Today</h2>
@@ -150,6 +161,7 @@ export function Progress() {
       {state.data && (
         <>
           <MetricCards data={state.data} />
+          <VocabularyOverview />
           <section className="card learning-panel">
             <div className="section-heading">
               <h2>Performance breakdown</h2>

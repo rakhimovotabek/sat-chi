@@ -14,7 +14,12 @@
     "test:e2e": "playwright test",
     "import:inspect": "node scripts/imports/local-books.js",
     "import:apply": "node scripts/imports/apply-local-imports.js",
-    "import:check": "node scripts/imports/sample-check.js"
+    "import:check": "node scripts/imports/sample-check.js",
+    "format": "prettier --write src scripts tests docs README.md package.json",
+    "format:check": "prettier --check src/features/learning/Vocabulary*.jsx src/features/learning/vocabulary-*.js",
+    "import:report": "node scripts/imports/report.js",
+    "import:check-vocabulary": "node scripts/imports/check-vocabulary.js",
+    "lint": "eslint src scripts tests"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
@@ -26,6 +31,10 @@
     "@electric-sql/pglite": "^0.5.8",
     "@playwright/test": "^1.63.0",
     "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "9.39.1",
+    "eslint-plugin-react": "7.37.5",
+    "globals": "16.5.0",
+    "prettier": "3.6.2",
     "vite": "^8.3.2"
   }
 }

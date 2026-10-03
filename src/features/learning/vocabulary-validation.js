@@ -50,7 +50,16 @@ export function validateVocabulary(payload) {
           if (seen.has(w.word.trim().toLocaleLowerCase()))
             errors.push(`Set ${i + 1}: duplicate word ${w.word}.`);
           seen.add(w.word.trim().toLocaleLowerCase());
-          for (const field of ["example", "synonym", "translation", "antonym", "part_of_speech", "additional_definitions", "notes", "extraction_confidence"])
+          for (const field of [
+            "example",
+            "synonym",
+            "translation",
+            "antonym",
+            "part_of_speech",
+            "additional_definitions",
+            "notes",
+            "extraction_confidence",
+          ])
             if (
               w[field] !== undefined &&
               (typeof w[field] !== "string" || w[field].length > 6000)
@@ -66,7 +75,14 @@ export function validateVocabulary(payload) {
       else
         (s.questions || []).forEach((q, j) =>
           errors.push(
-            ...validateQuestion(Object.fromEntries(Object.entries(q || {}).filter(([k]) => !["questionType", "sourcePage"].includes(k))), `Set ${i + 1}, question ${j + 1}`),
+            ...validateQuestion(
+              Object.fromEntries(
+                Object.entries(q || {}).filter(
+                  ([k]) => !["questionType", "sourcePage"].includes(k),
+                ),
+              ),
+              `Set ${i + 1}, question ${j + 1}`,
+            ),
           ),
         );
       if (
