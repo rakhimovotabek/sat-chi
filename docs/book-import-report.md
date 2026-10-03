@@ -1,6 +1,6 @@
 # Local book import report
 
-Audited 2026-10-03T19:26:04.676Z. Source scope: `~/Desktop/Books` only. Project: `ileffhbbaomfimwulvpw`.
+Audited 2026-10-03T19:35:18.994Z. Source scope: `~/Desktop/Books` only. Project: `ileffhbbaomfimwulvpw`.
 
 Completed checkpoints were resumed, not restarted. Counts below are actual remote counts; candidate counts in parentheses are extraction heuristics, not verified inventories. Extracted material is private in ignored `local-imports/`. Newly imported content stays draft. Existing admin publication decisions are preserved.
 
@@ -32,7 +32,7 @@ Completed checkpoints were resumed, not restarted. Counts below are actual remot
 | Transition (2).pdf | SAT Reading & Writing | review | 0 | 0 (0) | 0 / 0 / 0 / 0 | No duplicate source import | 0 questions excluded/review; NEEDS_REVIEW: no reliable adapter matched the complete question/key or vocabulary cell structure. No raw text imported. |
 | Transition (3).pdf | SAT Reading & Writing | imported | 1 | 254 (286) | 0 / 0 / 0 / 0 | No duplicate source import | 32 questions excluded/review; 32 source questions marked NEEDS_REVIEW; excluded from import. |
 | Ultimate Grammar Book.pdf | Grammar | imported (admin published) | 18 | 41 (41) | 0 / 0 / 0 / 0 | No duplicate source import | 0 questions excluded/review |
-| Vocabook 4.0 by SATashkent.pdf | Vocabulary | review | 109 | 0 (430) | 0 / 0 / 0 / 0 | No duplicate source import | 430 questions excluded/review; NEEDS_REVIEW: no reliable adapter matched the complete question/key or vocabulary cell structure. No raw text imported. |
+| Vocabook 4.0 by SATashkent.pdf | Vocabulary | imported | 109 | 0 (560) | 56 / 1400 / 56 / 559 | No duplicate source import | 1 questions excluded/review; 1 source questions marked NEEDS_REVIEW; excluded from import. |
 
 ## Review requirements
 

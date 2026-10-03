@@ -49,3 +49,15 @@ Run `npm test`, `npm run test:e2e`, and `npm run build` after changes. Tests cov
 - Known issues: report was absent at interruption and has been restored. Source sample checker currently assumes all books remain unpublished; change it to distinguish initial draft import from subsequent admin publication. Unknown parsers/visual dependencies stay NEEDS_REVIEW.
 - Unfinished tasks: roadmap milestones 2–19, especially secure review scheduling, multi-set vocabulary, learning modes, plan and mistake integration.
 - Exact next action: reconstruct Vocabook table cells from local PDF bounding boxes, validate 25-word boundaries and explicit answer tables with synthetic regression tests; import only verified draft material. Use cached offline CLI; never reset production.
+
+## Checkpoint — Vocabook draft import completed
+
+- Completed: recovered original PDF cells using bounding boxes and vector table borders, including cross-page continuation cells. Preserved College Panda 16 sets and SATashkent 40 sets (25 words each), 1,400 words, 56 source passages and 559 explicitly keyed sentence-completion quizzes. No source PDF, extracted text, examples or private intermediate assets are tracked.
+- Books processed: 27 source checkpoints; 743 SAT questions unchanged. Vocabulary source now imported as draft. Other 19 unparsed sources still NEEDS_REVIEW; no failed source blocks another.
+- Review: College Panda Set 6 question 9 has a blank C and merged D option in the source; excluded, not guessed. All imported vocabulary requires admin review before publication. PDF page numbers are physical pages (printed page is usually one lower).
+- Applied migration: `20261004000100_vocabulary_source_fields.sql`; adds source set/collection/page and word fields without altering existing content.
+- Tests: 53 unit/database tests passed; 32 browser tests passed; build and diff check passed. New synthetic parser tests verify both collections, original set sizes, supplied definitions, missing-key quarantine and normalized duplicate protection.
+- Audit commands: `node scripts/imports/check-vocabulary.js` checks every remote cell, passage and quiz/key against the validated payload, plus independent raw-source samples. `node scripts/imports/report.js` regenerates the non-copyrighted source inventory from real database counts. Existing question sample checker now allows subsequent admin publication.
+- Current milestone: secure vocabulary progress and learning environment. A next migration may exist uncommitted; it is not yet applied.
+- Unfinished: review scheduler/favorites, multi-set pool, word accordion/search, learning modes, dashboard/plan/mistake integration, admin editing improvements, performance/RLS tests.
+- Exact next action: test and finish `20261004000200_vocabulary_spaced_review.sql`, replace browser progress upserts with derived review RPCs, then add a bounded multi-set learning UI. Preserve auth/player behavior and run full checks before applying/pushing the next milestone.

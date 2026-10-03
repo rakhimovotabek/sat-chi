@@ -18,9 +18,9 @@ export function buildImportSql(safeReport, payload) {
  if vid is null then
  insert into public.vocabulary_books(title,description,source,published,import_fingerprint)values(data->>'title',coalesce(data->>'description',''),coalesce(data->>'source',r->>'source_file'),false,fp) returning id into vid;
  for s in select value from jsonb_array_elements(data->'sets') loop
- insert into public.vocabulary_sets(book_id,title,position)values(vid,s->>'title',pos) returning id into sid;pos=pos+1;wpos=0;
+ insert into public.vocabulary_sets(book_id,title,position,source_page,source_set,collection)values(vid,s->>'title',pos,(s->>'source_page')::int,(s->>'source_set')::int,coalesce(s->>'collection','')) returning id into sid;pos=pos+1;wpos=0;
  for w in select value from jsonb_array_elements(s->'words') loop
- insert into public.vocabulary_words(set_id,word,definition,example,synonym,translation,position)values(sid,w->>'word',w->>'definition',coalesce(w->>'example',''),coalesce(w->>'synonym',''),coalesce(w->>'translation',''),wpos);wpos=wpos+1;end loop;
+ insert into public.vocabulary_words(set_id,word,definition,example,synonym,translation,position,part_of_speech,additional_definitions,antonym,notes,source_page,extraction_confidence)values(sid,w->>'word',w->>'definition',coalesce(w->>'example',''),coalesce(w->>'synonym',''),coalesce(w->>'translation',''),wpos,coalesce(w->>'part_of_speech',''),coalesce(w->>'additional_definitions',''),coalesce(w->>'antonym',''),coalesce(w->>'notes',''),(w->>'source_page')::int,coalesce(w->>'extraction_confidence',''));wpos=wpos+1;end loop;
  if nullif(s->>'passage','') is not null then insert into public.vocabulary_passages(set_id,title,passage)values(sid,s->>'title',s->>'passage');end if;
  for q in select value from jsonb_array_elements(coalesce(s->'questions','[]'))loop insert into public.vocabulary_questions(set_id,payload)values(sid,q);n=n+1;end loop;end loop;
  else select count(*)::int into n from public.vocabulary_questions q join public.vocabulary_sets s on s.id=q.set_id where s.book_id=vid;end if;

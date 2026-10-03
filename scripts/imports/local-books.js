@@ -3,6 +3,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { basename, extname, join, resolve } from 'node:path';
 import { homedir } from 'node:os';
+import { parseVocabook } from './vocabook.js';
 import { parseGrammar, parseRulesToResults, inspectText } from './parsers.js';
 import { validateImport } from '../../src/features/books/import-validation.js';
 import { validateVocabulary } from '../../src/features/learning/vocabulary-validation.js';
@@ -31,7 +32,8 @@ try {
   const file=await sourcePath(root,relative), fingerprint=await fingerprintFile(file);
   if(seen.has(fingerprint)) { const report=seen.get(fingerprint); report.aliases.push(relative); await atomicJson(join(output,`${fingerprint}.report.json`),report); await atomicJson(join(output,'manifest.json'),reports); continue; }
   const cached=previous.find(r=>r.fingerprint===fingerprint) || await loadJson(join(output,`${fingerprint}.report.json`),null);
-  const prior=cached?.parser_version===PARSER_VERSION?cached:null;
+  const version=/vocab/i.test(relative)?'2026-10-04.vocab1':PARSER_VERSION;
+  const prior=cached?.parser_version===version?cached:null;
   if(prior && ['validated','imported','review'].includes(prior.status) && !(process.argv.includes('--reprocess')&&(!requested||relative===requested||basename(relative)===requested))) {
     let reusable=true;
     if(prior.intermediate_file) {
@@ -42,7 +44,7 @@ try {
       await atomicJson(join(output,'manifest.json'),reports); console.log(`Resume: ${relative} (${report.status})`); continue;
     }
   }
-  const report={source_root:root,source_path:relative,source_file:basename(file),fingerprint,parser_version:PARSER_VERSION,
+  const report={source_root:root,source_path:relative,source_file:basename(file),fingerprint,parser_version:version,
     title:basename(file,extname(file)),source_type:'book',category:/math/i.test(basename(file))?'Math':/reading|writing|grammar/i.test(basename(file))?'Reading & Writing':'Other',status:'review',detected_topics:0,detected_questions:0,
     detected_vocabulary_sets:0,imported_count:0,skipped_count:0,needs_review_count:0,warnings:[],errors:[],aliases:[],evidence:[],review_items:[]};
   try {
@@ -71,7 +73,13 @@ try {
       report.detected_vocabulary_sets=[...text.matchAll(/^\s*Set\s+\d+\s*$/gm)].length;
       if(/vocab/i.test(report.title)||/Word\s+Definition\s+Example/i.test(text)) {report.source_type='vocabulary';report.category='Vocabulary';}
       if(inspection.sparse) report.warnings.push('Sparse or image-based pages require OCR and visual review.');
-      if(/^Ultimate Grammar Book\.pdf$/i.test(basename(file))) {
+      if(report.source_type==='vocabulary' && /Vocabook/i.test(report.title) && /FOURTH EDITION/i.test(text)) {
+        const bbox=join(output,`${fingerprint}.vocab-bbox.html`);
+        await run('pdftotext',['-bbox-layout',file,bbox],{maxBuffer:1024*1024});
+        const extracted=JSON.parse((await run('python3',['scripts/imports/vocab-tables.py',bbox,file,join(output,`${fingerprint}.extracted.txt`)],{maxBuffer:60*1024*1024})).stdout);
+        const parsed=parseVocabook(extracted,report.source_file);payload=parsed.payload;report.errors.push(...parsed.errors);report.review_items=parsed.review;
+        report.evidence=payload.sets.map(s=>({set:s.title,page:s.source_page,words:s.words.length,questions:s.questions.length}));
+      } else if(/^Ultimate Grammar Book\.pdf$/i.test(basename(file))) {
         const parsed=parseGrammar(text,report.source_file); payload=parsed.payload; report.errors.push(...parsed.errors);
         const practice=text.indexOf('\nPractice Section');
         for(const m of text.slice(practice).matchAll(/^\s*(\d+)\s+([A-Z][A-Z &—,.-]+)\s*$/gm)) {
@@ -91,7 +99,7 @@ try {
         payload.published=false; report.title=payload.title; report.category='Vocabulary';
         report.detected_vocabulary_sets=payload.sets.length;
         report.detected_words=payload.sets.reduce((n,s)=>n+(s.words?.length||0),0);
-        report.detected_questions=payload.sets.reduce((n,s)=>n+(s.questions?.length||0),0);
+        report.detected_questions=payload.sets.reduce((n,s)=>n+(s.questions?.length||0),0)+report.review_items.length;
         report.errors.push(...validateVocabulary(payload));
       } else {
         payload.book.published=false; report.title=payload.book.title; report.category=payload.book.category||'Other';
