@@ -54,6 +54,9 @@ async function fixture(
     if (url.pathname === "/auth/v1/token") return json(session);
     if (url.pathname === "/auth/v1/signup") {
       expect(req.postDataJSON().data.role).toBeUndefined();
+      expect(url.searchParams.get("redirect_to")).toBe(
+        `${new URL(page.url()).origin}/login`,
+      );
       return json({ user, session: null });
     }
     if (url.pathname === "/auth/v1/logout")
@@ -105,6 +108,32 @@ test("public landing, working navigation, signup validation and confirmation", a
   await page.getByLabel("Confirm password").fill("test-password-123");
   await page.getByRole("button", { name: "Sign Up", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("Check your email");
+});
+test("email confirmation lands on login without creating a session", async ({ page }) => {
+  await fixture(page);
+  let tokenExchanges = 0;
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === "/auth/v1/token") tokenExchanges++;
+  });
+  await page.goto("/login?code=confirmed-email-code");
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole("status")).toHaveText(
+    "Email verified successfully. You can now sign in.",
+  );
+  await expect(page.getByRole("button", { name: "Sign In", exact: true })).toBeVisible();
+  expect(tokenExchanges).toBe(0);
+  await page.getByLabel("Email", { exact: true }).fill("learner@example.test");
+  await page.getByLabel("Password", { exact: true }).fill("test-password-123");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+});
+test("expired email confirmation shows a safe login error", async ({ page }) => {
+  await fixture(page);
+  await page.goto("/login#error=access_denied&error_code=otp_expired&error_description=private-details");
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole("alert")).toContainText("invalid or expired");
+  await expect(page.getByRole("alert")).not.toContainText("private-details");
+  await expect(page.getByRole("button", { name: "Sign In", exact: true })).toBeVisible();
 });
 test("student session refresh, all routes, admin guard, responsive menu, logout", async ({
   page,

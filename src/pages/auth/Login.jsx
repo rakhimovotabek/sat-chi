@@ -1,11 +1,21 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { emailConfirmationNotice } from "../../auth/email-confirmation.js";
 import useAuth from "../../hooks/useAuth.js";
 import usePageTitle from "../../hooks/usePageTitle.js";
 import { supabase } from "../../lib/supabase.js";
 import AuthFrame from "../../components/AuthFrame.jsx";
 import GoogleSignIn from "../../components/GoogleSignIn.jsx";
 export default function Login() {
+  const navigate = useNavigate();
+  const [confirmation] = useState(() =>
+    emailConfirmationNotice(window.location.search, window.location.hash),
+  );
+  useEffect(() => {
+    // Remove the one-use code/tokens and provider error details from the URL.
+    // No exchange, reload, or new auth subscription is needed for confirmation.
+    if (confirmation) navigate("/login", { replace: true });
+  }, [confirmation, navigate]);
   const { signIn, error: authError } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +48,17 @@ export default function Login() {
       {!supabase && (
         <p className="form-notice">
           Sign-in is not configured yet. Contact the administrator.
+        </p>
+      )}
+      {confirmation === "success" && (
+        <p className="form-notice" role="status">
+          Email verified successfully. You can now sign in.
+        </p>
+      )}
+      {confirmation === "error" && (
+        <p className="form-error" role="alert">
+          This verification link is invalid or expired. Try signing in if you
+          already confirmed your email, or request a new confirmation email.
         </p>
       )}
       {(error || authError) && (

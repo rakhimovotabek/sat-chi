@@ -3,7 +3,7 @@ project_id = "satchi"
 [auth]
 enable_signup = true
 site_url = "http://localhost:5173"
-additional_redirect_urls = ["http://localhost:5173/auth/callback", "http://127.0.0.1:5173/auth/callback"]
+additional_redirect_urls = ["http://localhost:5173/login", "http://127.0.0.1:5173/login", "http://localhost:5173/auth/callback", "http://127.0.0.1:5173/auth/callback"]
 
 [functions.manage-student]
 # Auth is verified inside the handler with auth.getUser(token), including projects

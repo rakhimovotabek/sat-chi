@@ -38,8 +38,7 @@ export default function Signup() {
         email: email.trim(),
         password,
         options: {
-          emailRedirectTo: new URL("/auth/callback", window.location.origin)
-            .href,
+          emailRedirectTo: `${window.location.origin}/login`,
           data: {
             display_name: values.display_name.trim(),
             onboarding: profilePayload(values),
