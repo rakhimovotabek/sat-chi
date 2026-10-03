@@ -177,6 +177,10 @@ test("student topic practice saves choices and marks, resumes, grades and review
   await expect(page.getByRole("status")).toHaveText("All changes saved");
   await page.reload();
   await expect(
+    page.getByText("Question 2 of 3", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Previous", exact: true }).click();
+  await expect(
     page.getByText("Question 1 of 3", { exact: true }),
   ).toBeVisible();
   await expect(

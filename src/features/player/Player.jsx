@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, Navigate } from "react-router";
+import useAuth from "../../hooks/useAuth.js";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import { getPractice, savePractice, finishPractice } from "../books/api.js";
+import useStudyTimer from "./useStudyTimer.js";
+import MathTools from "./MathTools.jsx";
+import { formatTime, sectionResults } from "../learning/homework-model.js";
 import Stimulus from "./Stimulus.jsx";
 import Navigator from "./Navigator.jsx";
 import { practiceSummary } from "./model.js";
 export default function Player() {
+  const { session: auth, profile } = useAuth();
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const state = useContent(() => getPractice(sessionId), [sessionId]);
@@ -20,6 +25,13 @@ export default function Player() {
   const unsaved = useRef(false);
   const alive = useRef(true);
   const revision = useRef(0);
+  const ownsSession = state.data?.session.student_id === auth.user.id;
+  const study = useStudyTimer(
+    sessionId,
+    index,
+    state.data?.session,
+    items.length > 0 && ownsSession,
+  );
   useEffect(() => {
     alive.current = true;
     const warn = (e) => {
@@ -37,10 +49,40 @@ export default function Player() {
   useEffect(() => {
     if (state.data) {
       setItems(state.data.items);
-      setIndex((i) => Math.min(i, Math.max(0, state.data.items.length - 1)));
+      setIndex((i) =>
+        Math.min(
+          state.data.session.current_position ?? i,
+          Math.max(0, state.data.items.length - 1),
+        ),
+      );
       unsaved.current = false;
     }
   }, [state.data]);
+  const autoSubmitted = useRef(false);
+  useEffect(() => {
+    const s = state.data?.session;
+    if (
+      !items.length ||
+      !ownsSession ||
+      !s?.timed ||
+      !s.time_limit ||
+      s.submitted_at ||
+      autoSubmitted.current
+    )
+      return;
+    if (study.now >= new Date(s.started_at).getTime() + s.time_limit * 1000) {
+      autoSubmitted.current = true;
+      queue.current
+        .catch(() => {})
+        .then(() => study.flush())
+        .then(() => finishPractice(sessionId))
+        .then(() => state.reload())
+        .catch(() => {
+          autoSubmitted.current = false;
+          setError("Time limit reached. Submit your saved answers to retry.");
+        });
+    }
+  }, [study.now, items.length, state.data, sessionId]);
   function persist(snapshot) {
     const version = ++revision.current;
     unsaved.current = true;
@@ -83,7 +125,14 @@ export default function Player() {
     setSubmitting(true);
     setError("");
     try {
-      await persist(items);
+      const s = state.data.session;
+      if (
+        !s.timed ||
+        !s.time_limit ||
+        Date.now() < new Date(s.started_at).getTime() + s.time_limit * 1000
+      )
+        await persist(items);
+      await study.flush();
       await finishPractice(sessionId);
       state.reload();
     } catch (e) {
@@ -95,7 +144,18 @@ export default function Player() {
   async function leave() {
     try {
       if (!state.data.session.submitted_at) await persist(items);
-      navigate("/books");
+      await study.flush();
+      navigate(
+        state.data.session.kind === "homework"
+          ? "/homework"
+          : state.data.session.kind === "bank"
+            ? profile.role === "admin"
+              ? "/admin/question-bank"
+              : "/question-bank"
+            : state.data.session.kind === "vocabulary"
+              ? "/vocabulary"
+              : "/books",
+      );
     } catch (e) {
       setError(e.message);
     }
@@ -108,6 +168,8 @@ export default function Player() {
         Preparing your questions…
       </p>
     );
+  if (!ownsSession)
+    return <Navigate to={`/admin/sessions/${sessionId}`} replace />;
   const { session, review } = state.data;
   const submitted = Boolean(session.submitted_at);
   const current = items[index];
@@ -159,6 +221,24 @@ export default function Player() {
           </div>
         </section>
       )}
+      {study.warning && <p className="empty-copy">{study.warning}</p>}
+      {submitted && (
+        <section className="card learning-panel">
+          <h2>Section results</h2>
+          <div className="section-list">
+            {sectionResults(items).map((s) => (
+              <div key={s.name} className="list-row">
+                <strong>{s.name}</strong>
+                <span>
+                  {s.correct} correct · {s.incorrect} incorrect · {s.unanswered}{" "}
+                  unanswered
+                </span>
+              </div>
+            ))}
+          </div>
+          <p>Study time: {formatTime(state.data.session.elapsed_seconds)}</p>
+        </section>
+      )}
       {error && (
         <div className="form-error" role="alert">
           {error}
@@ -173,6 +253,23 @@ export default function Player() {
         </div>
       )}
       <div className="player-toolbar">
+        <span className="practice-clock">
+          {session.timed ? "Time remaining · " : "Study time · "}
+          {formatTime(
+            session.timed && session.time_limit
+              ? Math.max(
+                  0,
+                  session.time_limit -
+                    Math.floor(
+                      (study.now - new Date(session.started_at).getTime()) /
+                        1000,
+                    ),
+                )
+              : study.elapsed,
+          )}
+          {session.time_limit ? ` / ${formatTime(session.time_limit)}` : ""}
+        </span>
+        {q.section === "Math" && <MathTools />}
         <strong>
           Question {index + 1} of {items.length}
         </strong>

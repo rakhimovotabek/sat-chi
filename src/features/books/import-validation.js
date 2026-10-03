@@ -69,7 +69,7 @@ export function validateQuestion(q, path = "Question") {
     errors.push(`${path}: correctAnswer must be 0, 1, 2, or 3.`);
   if (
     q.difficulty !== undefined &&
-    !["easy", "medium", "hard"].includes(q.difficulty)
+    !["easy", "medium", "hard", "unclassified"].includes(q.difficulty)
   )
     errors.push(`${path}: invalid difficulty.`);
   url(q.imageUrl, `${path}.imageUrl`, errors);

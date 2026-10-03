@@ -235,3 +235,14 @@ Migration `20261003000300_books_questions_practice.sql` creates `books`, `book_t
 The migration is applied to the verified project `ileffhbbaomfimwulvpw`. No sample educational content or test accounts were inserted into the hosted database. Add your own content through the admin interface and publish it when ready. This phase adds no Edge Function or frontend dependency. Homework, vocabulary, question bank, progress, and standings remain outside this phase.
 
 Tests include PostgreSQL RLS, transactional rollback, duplicate imports, hierarchy constraints, hidden answer keys, cross-student session access, immutable submission, content-deletion snapshots, admin content CRUD, file imports, student practice/resume/review, save failures, and responsive layout. Browser test responses are isolated in the test runner; production always uses Supabase.
+
+## Learning workflows and local imports
+
+Groups, multi-section homework, Question Bank, vocabulary learning, progress, standings and admin monitoring now query real Supabase records. See [learning workflows](docs/learning-workflows.md) for authoring, source handling, current limits, Desmos configuration and deployment details.
+
+```bash
+npm run import:inspect
+npm run import:apply -- --apply
+```
+
+The importer scans only relevant Desktop files and `Desktop/Books`, validates intermediate JSON, verifies the linked project, and leaves uncertain extraction unimported. Private artifacts remain under ignored `local-imports/`. Imported local books are drafts until an administrator reviews and publishes them.

@@ -138,7 +138,7 @@ export default function QuestionForm({ topicId, question, onSaved, onCancel }) {
         <label>
           Difficulty
           <select {...field("difficulty")}>
-            {["easy", "medium", "hard"].map((v) => (
+            {["easy", "medium", "hard", "unclassified"].map((v) => (
               <option key={v}>{v}</option>
             ))}
           </select>

@@ -38,7 +38,8 @@ export async function contentFixture(
     options: payload.options,
     image_url: payload.imageUrl || null,
     stimulus_table: payload.table || null,
-    domain: payload.domain || "",
+    section: "Math",
+    domain: payload.domain || "Algebra",
     difficulty: payload.difficulty || "medium",
     source: payload.source || "",
     skill: payload.skill || "",
@@ -244,6 +245,10 @@ export async function contentFixture(
         student_id: id,
         title: "Algebra",
         submitted_at: null,
+        started_at: new Date().toISOString(),
+        kind: "book",
+        current_position: 0,
+        elapsed_seconds: 0,
       };
       store.items = store.questions.map((q, i) => ({
         id: uuid(),
@@ -259,8 +264,13 @@ export async function contentFixture(
       }));
       return json(sessionId);
     }
-    if (table === "book_practice_sessions") return json(store.session);
+    if (table === "book_practice_sessions") return json(url.searchParams.has("id") ? store.session : store.session ? [store.session] : []);
     if (table === "book_practice_items") return json(store.items);
+    if (table === "practice_heartbeat") {
+      store.session.current_position = body.p_position;
+      store.session.elapsed_seconds += Math.min(30, body.p_seconds);
+      return json(store.session.elapsed_seconds);
+    }
     if (table === "save_book_practice") {
       body.p_answers.forEach((a) =>
         Object.assign(
