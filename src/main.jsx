@@ -9,6 +9,7 @@ import "./styles/layout.css";
 import "./styles/pages.css";
 import "./styles/auth.css";
 import "./styles/public.css";
+import "./styles/books.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

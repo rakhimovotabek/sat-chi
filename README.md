@@ -1,6 +1,6 @@
 # SAT’chi
 
-SAT learning platform foundation using React, Vite, JavaScript, Supabase, and plain CSS. Implemented: a public landing page, email/password registration and login, Google OAuth callback, student onboarding and profile editing, database-backed roles, distinct student/admin shells, student account management, and a secure groups schema. Books, homework, question bank, vocabulary, standings, analytics, and group-management screens remain placeholders.
+SAT learning platform foundation using React, Vite, JavaScript, Supabase, and plain CSS. Implemented: a public landing page, email/password registration and login, Google OAuth callback, student onboarding and profile editing, database-backed roles, distinct student/admin shells, student account management, and a secure groups schema. Books, topics/subtopics, question authoring, transactional JSON imports, and persistent two-panel book practice are now implemented. Homework, question bank, vocabulary, standings, analytics, and group-management screens remain placeholders.
 
 ## Frontend development
 
@@ -66,7 +66,7 @@ npx supabase@latest db push
 
 Replace `YOUR_PROJECT_REF` with your own reference. Login/link may prompt for your access token and database password. Review the dry run before applying changes. This migration is intended for a new project without conflicting tables.
 
-Alternatively, execute both migration files from `supabase/migrations/` in filename order in the trusted Dashboard SQL Editor: first `20261003000100_auth_groups_foundation.sql`, then `20261003000200_student_onboarding.sql`. Choose one migration method; manually applying SQL does not record CLI migration history. If switching to CLI later, reconcile history with the CLI’s migration repair command before pushing.
+Alternatively, execute both migration files from `supabase/migrations/` in filename order in the trusted Dashboard SQL Editor: first `20261003000100_auth_groups_foundation.sql`, then `20261003000200_student_onboarding.sql`, then `20261003000300_books_questions_practice.sql`. Choose one migration method; manually applying SQL does not record CLI migration history. If switching to CLI later, reconcile history with the CLI’s migration repair command before pushing.
 
 The migration creates `profiles`, `groups`, and `group_members`, profile provisioning on Auth inserts, active-role helpers, update safeguards, and RLS. Existing Auth users are backfilled as students. No account is automatically made admin.
 
@@ -165,7 +165,7 @@ Supabase persists and refreshes the normal browser session. The provider fetches
 npm test
 ```
 
-The Node suite runs Edge Function tests with isolated test doubles and executes both migrations and RLS regression checks in real PostgreSQL via PGlite, without Docker. Tests never use real accounts or server secrets. It covers unauthenticated/non-admin/inactive callers, role injection, validation, account cleanup failures, and deletion restrictions.
+The Node suite runs Edge Function tests with isolated test doubles and executes all migrations and RLS regression checks in real PostgreSQL via PGlite, without Docker. Tests never use real accounts or server secrets. It covers unauthenticated/non-admin/inactive callers, role injection, validation, account cleanup failures, and deletion restrictions.
 
 For actual SQL policy checks, install the Supabase CLI, Docker, and `psql`, then use a disposable local stack:
 
@@ -219,3 +219,17 @@ npm run build
 Browser tests intercept requests only in the test runner against an isolated local API address; application code has no mock-data mode. Tests cover landing links, signup validation/confirmation, onboarding persistence, login/logout, restored sessions, student/admin guards, all shell routes, responsive navigation, inactive/missing profiles, OAuth callback and safe errors. Real Google consent and delivery of confirmation emails require the configuration above and a real user's account; they are not claimed as live-tested.
 
 Official references: [Supabase Google setup](https://supabase.com/docs/guides/auth/social-login/auth-google), [PKCE flow](https://supabase.com/docs/guides/auth/sessions/pkce-flow).
+
+## Books, questions, and practice
+
+- Students browse published books at `/books`, open a book and its topic tree, open individual topics, then start practice. Parent-topic practice includes descendant questions in topic/question order. Empty libraries remain empty until real content is added.
+- Admins manage books and topics at `/admin/books`, and manage questions/answer keys at `/admin/questions` or inside a book. Topics can be nested and ordered; the database rejects cycles and parents from another book. Question lists use 50-row pagination. Books are drafts until explicitly published. Covers and question diagrams use HTTPS URLs.
+- Admin JSON imports accept complete books or questions for an existing topic, with preview, validation, a source-content preview, and transactional insertion. Exact duplicate imports are rejected. See [the JSON format and examples](docs/book-import-format.md).
+- `/practice/:sessionId` uses a two-panel passage/reference and question/choice interface. Previous/next, numbered overview, mark-for-review, and elimination controls retain state. Every answer change is saved through an ownership-checked RPC; failed saves offer retry. The layout stacks on narrow screens.
+- Submission grades on the server and reveals correct choices/explanations only afterward. Saved session URLs resume after refresh; submitted sessions reopen in review mode. The initial question snapshot is retained when source content is edited or deleted.
+
+Migration `20261003000300_books_questions_practice.sql` creates `books`, `book_topics`, `questions`, `question_answers`, `content_imports`, `book_practice_sessions`, `book_practice_items`, and `book_practice_keys`. All eight tables use RLS. Active students can read published content and their own session snapshots. Answer-key tables have admin-only SELECT policies. Students have no content mutation or direct practice-update grants. Fixed-search-path RPCs check the current database role/active status and session ownership; internal import helpers cannot be called by browser roles.
+
+The migration is applied to the verified project `ileffhbbaomfimwulvpw`. No sample educational content or test accounts were inserted into the hosted database. Add your own content through the admin interface and publish it when ready. This phase adds no Edge Function or frontend dependency. Homework, vocabulary, question bank, progress, and standings remain outside this phase.
+
+Tests include PostgreSQL RLS, transactional rollback, duplicate imports, hierarchy constraints, hidden answer keys, cross-student session access, immutable submission, content-deletion snapshots, admin content CRUD, file imports, student practice/resume/review, save failures, and responsive layout. Browser test responses are isolated in the test runner; production always uses Supabase.

@@ -59,6 +59,8 @@ async function fixture(
     if (url.pathname === "/auth/v1/logout")
       return route.fulfill({ status: 204, headers });
     if (url.pathname === "/auth/v1/user") return json(user);
+    if (["/rest/v1/books", "/rest/v1/book_topics"].includes(url.pathname))
+      return json([]);
     if (url.pathname === "/rest/v1/profiles")
       return json(missing ? [] : [profile]);
     if (url.pathname === "/rest/v1/rpc/complete_onboarding") {

@@ -12,7 +12,14 @@ export default function AppShell({ workspace, navigation }) {
       pathname.replace(/\/$/, "") ===
       (workspace === "admin" ? `/admin/${item.slug}` : `/${item.slug}`),
   );
-  const title = page?.label || "Page not found";
+  const prefix = workspace === "admin" ? "/admin/" : "/";
+  const nestedPage = navigation.find((item) =>
+    pathname.startsWith(`${prefix}${item.slug}/`),
+  );
+  const title =
+    page?.label ||
+    nestedPage?.label ||
+    (pathname.startsWith("/practice/") ? "Book practice" : "Page not found");
   usePageTitle(title);
 
   return (
