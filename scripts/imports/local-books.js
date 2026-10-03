@@ -3,11 +3,12 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { basename, extname, join, resolve } from 'node:path';
 import { homedir } from 'node:os';
+import { deduplicateQuestions } from './deduplicate-questions.js';
 import { parseVocabook } from './vocabook.js';
 import { parseGrammar, parseRulesToResults, inspectText } from './parsers.js';
 import { validateImport } from '../../src/features/books/import-validation.js';
 import { validateVocabulary } from '../../src/features/learning/vocabulary-validation.js';
-import { PARSER_VERSION, findSources, fingerprintFile, sourcePath, atomicJson, loadJson } from './source-files.js';
+import { PARSER_VERSION, classifySource, findSources, fingerprintFile, sourcePath, atomicJson, loadJson } from './source-files.js';
 const run=promisify(execFile), output=resolve('local-imports');
 const root=await realpath(join(homedir(),'Desktop','Books'));
 const requested=process.argv.find(a=>a.startsWith('--source='))?.slice(9);
@@ -40,12 +41,12 @@ try {
       try { reusable=(await fingerprintFile(join(output,prior.intermediate_file)))===prior.intermediate_hash; } catch { reusable=false; }
     }
     if(reusable) {
-      const report={...prior,source_path:relative,aliases:[]}; reports.push(report); seen.set(fingerprint,report);
+      const report={...prior,category:prior.category==='Other'?classifySource(relative):prior.category,source_path:relative,aliases:[]}; reports.push(report); seen.set(fingerprint,report);
       await atomicJson(join(output,'manifest.json'),reports); console.log(`Resume: ${relative} (${report.status})`); continue;
     }
   }
   const report={source_root:root,source_path:relative,source_file:basename(file),fingerprint,parser_version:version,
-    title:basename(file,extname(file)),source_type:'book',category:/math/i.test(basename(file))?'Math':/reading|writing|grammar/i.test(basename(file))?'Reading & Writing':'Other',status:'review',detected_topics:0,detected_questions:0,
+    title:basename(file,extname(file)),source_type:'book',category:classifySource(basename(file)),status:'review',detected_topics:0,detected_questions:0,
     detected_vocabulary_sets:0,imported_count:0,skipped_count:0,needs_review_count:0,warnings:[],errors:[],aliases:[],evidence:[],review_items:[]};
   try {
     let text,payload,columns,imagePages=new Set();
@@ -97,7 +98,7 @@ try {
       report.source_type=Array.isArray(payload.sets)?'vocabulary':'book';
       if(report.source_type==='vocabulary') {
         payload.published=false; report.title=payload.title; report.category='Vocabulary';
-        report.detected_vocabulary_sets=payload.sets.length;
+        report.detected_vocabulary_sets=payload.sets.length;report.detected_topics=payload.sets.length;
         report.detected_words=payload.sets.reduce((n,s)=>n+(s.words?.length||0),0);
         report.detected_questions=payload.sets.reduce((n,s)=>n+(s.questions?.length||0),0)+report.review_items.length;
         report.errors.push(...validateVocabulary(payload));
@@ -105,9 +106,9 @@ try {
         payload.book.published=false; report.title=payload.book.title; report.category=payload.book.category||'Other';
         const validation=validateImport(payload);report.errors.push(...validation.errors);report.detected_topics=validation.topics;
         report.detected_questions=report.review_items.length?validation.questions+report.review_items.length:validation.questions;
-        const seenQuestions=new Set();
-        const visit=t=>{for(const q of t.questions||[]) {const signature=JSON.stringify([q.question,q.passage||'',q.stimulus||'',q.options,q.imageUrl||null,q.table||null]);if(seenQuestions.has(signature)) report.errors.push('Duplicate question text/options: resolve source repetition before import.');seenQuestions.add(signature);}for(const c of t.children||[])visit(c);};
-        payload.topics?.forEach(visit);
+        const dedup=deduplicateQuestions(payload.topics,report.evidence);
+        report.evidence=dedup.evidence;report.review_items.push(...dedup.review);
+        if(dedup.duplicates.length)report.warnings.push(`${dedup.duplicates.length} exact source repeats skipped with matching printed keys.`);
       }
       if(!report.errors.length) {
         report.status='validated';report.intermediate_file=`${fingerprint}.json`;

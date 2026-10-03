@@ -1,6 +1,6 @@
 # Local book import report
 
-Audited 2026-10-03T19:35:18.994Z. Source scope: `~/Desktop/Books` only. Project: `ileffhbbaomfimwulvpw`.
+Audited 2026-10-03T23:57:07.686Z. Source scope: `~/Desktop/Books` only. Project: `ileffhbbaomfimwulvpw`.
 
 Completed checkpoints were resumed, not restarted. Counts below are actual remote counts; candidate counts in parentheses are extraction heuristics, not verified inventories. Extracted material is private in ignored `local-imports/`. Newly imported content stays draft. Existing admin publication decisions are preserved.
 
@@ -8,7 +8,7 @@ Completed checkpoints were resumed, not restarted. Counts below are actual remot
 | --- | --- | --- | ---: | ---: | --- | --- | --- |
 | 800 Challenge - Hard Math 150 (Part 1) - SAT Math Club.pdf | SAT Math | review | 0 | 0 (10) | 0 / 0 / 0 / 0 | No duplicate source import | 10 questions excluded/review; NEEDS_REVIEW: no reliable adapter matched the complete question/key or vocabulary cell structure. No raw text imported. |
 | Apostrophe.pdf | Grammar | review | 1 | 0 (22) | 0 / 0 / 0 / 0 | No duplicate source import | 22 questions excluded/review; 22 source questions marked NEEDS_REVIEW; excluded from import.; No safely matched questions. |
-| Central Ideas.pdf | SAT Reading & Writing | review | 1 | 0 (106) | 0 / 0 / 0 / 0 | No duplicate source import | 106 questions excluded/review; 26 source questions marked NEEDS_REVIEW; excluded from import.; Duplicate question text/options: resolve source repetition before import. |
+| Central Ideas.pdf | SAT Reading & Writing | imported | 1 | 79 (106) | 0 / 0 / 0 / 0 | No duplicate source import | 26 questions excluded/review; 1 exact source repeats skipped with matching printed keys.; 26 source questions marked NEEDS_REVIEW; excluded from import. |
 | College panda MATH.pdf | SAT Math | review | 0 | 0 (0) | 0 / 0 / 0 / 0 | No duplicate source import | 0 questions excluded/review; Sparse or image-based pages require OCR and visual review.; NEEDS_REVIEW: no reliable adapter matched the complete question/key or vocabulary cell structure. No raw text imported. |
 | Dual Texts.pdf | SAT Reading & Writing | review | 0 | 0 (0) | 0 / 0 / 0 / 0 | No duplicate source import | 0 questions excluded/review; Sparse or image-based pages require OCR and visual review.; NEEDS_REVIEW: no reliable adapter matched the complete question/key or vocabulary cell structure. No raw text imported. |
 | Erica writing book.pdf | SAT Reading & Writing | review | 4 | 0 (427) | 0 / 0 / 0 / 0 | No duplicate source import | 427 questions excluded/review; NEEDS_REVIEW: no reliable adapter matched the complete question/key or vocabulary cell structure. No raw text imported. |
@@ -32,7 +32,7 @@ Completed checkpoints were resumed, not restarted. Counts below are actual remot
 | Transition (2).pdf | SAT Reading & Writing | review | 0 | 0 (0) | 0 / 0 / 0 / 0 | No duplicate source import | 0 questions excluded/review; NEEDS_REVIEW: no reliable adapter matched the complete question/key or vocabulary cell structure. No raw text imported. |
 | Transition (3).pdf | SAT Reading & Writing | imported | 1 | 254 (286) | 0 / 0 / 0 / 0 | No duplicate source import | 32 questions excluded/review; 32 source questions marked NEEDS_REVIEW; excluded from import. |
 | Ultimate Grammar Book.pdf | Grammar | imported (admin published) | 18 | 41 (41) | 0 / 0 / 0 / 0 | No duplicate source import | 0 questions excluded/review |
-| Vocabook 4.0 by SATashkent.pdf | Vocabulary | imported | 109 | 0 (560) | 56 / 1400 / 56 / 559 | No duplicate source import | 1 questions excluded/review; 1 source questions marked NEEDS_REVIEW; excluded from import. |
+| Vocabook 4.0 by SATashkent.pdf | Vocabulary | imported | 56 | 0 (560) | 56 / 1400 / 56 / 559 | No duplicate source import | 1 questions excluded/review; 1 source questions marked NEEDS_REVIEW; excluded from import. |
 
 ## Review requirements
 

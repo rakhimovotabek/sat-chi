@@ -42,3 +42,10 @@ export async function loadJson(path, fallback) {
   try { return JSON.parse(await readFile(path, 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') return fallback; throw error; }
 }
+
+export function classifySource(name) {
+ if (/vocab/i.test(name)) return 'Vocabulary';
+ if (/math/i.test(name)) return 'Math';
+ if (/reading|writing|grammar|central ideas|dual texts|apostrophe|verbs|modifiers|pronoun|punctuation|agreement|tense|transition/i.test(name)) return 'Reading & Writing';
+ return 'Other';
+}

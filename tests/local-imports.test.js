@@ -33,3 +33,10 @@ test('column-aware parser matches explicit keys, preserves numeric order, and qu
  const missing=parseRulesToResults(text.replace('1. B 2. C','2. C'),pages,'Subject Verb Agreement.pdf');
  assert.ok(missing.errors.some(e=>e.includes('numbering')));
 });
+
+test('exact source repeats skip safely, conflicting keys quarantine both, and evidence follows retained order',async()=>{
+ const {deduplicateQuestions}=await import('../scripts/imports/deduplicate-questions.js');
+ const q=n=>({question:`Question ${n}`,options:['one','two','three','four'],correctAnswer:1});const first=q(1),second=q(2);
+ const topics=[{questions:[first,{...first},second,{...second,correctAnswer:2},q(3)]}];const result=deduplicateQuestions(topics,[0,1,2,3,4].map(question_index=>({question_index,page:question_index+1})));
+ assert.equal(result.duplicates.length,1);assert.equal(result.review.length,2);assert.deepEqual(topics[0].questions.map(q=>q.question),['Question 1','Question 3']);assert.deepEqual(result.evidence,[{question_index:0,page:1},{question_index:1,page:5}]);
+});

@@ -73,3 +73,11 @@ Run `npm test`, `npm run test:e2e`, and `npm run build` after changes. Tests cov
 - Current milestone: connected Study Plan, meaningful streaks and unified mistake review. Before that, inspect Central Ideas duplicate warnings: exact repeated source questions should be safely skipped rather than rejecting its entire otherwise validated draft.
 - Unfinished: other 19 unstructured sources need specialized parsers or manual review; adaptive plan/settings/history; SAT/vocabulary mistake center; recent performance/strong and weak areas; collapsible sidebar with one logout; final performance/security/design audit.
 - Exact next action: salvage only confidently parsed Central Ideas questions with exact-key duplicate protection and re-audit; then add bounded, persisted Study Plan tasks linked to real practice/reviews and test automatic completion/history. Keep all new extraction draft and checkpoint each milestone to origin/main.
+
+## Checkpoint — Central Ideas recovered
+
+- Completed: safely skipped one exact repeated question with a matching printed key. Imported 79 validated Central Ideas questions as a new draft; 26 formatting/visual-dependent questions remain NEEDS_REVIEW. Conflicting printed answers now quarantine both duplicate instances, with source evidence renumbered after exclusions.
+- Remote audit: eight question books, **822 actual SAT questions**, plus unchanged draft Vocabook (1,400 words / 56 passages / 559 quizzes). All 27 remote import jobs match actual counts. Twenty-four SAT source/database samples passed. Other **18** sources remain review-only.
+- Tests: 58 unit/database tests, 34 browser tests, lint, build and diff check passed. No migration applied in this checkpoint.
+- Current work: `20261004000400_study_plan.sql` may be present uncommitted; it is NOT applied yet. It needs executed RPC tests and UI before deployment.
+- Exact next action: finish Study Plan preference/task RPC tests, verify automatic completion and bounded daily workloads, add Study Plan UI and meaningful streak/mistake integration. Commit/apply only after checks. Preserve all past completed history and all working sessions.
