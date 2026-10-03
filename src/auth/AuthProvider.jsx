@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createAuthLifecycle } from "./auth-lifecycle.js";
 import { AuthContext } from "./AuthContext.js";
 import { supabase } from "../lib/supabase.js";
 
@@ -12,98 +13,14 @@ const initialState = {
 export default function AuthProvider({ children }) {
   const [state, setState] = useState(initialState);
 
+  const lifecycle = useRef(null);
   useEffect(() => {
     if (!supabase) return undefined;
-    let live = true;
-    let sequence = 0;
-    const timers = new Set();
-
-    const queueSession = (session) => {
-      const request = ++sequence;
-      if (!live) return;
-      setState({
-        session,
-        profile: null,
-        loading: Boolean(session),
-        error: null,
-      });
-      if (!session) return;
-      // Do not await Supabase calls inside onAuthStateChange: its auth lock is held.
-      const timer = setTimeout(async () => {
-        timers.delete(timer);
-        if (!live || sequence !== request) return;
-        try {
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .maybeSingle();
-          if (!live || sequence !== request) return;
-          let message = null;
-          if (error)
-            message =
-              "Could not load your account. Check your connection and try again.";
-          else if (!data)
-            message =
-              "Your account profile is missing. Contact your administrator.";
-          else if (!["admin", "student"].includes(data.role))
-            message =
-              "Your account role is not supported. Contact your administrator.";
-          else if (!data.active)
-            message = "Your account is inactive. Contact your administrator.";
-          setState({
-            session,
-            profile: message ? null : data,
-            loading: false,
-            error: message,
-          });
-        } catch {
-          if (live && sequence === request) {
-            setState({
-              session,
-              profile: null,
-              loading: false,
-              error: "Could not load your account. Try again.",
-            });
-          }
-        }
-      }, 0);
-      timers.add(timer);
-    };
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) =>
-      queueSession(session),
-    );
-    const initialSequence = sequence;
-    supabase.auth
-      .getSession()
-      .then(({ data, error }) => {
-        if (!live || sequence !== initialSequence) return;
-        if (error)
-          setState({
-            session: null,
-            profile: null,
-            loading: false,
-            error: "Could not restore your session. Please sign in again.",
-          });
-        else queueSession(data.session);
-      })
-      .catch(() => {
-        if (live && sequence === initialSequence)
-          setState({
-            session: null,
-            profile: null,
-            loading: false,
-            error: "Could not restore your session.",
-          });
-      });
+    const controller = createAuthLifecycle(supabase, setState);
+    lifecycle.current = controller;
     return () => {
-      live = false;
-      sequence++;
-      timers.forEach(clearTimeout);
-      subscription.unsubscribe();
+      controller.dispose();
+      lifecycle.current = null;
     };
   }, []);
 
@@ -119,14 +36,8 @@ export default function AuthProvider({ children }) {
   };
 
   const refreshProfile = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", state.session.user.id)
-      .single();
-    if (error)
-      throw new Error("Could not refresh your profile. Please reload.");
-    setState((previous) => ({ ...previous, profile: data }));
+    if (!lifecycle.current) throw new Error("Please sign in again.");
+    await lifecycle.current.refreshProfile();
   };
   return (
     <AuthContext.Provider value={{ ...state, signIn, signOut, refreshProfile }}>

@@ -151,6 +151,8 @@ Account creation spans Auth and a subsequent profile update. If profile setup fa
 
 Supabase persists and refreshes the normal browser session. The provider fetches the profile from the database before rendering a protected route; it does not trust role claims from user metadata or local storage. Async profile responses are versioned so a stale request cannot overwrite a newer login/logout. Missing, inactive, unsupported, or unreadable profiles fail closed with retry/logout controls.
 
+Tab/window return and same-user `SIGNED_IN` / `TOKEN_REFRESHED` events update the session silently, without clearing the profile, refetching it, redirecting, or unmounting the active page. The question player keeps its current question, selections, elimination, review marks, and open navigator. Profiles are loaded on initial restoration or an account change, and explicitly refreshed after profile/onboarding saves. The provider owns one auth subscription and cleans up queued work and that subscription on unmount. Supabase still handles token renewal and invalid-session sign-out; database RLS remains authoritative. An intentional browser reload continues to restore the saved session and practice answers.
+
 - `/` is public for visitors; signed-in users are redirected by database role.
 - `/login`, `/signup`, and `/auth/callback` support email and Google authentication.
 - `/onboarding` is student-only. Missing required learning information or an incomplete flag sends students there before entering the workspace.
