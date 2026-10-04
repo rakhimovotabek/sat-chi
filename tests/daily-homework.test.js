@@ -570,6 +570,7 @@ test("daily homework backend preserves local deadlines, recurring history, gradi
         );
         await db.exec("reset role;set role anon");
         await assert.rejects(call("daily_homework_directory"));
+        await assert.rejects(call("finish_book_practice", [session], ["uuid"]), /permission denied/);
         await assert.rejects(
           db.query("select * from public.daily_homework_instances"),
         );
