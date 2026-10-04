@@ -1,6 +1,6 @@
 # SAT’chi
 
-SAT learning platform foundation using React, Vite, JavaScript, Supabase, and plain CSS. Implemented: a public landing page, email/password registration and login, Google OAuth callback, student onboarding and profile editing, database-backed roles, distinct student/admin shells, student account management, and a secure groups schema. Books, topics/subtopics, question authoring, transactional JSON imports, and persistent two-panel book practice are now implemented. Homework, question bank, vocabulary, standings, analytics, and group-management screens remain placeholders.
+SAT learning platform using React, Vite, JavaScript, Supabase, and plain CSS. Includes secure student/admin workspaces, books and private covers, question practice, homework, a filtered Question Bank, vocabulary learning and multi-set study, study plans, progress, groups, settings, and administrator Content Review with validated bulk approval. Local PDF adapters preserve source provenance and private question visuals; imported content remains draft until reviewed and explicitly published.
 
 ## Frontend development
 
@@ -22,7 +22,7 @@ Commands:
 - `npm test`: Edge Function authorization, validation, deletion, and compensation tests, using Node’s built-in test runner.
 - `npm ci`: repeatable install from the lockfile.
 
-No additional application dependencies were needed for Task 2. Components use two-space indentation and PascalCase names. No formatter or linter is installed.
+Components use two-space indentation and PascalCase names. ESLint and Prettier are project-local: run `npm run lint`, `npm run format`, or the scoped `npm run format:check`. Browser verification uses `npm run test:e2e`; the complete unit/database suite uses `npm test`.
 
 ## Project structure
 
@@ -268,7 +268,7 @@ Administrators use `/admin/content-review` for live source outcomes, paginated c
 
 Students use `/settings` for their account display name and daily Study Plan budget, plus per-account browser vocabulary defaults that initialize shuffle/test size/type. Administrators have account settings at `/admin/settings`. No placeholder toggles or partial theme switch are exposed.
 
-Apply additive migrations through `20261004001400`; never reset the linked production database. `npm test`, `npm run test:e2e`, `npm run lint`, `npm run format:check` and `npm run build` cover the existing and new workflows. Private source/provenance audits stay under ignored `local-imports/`.
+Apply additive migrations through `20261004002000`; never reset the linked production database. `npm test`, `npm run test:e2e`, `npm run lint`, `npm run format:check` and `npm run build` cover the existing and new workflows. Private source/provenance audits stay under ignored `local-imports/`.
 
 ### Source-specific Math recovery
 

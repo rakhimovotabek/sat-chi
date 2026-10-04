@@ -9,6 +9,7 @@ import ContentState from "../books/ContentState.jsx";
 import ReviewItem from "./ReviewItem.jsx";
 import QuestionForm from "../books/QuestionForm.jsx";
 import { reviewRpc, reviewHistory, outcomeLabel } from "./api.js";
+import { blockedSourcePage } from "./source-pages.js";
 function Pages({ page, setPage, total, size = 25, loading }) {
   return (
     <div className="button-row">
@@ -362,14 +363,13 @@ export default function ContentReview() {
       () => reviewRpc("content_review_overview"),
       [revision],
     ),
-    sources = useContent(
-      () =>
-        reviewRpc("content_review_sources", {
-          p_page: sourcePage,
-          p_search: sourceSearch,
-        }),
-      [sourcePage, sourceSearch, revision],
-    );
+    sources = useContent(() => {
+      const fetchPage = (p_page) =>
+        reviewRpc("content_review_sources", { p_page, p_search: sourceSearch });
+      return tab === "Blocked sources"
+        ? blockedSourcePage(fetchPage, sourcePage)
+        : fetchPage(sourcePage);
+    }, [sourcePage, sourceSearch, revision, tab === "Blocked sources"]);
   const queue = useContent(
     () =>
       ["Review queue", "Catalog"].includes(tab)
@@ -515,7 +515,10 @@ export default function ContentReview() {
         </button>
         <button
           className="button button-secondary"
-          onClick={() => setTab("Blocked sources")}
+          onClick={() => {
+            setSourcePage(0);
+            setTab("Blocked sources");
+          }}
         >
           Inspect blocked sources
         </button>
@@ -539,6 +542,7 @@ export default function ContentReview() {
             aria-pressed={t === tab}
             onClick={() => {
               setTab(t);
+              setSourcePage(0);
               setPage(0);
               setItem(null);
             }}
