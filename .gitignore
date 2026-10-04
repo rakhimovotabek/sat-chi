@@ -14,3 +14,7 @@ test-results/
 playwright-report/
 __pycache__/
 *.pyc
+
+# Project-local design advisers (restore from skills-lock.json/documented commands).
+.agents/
+.codex/skills/

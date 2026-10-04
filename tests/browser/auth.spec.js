@@ -223,11 +223,17 @@ test("admin has distinct navigation and all admin routes render", async ({
   await expect(page.locator(".brand-caption")).toHaveText(
     "Admin Control Panel",
   );
+  await expect(
+    page.locator('.sidebar-nav a[href="/admin/questions"]'),
+  ).toHaveCount(0);
+  await page.goto("/admin/questions");
+  await expect(
+    page.getByRole("heading", { name: "Questions", exact: true }),
+  ).toBeVisible();
   for (const route of [
     "students",
     "groups",
     "books",
-    "questions",
     "question-bank",
     "homework",
     "vocabulary",
@@ -241,7 +247,6 @@ test("admin has distinct navigation and all admin routes render", async ({
         students: "Students",
         groups: "Groups",
         books: "Books",
-        questions: "Questions",
         "question-bank": "Question Bank",
         homework: "Homework",
         vocabulary: "Vocabulary",

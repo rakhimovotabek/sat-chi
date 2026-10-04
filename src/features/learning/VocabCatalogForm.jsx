@@ -29,7 +29,6 @@ export default function VocabCatalogForm({
                   title: form.get("title"),
                   description: form.get("description"),
                   source: form.get("source"),
-                  published: form.get("published") === "on",
                 };
           action.run(async () => {
             const table = bookId ? "vocabulary_sets" : "vocabulary_books";
@@ -78,14 +77,6 @@ export default function VocabCatalogForm({
                 maxLength={500}
                 defaultValue={values.source || ""}
               />
-            </label>
-            <label className="checkbox-row">
-              <input
-                type="checkbox"
-                name="published"
-                defaultChecked={values.published || false}
-              />
-              Published
             </label>
           </>
         )}

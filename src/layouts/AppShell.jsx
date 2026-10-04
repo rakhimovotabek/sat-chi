@@ -45,11 +45,13 @@ export default function AppShell({ workspace, navigation }) {
   const title =
     page?.label ||
     nestedPage?.label ||
-    (pathname.startsWith("/practice/")
-      ? "Book practice"
-      : pathname === "/mistakes"
-        ? "Review Mistakes"
-        : "Page not found");
+    (pathname === "/admin/questions"
+      ? "Questions"
+      : pathname.startsWith("/practice/")
+        ? "Book practice"
+        : pathname === "/mistakes"
+          ? "Review Mistakes"
+          : "Page not found");
   usePageTitle(title);
 
   return (

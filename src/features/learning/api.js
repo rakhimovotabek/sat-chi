@@ -189,3 +189,16 @@ export const importVocab = (payload) =>
   rpc("import_vocabulary", { p_payload: payload });
 export const startVocab = (id, mode) =>
   rpc("start_vocabulary_test", { p_set: id, p_imported: mode === "test" });
+
+export const bankFacets = (filters) =>
+  rpc("question_bank_facets", { p_filters: filters });
+export const vocabBookDetail = (book) =>
+  rpc("vocabulary_book_detail", { p_book: book });
+export const publishVocabBook = (book, state) =>
+  checked(
+    supabase.rpc("set_vocabulary_publication", {
+      p_book: book,
+      p_state: state,
+    }),
+    "Could not change publication. Check the book’s readiness and review imported content first.",
+  );

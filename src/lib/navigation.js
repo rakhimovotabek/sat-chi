@@ -86,15 +86,6 @@ export const adminNavigation = [
       "Book and topic management will be added in a future phase.",
   },
   {
-    slug: "questions",
-    label: "Questions",
-    icon: "questions",
-    description: "A workspace for SAT-style questions and explanations.",
-    emptyTitle: "Question management",
-    emptyDescription:
-      "Question authoring, organization, and review will be available here.",
-  },
-  {
     slug: "homework",
     label: "Homework",
     icon: "homework",

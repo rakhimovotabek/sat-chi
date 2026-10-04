@@ -100,14 +100,12 @@ test("question bank filters server results and creates a stable session with mat
     page.getByRole("heading", { name: "3 questions match" }),
   ).toBeVisible();
   await page
-    .getByLabel("Section", { exact: true })
-    .selectOption("Reading & Writing");
-  await page.getByRole("button", { name: "Apply filters" }).click();
+    .getByRole("button", { name: "Reading & Writing", exact: true })
+    .click();
   await expect(
     page.getByRole("heading", { name: "0 questions match" }),
   ).toBeVisible();
-  await page.getByLabel("Section", { exact: true }).selectOption("Math");
-  await page.getByRole("button", { name: "Apply filters" }).click();
+  await page.getByRole("button", { name: "Math", exact: true }).click();
   await page.getByRole("button", { name: "Start practice" }).click();
   await expect(
     page.getByText("Question 1 of 3", { exact: true }),
@@ -136,8 +134,10 @@ test("vocabulary flashcards persist recall ratings, highlight supplied passage, 
 }) => {
   const store = await learningFixture(page);
   await page.goto("/vocabulary");
-  await page.getByRole("link", { name: "Open book" }).click();
-  await page.getByRole("link", { name: "Open set" }).click();
+  await page
+    .getByRole("link", { name: "Vocabulary Source", exact: true })
+    .click();
+  await page.getByRole("link", { name: "Set 1", exact: true }).click();
   await page.getByRole("button", { name: "Flashcards", exact: true }).click();
   await page.getByRole("button", { name: "Flip flashcard" }).click();
   await expect(
@@ -173,11 +173,13 @@ test("admin authors vocabulary books, sets, words, passages and validated test q
   const book = page.locator("article").filter({
     has: page.getByRole("heading", { name: "Admin vocabulary", exact: true }),
   });
-  await book.getByRole("link", { name: "Open book" }).click();
+  await book
+    .getByRole("link", { name: "Admin vocabulary", exact: true })
+    .click();
   await page.getByRole("button", { name: "Create set", exact: true }).click();
   await page.getByLabel("Set title").fill("First set");
   await page.getByRole("button", { name: "Save vocabulary set" }).click();
-  await page.getByRole("link", { name: "Open set" }).click();
+  await page.getByRole("link", { name: "First set", exact: true }).click();
   await page.getByLabel("New word").fill("lucid");
   await page.getByLabel("New definition").fill("clear and easy to understand");
   await page.getByRole("button", { name: "Add word", exact: true }).click();

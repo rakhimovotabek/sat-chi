@@ -78,7 +78,7 @@ export async function learningFixture(page, role = "student") {
       },
     ]);
   const regex =
-    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(start_vocabulary_typed_test|vocabulary_typed_history|vocabulary_typed_test|answer_vocabulary_typed_test|finish_vocabulary_typed_test|refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
+    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(start_vocabulary_typed_test|vocabulary_typed_history|vocabulary_typed_test|answer_vocabulary_typed_test|finish_vocabulary_typed_test|refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|question_bank_facets|vocabulary_book_detail|set_vocabulary_publication|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
   await page.route(regex, async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
@@ -147,14 +147,36 @@ export async function learningFixture(page, role = "student") {
         study_seconds: 0,
         completed: 0,
       });
-    if (table === "question_bank") {
-      const f = body.p_filters;
+    if (table === "question_bank" || table === "question_bank_facets") {
+      const f = body.p_filters || {};
       const rows = store.questions.filter(
         (q) =>
           (!f.section || q.section === f.section) &&
           (!f.domain || q.domain === f.domain) &&
-          (!f.book || f.book === bookId),
+          (!f.book || f.book === bookId) &&
+          (!f.difficulty || q.difficulty === f.difficulty) &&
+          (table === "question_bank_facets" ||
+            !(f.domains?.length || f.skills?.length) ||
+            f.domains?.includes(q.domain) ||
+            f.skills?.some(
+              (s) => s.domain === q.domain && s.skill === q.skill,
+            )),
       );
+      if (table === "question_bank_facets") {
+        const groups = new Map();
+        for (const q of rows) {
+          const key = JSON.stringify([q.section, q.domain, q.skill]);
+          const entry = groups.get(key) || {
+            section: q.section,
+            domain: q.domain,
+            skill: q.skill,
+            count: 0,
+          };
+          entry.count++;
+          groups.set(key, entry);
+        }
+        return json([...groups.values()]);
+      }
       return json({
         count: rows.length,
         rows: rows.map((q) => ({
@@ -163,6 +185,46 @@ export async function learningFixture(page, role = "student") {
           topic_title: "Algebra",
         })),
       });
+    }
+    if (table === "vocabulary_book_detail") {
+      const book = store.vocabBooks.find((b) => b.id === body.p_book);
+      if (!book || (role !== "admin" && !book.published))
+        return json({ message: "Book unavailable" }, 403);
+      const sets = store.sets
+        .filter((s) => s.book_id === book.id)
+        .map((s) => ({
+          ...s,
+          words: store.words.filter((w) => w.set_id === s.id).length,
+          passages: store.passages.filter((p) => p.set_id === s.id).length,
+          exercises: store.tests.filter((q) => q.set_id === s.id).length,
+        }));
+      return json({
+        book,
+        sets,
+        ...(role === "admin"
+          ? {
+              pending: book.pending || 0,
+              state: book.archived
+                ? "archived"
+                : book.published
+                  ? "published"
+                  : book.pending
+                    ? "needs_review"
+                    : "draft",
+              eligible:
+                sets.length > 0 &&
+                sets.every((s) => s.words > 0) &&
+                !book.pending,
+            }
+          : {}),
+      });
+    }
+    if (table === "set_vocabulary_publication") {
+      if (role !== "admin") return json({ message: "Admin required" }, 403);
+      const book = store.vocabBooks.find((b) => b.id === body.p_book);
+      book.published = body.p_state === "published";
+      book.archived = body.p_state === "archived";
+      return json(null);
     }
     if (table === "start_bank_practice")
       return json(
@@ -318,8 +380,10 @@ export async function learningFixture(page, role = "student") {
           .replace(/^ilike\./, "")
           .replace(/%/g, "")
           .toLowerCase();
-        const matched = rows.filter((r) =>
-          r.title.toLowerCase().includes(title),
+        const matched = rows.filter(
+          (r) =>
+            (role === "admin" || r.published) &&
+            r.title.toLowerCase().includes(title),
         );
         const offset = Number(url.searchParams.get("offset") || 0),
           limit = Number(url.searchParams.get("limit") || 50);

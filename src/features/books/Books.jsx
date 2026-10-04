@@ -100,7 +100,6 @@ export default function Books({ admin = false }) {
                   )}
                   <h2>{b.title}</h2>
                   <p>{b.description || "Explore the topics in this book."}</p>
-                  <span className="card-link">Open book →</span>
                 </div>
               </Link>
             ))}

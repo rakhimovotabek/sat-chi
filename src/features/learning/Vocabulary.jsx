@@ -10,6 +10,7 @@ import VocabCatalogForm from "./VocabCatalogForm.jsx";
 import VocabImport from "./VocabImport.jsx";
 import { VocabularyTestHistory } from "./VocabularyTypedTest.jsx";
 import VocabularyStats from "./VocabularyStats.jsx";
+import { shortSetTitle } from "./bank-selection.js";
 import { masteryPercent } from "./vocabulary-model.js";
 export default function Vocabulary({ admin = false }) {
   const { bookId } = useParams(),
@@ -25,7 +26,8 @@ export default function Vocabulary({ admin = false }) {
     [importing, setImporting] = useState(false),
     [editing, setEditing] = useState(null),
     state = useContent(
-      () => (bookId ? api.vocabSets(bookId) : api.vocabBooks(page, query)),
+      () =>
+        bookId ? api.vocabBookDetail(bookId) : api.vocabBooks(page, query),
       [bookId, page, query],
     ),
     action = useAction();
@@ -42,10 +44,18 @@ export default function Vocabulary({ admin = false }) {
     }, 250);
     return () => clearTimeout(timer);
   }, [search]);
+  const rows = bookId ? state.data?.sets : state.data;
+  const book = bookId ? state.data?.book : null;
+  const lifecycle = state.data?.state;
+  const publish = (next) =>
+    action.run(async () => {
+      await api.publishVocabBook(bookId, next);
+      state.reload();
+    });
   return (
     <>
       <PageHeader
-        title="Vocabulary"
+        title={book?.title || "Vocabulary"}
         eyebrow={admin ? "Vocabulary library" : "Words for stronger reading"}
         description={
           bookId
@@ -76,7 +86,7 @@ export default function Vocabulary({ admin = false }) {
           <div className="button-row">
             <button
               className="button button-secondary"
-              onClick={() => setSelected(state.data?.map((s) => s.id) || [])}
+              onClick={() => setSelected(rows?.map((s) => s.id) || [])}
             >
               Select All
             </button>
@@ -118,6 +128,82 @@ export default function Vocabulary({ admin = false }) {
           </div>
         </section>
       )}
+      {admin && book && (
+        <section
+          className="vocabulary-publication"
+          aria-label="Book publication"
+        >
+          <div>
+            <span className={`status-label status-${lifecycle}`}>
+              {
+                {
+                  draft: "Draft",
+                  needs_review: "Needs review",
+                  published: "Published",
+                  archived: "Archived",
+                }[lifecycle]
+              }
+            </span>
+            <p>
+              {book.published
+                ? "Visible to students. Publication applies to every set in this book."
+                : state.data.pending > 0
+                  ? `${state.data.pending} imported items need approval before publication.`
+                  : state.data.eligible
+                    ? "Ready to publish. All sets contain words."
+                    : "Add at least one set. Every set must contain words before publishing."}
+            </p>
+            {state.data.pending > 0 && (
+              <Link className="primary-link" to="/admin/content-review">
+                Review imported content →
+              </Link>
+            )}
+          </div>
+          <div className="button-row">
+            {book.published ? (
+              <button
+                className="button button-secondary"
+                disabled={action.busy}
+                onClick={() => publish("draft")}
+              >
+                Unpublish
+              </button>
+            ) : (
+              <button
+                className="button"
+                disabled={action.busy || !state.data.eligible}
+                onClick={() => publish("published")}
+              >
+                Publish Book
+              </button>
+            )}
+            <button
+              className="quiet-button"
+              onClick={() => {
+                setEditing(book);
+              }}
+            >
+              Edit vocabulary book
+            </button>
+            {!book.archived && (
+              <button
+                className="quiet-button"
+                disabled={action.busy}
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Archive this vocabulary book? It will be hidden from students.",
+                    )
+                  )
+                    publish("archived");
+                }}
+              >
+                Archive
+              </button>
+            )}
+          </div>
+        </section>
+      )}
       {admin && (
         <button
           className="button button-secondary"
@@ -149,19 +235,56 @@ export default function Vocabulary({ admin = false }) {
           {action.error}
         </p>
       )}
-      {state.data?.length ? (
-        <div className="card-grid">
-          {state.data.map((row) => (
-            <article key={row.id} className="card learning-panel">
-              <span className="subtle-badge">
-                {bookId ? "Study set" : row.published ? "Published" : "Draft"}
-              </span>
-              <h2>{row.title}</h2>
+      {rows?.length ? (
+        <div
+          className={bookId ? "study-set-list" : "card-grid vocabulary-library"}
+        >
+          {rows.map((row) => (
+            <article
+              key={row.id}
+              className={
+                bookId ? "study-set-row" : "card learning-panel vocabulary-book"
+              }
+            >
+              <Link
+                className="study-set-main"
+                aria-label={
+                  bookId ? shortSetTitle(row.title, book?.title) : row.title
+                }
+                to={`${admin ? "/admin" : ""}/vocabulary/${bookId ? `${bookId}/sets/${row.id}` : row.id}`}
+              >
+                {!bookId && admin && (
+                  <span className="subtle-badge">
+                    {row.archived
+                      ? "Archived"
+                      : row.published
+                        ? "Published"
+                        : "Draft"}
+                  </span>
+                )}
+                <h2>
+                  {bookId ? shortSetTitle(row.title, book?.title) : row.title}
+                </h2>
+                {bookId && (
+                  <p className="set-metadata">
+                    {row.words} words
+                    {row.passages > 0 &&
+                      ` · ${row.passages} passage${row.passages === 1 ? "" : "s"}`}
+                    {row.exercises > 0 && ` · ${row.exercises} exercises`}
+                  </p>
+                )}
+                {!bookId && row.description && (
+                  <p className="page-description">{row.description}</p>
+                )}
+                <span className="set-arrow" aria-hidden="true">
+                  →
+                </span>
+              </Link>
               {!admin && bookId && (
                 <label className="checkbox-row">
                   <input
                     type="checkbox"
-                    aria-label={`Select ${row.title}`}
+                    aria-label={`Select ${shortSetTitle(row.title, book?.title)}`}
                     checked={selected.includes(row.id)}
                     onChange={(e) =>
                       setSelected((v) =>
@@ -192,16 +315,9 @@ export default function Vocabulary({ admin = false }) {
                       <small>Mastery: {masteryPercent(s)}%</small>
                     </div>
                   ))}
-              <p className="page-description">{row.description || ""}</p>
-              <Link
-                className="button button-secondary"
-                to={`${admin ? "/admin" : ""}/vocabulary/${bookId ? `${bookId}/sets/${row.id}` : row.id}`}
-              >
-                {bookId ? "Open set" : "Open book"}
-              </Link>
               {admin && (
                 <button
-                  className="button button-secondary button-compact"
+                  className="quiet-button"
                   onClick={() => setEditing(row)}
                 >
                   {bookId ? "Edit set" : "Edit vocabulary book"}
@@ -209,7 +325,7 @@ export default function Vocabulary({ admin = false }) {
               )}
               {admin && bookId && (
                 <button
-                  className="button button-danger button-compact"
+                  className="quiet-button quiet-danger"
                   disabled={action.busy}
                   onClick={() => {
                     if (
@@ -236,7 +352,7 @@ export default function Vocabulary({ admin = false }) {
               )}
               {admin && !bookId && (
                 <button
-                  className="button button-danger button-compact"
+                  className="quiet-button quiet-danger"
                   onClick={() => {
                     if (
                       window.confirm(

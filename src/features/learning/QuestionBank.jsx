@@ -1,178 +1,398 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router";
+import Icon from "../../components/Icon.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
-import Filters from "./Filters.jsx";
+import BookSelect from "../books/BookSelect.jsx";
+import useAuth from "../../hooks/useAuth.js";
+import { DOMAINS } from "./Filters.jsx";
+import { toggleDomain, toggleSkill } from "./bank-selection.js";
 import useAction from "./useAction.js";
-import { bank, startBank } from "./api.js";
+import { bank, bankFacets, startBank } from "./api.js";
+function readConfiguration(key) {
+  try {
+    const v = JSON.parse(sessionStorage.getItem(key));
+    return v && typeof v.filters === "object" && v.filters !== null ? v : {};
+  } catch {
+    return {};
+  }
+}
 export default function QuestionBank({ admin = false }) {
-  const [draft, setDraft] = useState({}),
-    [filters, setFilters] = useState({}),
+  const { profile } = useAuth(),
+    key = `satchi.bank.${profile.id}`;
+  const [saved] = useState(() => readConfiguration(key));
+  const [filters, setFilters] = useState(saved.filters || {}),
     [page, setPage] = useState(0),
-    [count, setCount] = useState("20"),
-    [timed, setTimed] = useState(false);
+    [expanded, setExpanded] = useState([]),
+    [count, setCount] = useState(saved.count || "20"),
+    [timed, setTimed] = useState(saved.timed === true);
   const navigate = useNavigate(),
     action = useAction();
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(key, JSON.stringify({ filters, count, timed }));
+    } catch {
+      /* Browser storage can be unavailable. */
+    }
+  }, [key, filters, count, timed]);
+  const change = (next) => {
+    setPage(0);
+    setFilters(next);
+  };
+  const field = (name, value) => change({ ...filters, [name]: value });
   const state = useContent(
     () => bank(filters, page),
     [JSON.stringify(filters), page],
   );
+  const facetFilters = { ...filters };
+  delete facetFilters.domains;
+  delete facetFilters.skills;
+  const facets = useContent(
+    () => bankFacets(facetFilters),
+    [JSON.stringify(facetFilters)],
+  );
+  const rows = facets.data || [];
+  const standards = filters.section
+    ? DOMAINS[filters.section] || []
+    : Object.values(DOMAINS).flat();
+  const domains = [...new Set([...standards, ...rows.map((r) => r.domain)])];
+  const matching = state.data?.count ?? 0;
   return (
     <>
       <PageHeader
-        eyebrow="Focused SAT practice"
         title="Question Bank"
-        description="Build a practice session from the published library. Questions are filtered on the server."
+        description="Choose what to work on. Build a session around your goals."
       />
-      <form
-        className="card learning-panel"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setPage(0);
-          setFilters(draft);
-        }}
-      >
-        <Filters value={draft} onChange={setDraft} />
-        <div className="button-row">
-          <button className="button">Apply filters</button>
-          <button
-            type="button"
-            className="button button-secondary"
-            onClick={() => {
-              setDraft({});
-              setFilters({});
-              setPage(0);
-            }}
-          >
-            Reset filters
-          </button>
-        </div>
-      </form>
-      {state.loading || state.error ? (
-        <ContentState {...state} onRetry={state.reload} />
-      ) : (
-        <>
-          <section className="card learning-panel">
-            <div className="section-heading">
-              <h2>{state.data.count} questions match</h2>
-            </div>
-            <div className="button-row">
-              <label>
-                Question count
-                <select
-                  value={count}
-                  onChange={(e) => setCount(e.target.value)}
-                >
-                  {[10, 20, 30, 40, 50].map((n) => (
-                    <option key={n}>{n}</option>
-                  ))}
-                  <option value="all">All (up to 500)</option>
-                </select>
-              </label>
-              <label>
-                Mode
-                <select
-                  value={String(timed)}
-                  onChange={(e) => setTimed(e.target.value === "true")}
-                >
-                  <option value="false">Untimed</option>
-                  <option value="true">Timed</option>
-                </select>
-              </label>
-              <button
-                className="button"
-                disabled={action.busy || !state.data.count}
-                onClick={() =>
-                  action.run(async () =>
-                    navigate(
-                      `${admin ? "/admin" : ""}/practice/${await startBank(filters, Math.min(state.data.count, count === "all" ? 500 : Number(count)), timed)}`,
-                    ),
-                  )
-                }
+      <section className="bank-workspace" aria-label="Practice configuration">
+        <div className="bank-columns">
+          <section className="bank-domains" aria-label="Domain selection">
+            <div className="bank-section-heading">
+              <h2>Select domains</h2>
+              <span
+                className="count-badge"
+                aria-label="Matching question count"
+                aria-busy={state.loading}
               >
-                Start practice
+                {state.loading ? "…" : matching}
+              </span>
+            </div>
+            <div
+              className="segmented-control"
+              role="group"
+              aria-label="Section"
+            >
+              {[
+                ["", "All sections"],
+                ["Reading & Writing", "Reading & Writing"],
+                ["Math", "Math"],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  aria-pressed={(filters.section || "") === value}
+                  onClick={() =>
+                    change({
+                      ...filters,
+                      section: value,
+                      domains: [],
+                      skills: [],
+                      domain: "",
+                      skill: "",
+                    })
+                  }
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p className="bank-hint">
+              Choose domains or expand them to select individual skills.
+            </p>
+            <label className="bank-all">
+              <input
+                type="checkbox"
+                checked={!(filters.domains?.length || filters.skills?.length)}
+                onChange={() => change({ ...filters, domains: [], skills: [] })}
+              />
+              Entire {filters.section || "question bank"}
+            </label>
+            <div aria-busy={facets.loading}>
+              {domains.map((domain, index) => {
+                const items = rows.filter((r) => r.domain === domain);
+                const total = items.reduce((n, r) => n + r.count, 0);
+                const skills = [
+                  ...new Set(items.map((r) => r.skill).filter(Boolean)),
+                ];
+                const whole = (filters.domains || []).includes(domain);
+                const partial = (filters.skills || []).some(
+                  (s) => s.domain === domain,
+                );
+                const open = expanded.includes(domain),
+                  id = `bank-skills-${index}`;
+                return (
+                  <div
+                    key={domain}
+                    className={`bank-domain ${whole || partial ? "is-selected" : ""}`}
+                  >
+                    <div className="bank-domain-row">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={whole}
+                          ref={(el) => {
+                            if (el) el.indeterminate = !whole && partial;
+                          }}
+                          onChange={() => change(toggleDomain(filters, domain))}
+                        />
+                        <span>{domain || "Unclassified domain"}</span>
+                        <span className="bank-count">
+                          {facets.loading ? "…" : total}
+                        </span>
+                      </label>
+                      <button
+                        className="bank-disclosure"
+                        aria-label={`${open ? "Collapse" : "Expand"} ${domain || "unclassified domain"} skills`}
+                        aria-expanded={open}
+                        aria-controls={id}
+                        onClick={() =>
+                          setExpanded((v) =>
+                            open
+                              ? v.filter((d) => d !== domain)
+                              : [...v, domain],
+                          )
+                        }
+                      >
+                        <Icon name="chevron" />
+                      </button>
+                    </div>
+                    <div id={id} hidden={!open} className="bank-skills">
+                      {skills.length ? (
+                        skills.map((skill) => (
+                          <label key={skill} className="bank-skill">
+                            <input
+                              type="checkbox"
+                              checked={
+                                whole ||
+                                (filters.skills || []).some(
+                                  (s) =>
+                                    s.domain === domain && s.skill === skill,
+                                )
+                              }
+                              onChange={() =>
+                                change(
+                                  toggleSkill(filters, domain, skill, skills),
+                                )
+                              }
+                            />
+                            <span>{skill}</span>
+                            <span className="bank-count">
+                              {facets.loading
+                                ? "…"
+                                : items
+                                    .filter((s) => s.skill === skill)
+                                    .reduce((n, s) => n + s.count, 0)}
+                            </span>
+                          </label>
+                        ))
+                      ) : (
+                        <p className="bank-hint">
+                          {facets.loading
+                            ? "Loading skills…"
+                            : "No classified skills match these filters."}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {facets.error && (
+              <ContentState {...facets} onRetry={facets.reload} />
+            )}
+          </section>
+          <section className="bank-advanced" aria-label="Advanced filters">
+            <div className="bank-section-heading">
+              <h2>Advanced filters</h2>
+              <button className="quiet-button" onClick={() => change({})}>
+                Reset filters
               </button>
             </div>
-            {action.error && (
-              <p className="form-error" role="alert">
-                {action.error}
-              </p>
-            )}
-            <p className="empty-copy">
-              The session freezes question order and answer keys. Timed practice
-              allows 90 seconds per question.
+            <label>
+              Difficulty
+              <select
+                aria-label="Difficulty"
+                value={filters.difficulty || ""}
+                onChange={(e) => field("difficulty", e.target.value)}
+              >
+                <option value="">Any difficulty</option>
+                {["easy", "medium", "hard", "unclassified"].map((v) => (
+                  <option value={v} key={v}>
+                    {v[0].toUpperCase() + v.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <BookSelect
+              label="Book / source"
+              emptyLabel="All books"
+              value={filters.book}
+              onChange={(book) => change({ ...filters, book, topic: "" })}
+            />
+            <label>
+              Previous practice
+              <select
+                aria-label="Previous practice"
+                value={filters.status || ""}
+                onChange={(e) => field("status", e.target.value)}
+              >
+                <option value="">All questions</option>
+                <option value="unanswered">Unanswered</option>
+                <option value="correct">Previously correct</option>
+                <option value="incorrect">Previously incorrect</option>
+              </select>
+            </label>
+            <label>
+              Marked for review
+              <select
+                aria-label="Marked for review"
+                value={filters.marked || ""}
+                onChange={(e) => field("marked", e.target.value)}
+              >
+                <option value="">All</option>
+                <option value="yes">Marked</option>
+                <option value="no">Not marked</option>
+              </select>
+            </label>
+            <p className="bank-hint">
+              History and review marks come from your own practice. Domain
+              counts follow these filters.
             </p>
           </section>
-          {!state.data.count ? (
-            <section className="empty-state card">
-              <h2>No matching questions</h2>
-              <p>
-                Try broader filters or ask your administrator to publish
-                learning material.
-              </p>
-            </section>
-          ) : (
-            <section className="card learning-panel">
-              <div className="table-scroll">
-                <table className="students-table">
-                  <thead>
-                    <tr>
-                      <th>Question</th>
-                      <th>Domain / skill</th>
-                      <th>Source</th>
-                      <th>Difficulty</th>
+        </div>
+        <footer className="bank-action-bar">
+          <label>
+            Volume
+            <select
+              aria-label="Question count"
+              value={count}
+              onChange={(e) => setCount(e.target.value)}
+            >
+              {[10, 20, 30, 40, 50].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+              <option value="all">All (up to 500)</option>
+            </select>
+          </label>
+          <label>
+            Mode
+            <select
+              aria-label="Mode"
+              value={String(timed)}
+              onChange={(e) => setTimed(e.target.value === "true")}
+            >
+              <option value="false">Untimed</option>
+              <option value="true">Timed</option>
+            </select>
+          </label>
+          <div className="bank-start">
+            <p role="status" aria-live="polite">
+              {state.loading
+                ? "Updating matches…"
+                : `${matching} questions match your filters`}
+            </p>
+            <button
+              className="button"
+              disabled={
+                action.busy || state.loading || !!state.error || !matching
+              }
+              onClick={() =>
+                action.run(async () =>
+                  navigate(
+                    `${admin ? "/admin" : ""}/practice/${await startBank(filters, Math.min(matching, count === "all" ? 500 : Number(count)), timed)}`,
+                  ),
+                )
+              }
+            >
+              Start practice
+            </button>
+          </div>
+        </footer>
+      </section>
+      {state.error && <ContentState {...state} onRetry={state.reload} />}
+      {action.error && (
+        <p className="form-error" role="alert">
+          {action.error}
+        </p>
+      )}
+      <section className="bank-preview" aria-busy={state.loading}>
+        <div className="bank-section-heading">
+          <h2>{matching} questions match</h2>
+          <span className="bank-hint">Preview · answers stay hidden</span>
+        </div>
+        {!state.loading && !state.error && !matching && (
+          <div className="empty-state">
+            <h3>No matching questions</h3>
+            <p>Try broader filters or clear your domain selection.</p>
+          </div>
+        )}
+        {!!matching && (
+          <>
+            <div className="table-scroll">
+              <table className="students-table">
+                <thead>
+                  <tr>
+                    <th>Question</th>
+                    <th>Domain / skill</th>
+                    <th>Source</th>
+                    <th>Difficulty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {state.data?.rows.map((q) => (
+                    <tr key={q.id}>
+                      <td>{q.question_text}</td>
+                      <td>
+                        {q.domain}
+                        <small>{q.skill}</small>
+                      </td>
+                      <td>
+                        {q.book_title}
+                        <small>{q.topic_title}</small>
+                      </td>
+                      <td>{q.difficulty}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {state.data.rows.map((q) => (
-                      <tr key={q.id}>
-                        <td>{q.question_text}</td>
-                        <td>
-                          {q.domain}
-                          <small>{q.skill}</small>
-                        </td>
-                        <td>
-                          {q.book_title}
-                          <small>{q.topic_title}</small>
-                        </td>
-                        <td>
-                          <span className="subtle-badge">{q.difficulty}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="pagination">
+              <span>
+                Page {page + 1} · {matching} questions
+              </span>
+              <div className="button-row">
+                <button
+                  className="button button-secondary"
+                  disabled={!page || state.loading}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  Previous page
+                </button>
+                <button
+                  className="button button-secondary"
+                  disabled={state.loading || (page + 1) * 25 >= matching}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next page
+                </button>
               </div>
-              <div className="pagination">
-                <span>
-                  Page {page + 1} · {state.data.count} questions
-                </span>
-                <div className="button-row">
-                  <button
-                    className="button button-secondary"
-                    disabled={!page}
-                    onClick={() => setPage((p) => p - 1)}
-                  >
-                    Previous page
-                  </button>
-                  <button
-                    className="button button-secondary"
-                    disabled={(page + 1) * 25 >= state.data.count}
-                    onClick={() => setPage((p) => p + 1)}
-                  >
-                    Next page
-                  </button>
-                </div>
-              </div>
-            </section>
-          )}
-          {admin && (
-            <Link className="button button-secondary" to="/admin/questions">
-              Manage questions
-            </Link>
-          )}
-        </>
+            </div>
+          </>
+        )}
+      </section>
+      {admin && (
+        <Link className="primary-link" to="/admin/questions">
+          Manage questions
+        </Link>
       )}
     </>
   );
