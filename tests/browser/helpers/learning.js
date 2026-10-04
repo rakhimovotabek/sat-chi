@@ -6,6 +6,8 @@ export async function learningFixture(page, role = "student") {
   store.members = [];
   store.progress = [];
   store.homework = [];
+  store.dailyTemplates = [];
+  store.dailyRows = [];
   store.vocabBooks = [
     { id: "vbook", title: "Vocabulary Source", published: true },
   ];
@@ -78,7 +80,7 @@ export async function learningFixture(page, role = "student") {
       },
     ]);
   const regex =
-    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(practice_analytics|practice_question_analytics|start_vocabulary_typed_test|vocabulary_typed_history|vocabulary_typed_test|answer_vocabulary_typed_test|finish_vocabulary_typed_test|refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|vocabulary_catalog|question_bank_facets|vocabulary_book_detail|set_vocabulary_publication|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
+    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(daily_homework_templates|daily_homework_directory|daily_homework_report|daily_homework_statistics|save_daily_homework|set_daily_homework_state|start_daily_homework|practice_analytics|practice_question_analytics|start_vocabulary_typed_test|vocabulary_typed_history|vocabulary_typed_test|answer_vocabulary_typed_test|finish_vocabulary_typed_test|refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|vocabulary_catalog|question_bank_facets|vocabulary_book_detail|set_vocabulary_publication|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
   await page.route(regex, async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
@@ -260,6 +262,111 @@ export async function learningFixture(page, role = "student") {
           time_limit: body.p_timed ? 270 : null,
         }),
       );
+    if (table === "daily_homework_templates") return json(store.dailyTemplates);
+    if (table === "save_daily_homework") {
+      const id = body.p_template || `daily-${counter++}`;
+      const old = store.dailyTemplates.find((t) => t.id === id);
+      const t = {
+        id,
+        data: body.p_data,
+        timezone: body.p_data.timezone,
+        state: old?.state || (body.p_data.active ? "active" : "paused"),
+        all_students: body.p_data.allStudents,
+        students: body.p_data.students,
+        groups: body.p_data.groups,
+        revision: (old?.revision || 0) + 1,
+        valid_from: body.p_data.startDate,
+        pool_count: store.questions.length,
+      };
+      if (old) Object.assign(old, t);
+      else store.dailyTemplates.push(t);
+      return json(id);
+    }
+    if (table === "set_daily_homework_state") {
+      store.dailyTemplates.find((t) => t.id === body.p_template).state =
+        body.p_state;
+      return json(null);
+    }
+    const dailyRows = () =>
+      store.dailyRows.map((r) => {
+        if (
+          store.dailySessionKey !== `${r.template_id}-${r.study_date}` ||
+          !store.session
+        )
+          return r;
+        const answered = store.items.filter(
+          (i) => i.selected_answer != null,
+        ).length;
+        const completed =
+          store.session.submitted_at && answered === r.question_count;
+        return {
+          ...r,
+          session_id: store.session.id,
+          answered,
+          active_seconds: store.session.elapsed_seconds,
+          completed_at: completed ? store.session.submitted_at : null,
+          correct: store.items.filter((i) => i.correct).length,
+          status: completed
+            ? r.is_today
+              ? "Completed"
+              : "Completed late"
+            : !r.is_today
+              ? "Missed"
+              : "In progress",
+        };
+      });
+    if (table === "daily_homework_directory") {
+      const rows = dailyRows().filter(
+        (r) =>
+          (!body.p_template || r.template_id === body.p_template) &&
+          (!body.p_from || r.study_date >= body.p_from) &&
+          (!body.p_until || r.study_date <= body.p_until),
+      );
+      return json({
+        total: rows.length,
+        rows: rows.slice((body.p_page || 0) * 50, (body.p_page || 0) * 50 + 50),
+      });
+    }
+    if (table === "daily_homework_report")
+      return json(
+        store.dailyReport || {
+          today: store.dailyTemplates.map((t) => ({
+            template_id: t.id,
+            assigned: dailyRows().filter(
+              (r) => r.is_today && r.template_id === t.id,
+            ).length,
+            completed: dailyRows().filter(
+              (r) => r.is_today && r.template_id === t.id && r.completed_at,
+            ).length,
+          })),
+          history: [],
+          students: [],
+          student_total: 0,
+        },
+      );
+    if (table === "daily_homework_statistics")
+      return json(
+        store.dailyStats || {
+          assigned: 0,
+          completed: 0,
+          missed_days: 0,
+          current_streak: 0,
+          longest_streak: 0,
+          completion_rate: null,
+          accuracy: null,
+          average_seconds: null,
+        },
+      );
+    if (table === "start_daily_homework") {
+      const key = `${body.p_template}-${body.p_day}`;
+      if (store.dailySessionKey === key && store.session)
+        return json(store.session.id);
+      const row = store.dailyRows.find(
+        (r) => r.template_id === body.p_template && r.study_date === body.p_day,
+      );
+      store.dailySessionKey = key;
+      return json(start("homework", row.title));
+    }
     if (table === "create_homework") {
       store.homework.push({
         id: `homework-${counter++}`,
@@ -330,8 +437,18 @@ export async function learningFixture(page, role = "student") {
       });
     if (table === "practice_mistake")
       return json(start("bank", "Review a question mistake"));
-    if (table === "practice_analytics") return json(store.analytics || {practiced:0,solved:0,unresolved:0,areas:[],activity:[]});
-    if (table === "practice_question_analytics") return json(store.questionAnalytics || {total:0,rows:[]});
+    if (table === "practice_analytics")
+      return json(
+        store.analytics || {
+          practiced: 0,
+          solved: 0,
+          unresolved: 0,
+          areas: [],
+          activity: [],
+        },
+      );
+    if (table === "practice_question_analytics")
+      return json(store.questionAnalytics || { total: 0, rows: [] });
     if (table === "learning_metrics")
       return json({
         attempted: store.session?.submitted_at

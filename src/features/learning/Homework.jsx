@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
+import DailyHomeworkAdmin from "./DailyHomeworkAdmin.jsx";
 import HomeworkForm from "./HomeworkForm.jsx";
 import useAction from "./useAction.js";
 import { homework, startHomework } from "./api.js";
@@ -11,7 +12,8 @@ export default function Homework({ admin = false }) {
   const state = useContent(homework),
     action = useAction(),
     navigate = useNavigate(),
-    [creating, setCreating] = useState(false);
+    [creating, setCreating] = useState(false),
+    [revision, setRevision] = useState(0);
   return (
     <>
       <PageHeader
@@ -32,10 +34,13 @@ export default function Homework({ admin = false }) {
         <HomeworkForm
           onCreated={() => {
             setCreating(false);
+            setRevision((v) => v + 1);
             state.reload();
           }}
         />
       )}
+      {admin && <DailyHomeworkAdmin key={revision} />}
+      {admin && <h2>One-time homework</h2>}
       {action.error && (
         <p role="alert" className="form-error">
           {action.error}

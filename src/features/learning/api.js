@@ -205,3 +205,4 @@ export const publishVocabBook = (book, state) =>
     }),
     "Could not change publication. Check the book’s readiness and review imported content first.",
   );
+export { saveDailyHomework } from "./daily-homework-api.js";
