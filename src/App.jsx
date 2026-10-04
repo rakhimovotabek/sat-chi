@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router";
 import StudentLayout from "./layouts/StudentLayout.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
+const Settings = lazy(() => import("./features/settings/Settings.jsx"));
 const StudyPlan = lazy(() => import("./features/learning/StudyPlan.jsx"));
 const Mistakes = lazy(() => import("./features/learning/Mistakes.jsx"));
 const StudentDashboard = lazy(() =>
@@ -61,6 +62,7 @@ const AdminSession = lazy(() =>
     default: m.AdminSession,
   })),
 );
+const ContentReview = lazy(() => import("./features/review/ContentReview.jsx"));
 const ImportStatus = lazy(() => import("./features/learning/ImportStatus.jsx"));
 function LegacyStudent() {
   const params = useParams();
@@ -85,6 +87,7 @@ export default function App() {
           <Route path="/student/*" element={<LegacyStudent />} />
           <Route element={<StudentLayout />}>
             <Route path="/dashboard" element={<StudentDashboard />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/profile" element={<Onboarding editing />} />
             <Route path="/books" element={<Books />} />
             <Route path="/books/:bookId" element={<BookDetail />} />
@@ -116,6 +119,7 @@ export default function App() {
                   ![
                     "dashboard",
                     "profile",
+                    "settings",
                     "books",
                     "homework",
                     "question-bank",
@@ -154,7 +158,9 @@ export default function App() {
               <Route path="results" element={<AdminDashboard results />} />
               <Route path="students/:studentId" element={<StudentDetail />} />
               <Route path="sessions/:sessionId" element={<AdminSession />} />
+              <Route path="settings" element={<Settings />} />
               <Route path="imports" element={<ImportStatus />} />
+              <Route path="content-review" element={<ContentReview />} />
               {adminNavigation
                 .filter(
                   (p) =>
@@ -168,6 +174,8 @@ export default function App() {
                       "question-bank",
                       "vocabulary",
                       "results",
+                      "content-review",
+                      "settings",
                     ].includes(p.slug),
                 )
                 .map((p) => (

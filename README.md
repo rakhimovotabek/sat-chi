@@ -100,12 +100,12 @@ Verify exactly one intended row is returned. Sign in at `/login`. If already sig
 
 The server requires these environment values:
 
-| Variable | Source | Purpose |
-| --- | --- | --- |
-| `SUPABASE_URL` | Automatically injected by Supabase | Project API |
-| `SUPABASE_ANON_KEY` | Automatically injected legacy key | Verify the caller with `auth.getUser(token)` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Automatically injected legacy server secret | Admin Auth API and profile management |
-| `ALLOWED_ORIGINS` | Set by you as an Edge Function secret | Comma-separated frontend origins for browser CORS |
+| Variable                    | Source                                      | Purpose                                           |
+| --------------------------- | ------------------------------------------- | ------------------------------------------------- |
+| `SUPABASE_URL`              | Automatically injected by Supabase          | Project API                                       |
+| `SUPABASE_ANON_KEY`         | Automatically injected legacy key           | Verify the caller with `auth.getUser(token)`      |
+| `SUPABASE_SERVICE_ROLE_KEY` | Automatically injected legacy server secret | Admin Auth API and profile management             |
+| `ALLOWED_ORIGINS`           | Set by you as an Edge Function secret       | Comma-separated frontend origins for browser CORS |
 
 Supabase injects the reserved `SUPABASE_*` variables. Do not try to upload them with `supabase secrets set`, and do not copy them into the frontend `.env`. Check your project’s legacy key availability if the function reports missing configuration.
 
@@ -132,14 +132,14 @@ On October 3, 2026, migrations `20261003000100` and `20261003000200` were applie
 
 ## Database authorization model
 
-| Resource | Active student | Active admin |
-| --- | --- | --- |
-| Own profile | Read; update display name/username | Read; update display name/username |
-| Other profiles | No access | Read all; update student display name/username/status |
-| Profile ID, role, creation timestamp | No browser updates | No browser updates |
-| Profile create/delete | No direct access | Through the server-only account function |
-| Groups | Read joined groups | Read/create/update/delete |
-| Memberships | Read own memberships | Read/create/update/delete student memberships |
+| Resource                             | Active student                     | Active admin                                          |
+| ------------------------------------ | ---------------------------------- | ----------------------------------------------------- |
+| Own profile                          | Read; update display name/username | Read; update display name/username                    |
+| Other profiles                       | No access                          | Read all; update student display name/username/status |
+| Profile ID, role, creation timestamp | No browser updates                 | No browser updates                                    |
+| Profile create/delete                | No direct access                   | Through the server-only account function              |
+| Groups                               | Read joined groups                 | Read/create/update/delete                             |
+| Memberships                          | Read own memberships               | Read/create/update/delete student memberships         |
 
 Inactive users can read only their own profile so the frontend can explain the disabled account; they cannot edit profiles or access group data. Anonymous callers have no table privileges or helper execution grants.
 
@@ -261,3 +261,11 @@ npm run test:e2e -- tests/browser/learning.spec.js
 ```
 
 Source discovery is restricted to `~/Desktop/Books` and its subdirectories. Source PDFs, extracted text, SQL payloads and local checkpoints stay in ignored `local-imports/`; they must never be committed.
+
+### Content Review and Settings
+
+Administrators use `/admin/content-review` for live source outcomes, paginated catalog/review inspection, corrections, explicit approval, rejection, duplicate/defer decisions, manual source transcription and audit/import history. Review RPCs and RLS enforce administrator access; imported catalog publication requires completed reviews. See [the review workflow](docs/content-review-workflow.md) and [source reconciliation report](docs/book-import-report.md).
+
+Students use `/settings` for their account display name and daily Study Plan budget, plus per-account browser vocabulary defaults that initialize shuffle/test size/type. Administrators have account settings at `/admin/settings`. No placeholder toggles or partial theme switch are exposed.
+
+Apply additive migrations through `20261004001400`; never reset the linked production database. `npm test`, `npm run test:e2e`, `npm run lint`, `npm run format:check` and `npm run build` cover the existing and new workflows. Private source/provenance audits stay under ignored `local-imports/`.

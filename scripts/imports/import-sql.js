@@ -15,6 +15,7 @@ export function buildImportSql(safeReport, payload) {
  if data is not null then
  if r->>'source_type'='vocabulary' then
  fp=md5(data::text);select id into vid from public.vocabulary_books where import_fingerprint=fp;
+ if vid is null and exists(select 1 from public.import_jobs j join public.vocabulary_books b on b.id=j.vocabulary_book_id where j.fingerprint=r->>'fingerprint') then raise exception 'Vocabulary source already imported; reconcile corrections through admin review instead of duplicating it';end if;
  if vid is null then
  insert into public.vocabulary_books(title,description,source,published,import_fingerprint)values(data->>'title',coalesce(data->>'description',''),coalesce(data->>'source',r->>'source_file'),false,fp) returning id into vid;
  for s in select value from jsonb_array_elements(data->'sets') loop
@@ -28,10 +29,16 @@ export function buildImportSql(safeReport, payload) {
  fp=md5(data::text||'book');select book_id,question_count into bid,n from public.content_imports where fingerprint=fp;
  if bid is null then
  n:=0;
+ select j.book_id into bid from public.import_jobs j join public.books b on b.id=j.book_id where j.fingerprint=r->>'fingerprint';
+ if bid is null then
  insert into public.books(title,description,category,published) values(data->'book'->>'title',coalesce(data->'book'->>'description',''),coalesce(data->'book'->>'category','Other'),false) returning id into bid;
+ end if;
+ select coalesce(max(position)+1,0) into pos from public.book_topics where book_id=bid and parent_id is null;
  for t in select value from jsonb_array_elements(data->'topics') loop n=n+public.import_local_topic(bid,null,t,pos,0);pos=pos+1;end loop;
+ select count(*)::int into n from public.questions q join public.book_topics t on t.id=q.topic_id where t.book_id=bid;
  insert into public.content_imports(fingerprint,book_id,question_count) values(fp,bid,n);
  end if;
+ if r->>'source_type'<>'vocabulary' then select count(*)::int into n from public.questions q join public.book_topics t on t.id=q.topic_id where t.book_id=bid;end if;
  end if;
  r=r||jsonb_build_object('status','imported','imported_count',n,'skipped_count',greatest(coalesce((r->>'detected_questions')::int,0)-n,0));end if;
  insert into public.import_jobs(fingerprint,source_file,title,status,detected_topics,detected_questions,imported_count,skipped_count,warnings,errors,book_id)

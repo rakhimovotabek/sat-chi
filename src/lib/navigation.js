@@ -172,3 +172,15 @@ studentNavigation.splice(2, 0, {
   label: "Study Plan",
   icon: "homework",
 });
+
+adminNavigation.splice(
+  adminNavigation.findIndex((p) => p.slug === "settings"),
+  0,
+  { slug: "content-review", label: "Content Review", icon: "books" },
+);
+
+studentNavigation.push({
+  slug: "settings",
+  label: "Settings",
+  icon: "profile",
+});

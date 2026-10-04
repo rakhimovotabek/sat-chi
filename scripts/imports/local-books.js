@@ -10,6 +10,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { basename, extname, join, resolve } from "node:path";
 import { homedir } from "node:os";
+import { attachProvenance } from "./provenance.js";
 import { deduplicateQuestions } from "./deduplicate-questions.js";
 import { parseVocabook } from "./vocabook.js";
 import { parseGrammar, parseRulesToResults, inspectText } from "./parsers.js";
@@ -377,29 +378,12 @@ try {
           const dedup = deduplicateQuestions(payload.topics, report.evidence);
           report.evidence = dedup.evidence;
           report.review_items.push(...dedup.review);
-          let qi = 0;
-          const provenance = (rows) => {
-            for (const t of rows) {
-              for (const q of t.questions || []) {
-                const e = report.evidence.find(
-                  (e) => e.question_index === qi++,
-                );
-                if (e?.page) {
-                  q.source_page = e.page;
-                  q.import_metadata = {
-                    source_file: report.source_file,
-                    parser_version: version,
-                    extraction_method: e.method || "embedded_bbox",
-                    source_number: e.number,
-                    source_section: e.set || e.skill || t.title,
-                    review_required: true,
-                  };
-                }
-              }
-              provenance(t.children || []);
-            }
-          };
-          provenance(payload.topics);
+          attachProvenance(
+            payload.topics,
+            report.evidence,
+            report.source_file,
+            version,
+          );
           if (dedup.duplicates.length)
             report.warnings.push(
               `${dedup.duplicates.length} exact source repeats skipped with matching printed keys.`,

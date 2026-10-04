@@ -1,0 +1,60 @@
+.review-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.review-stats .card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.review-stats strong {
+  font-size: 1.6rem;
+}
+.review-source-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  margin: 12px 0;
+}
+.review-source-row h3,
+.review-detail p {
+  overflow-wrap: anywhere;
+}
+.review-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.review-tabs {
+  margin: 20px 0;
+}
+.review-json {
+  max-height: 360px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.review-detail {
+  scroll-margin-top: 90px;
+  margin-top: 24px;
+}
+.review-detail label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0;
+}
+@media (max-width: 700px) {
+  .review-source-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .review-source-row .button {
+    justify-self: start;
+  }
+}

@@ -11,6 +11,7 @@ import "./styles/auth.css";
 import "./styles/public.css";
 import "./styles/books.css";
 import "./styles/learning.css";
+import "./styles/review.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

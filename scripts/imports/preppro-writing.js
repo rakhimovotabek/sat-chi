@@ -39,14 +39,20 @@ export function parsePrepProWriting(text, columns, source) {
     )
       throw new Error("Incomplete chapter key");
     const questions = [],
-      seen = new Set();
-    for (let p = start; p <= end; p++) {
-      const body = clean(
-        chapter === 12 ? columns[p - 1].columns.join("\n") : pages[p - 1],
-      );
+      seen = new Set(),
+      counts = new Map();
+    const blocks = Array.from({ length: end - start + 1 }, (_, i) => {
+      const p = start + i,
+        body = clean(
+          chapter === 12 ? columns[p - 1].columns.join("\n") : pages[p - 1],
+        );
       const starts = [
         ...body.matchAll(chapter === 12 ? /^\s*(\d+)\.\s+/gm : /^(\d+)\.\s+/gm),
       ];
+      for (const m of starts) counts.set(+m[1], (counts.get(+m[1]) || 0) + 1);
+      return { p, body, starts };
+    });
+    for (const { p, body, starts } of blocks) {
       for (let k = 0; k < starts.length; k++) {
         const number = +starts[k][1],
           raw = body.slice(
@@ -77,7 +83,10 @@ export function parsePrepProWriting(text, columns, source) {
           source,
         };
         const reasons = [];
-        if (seen.has(number)) reasons.push("Repeated source question number");
+        if (counts.get(number) > 1)
+          reasons.push(
+            "Repeated source question number; all matching regions quarantined",
+          );
         seen.add(number);
         if (boundary < 0 || opts.map((m) => m[1]).join("") !== "ABCD")
           reasons.push("Incomplete passage/prompt/choices");

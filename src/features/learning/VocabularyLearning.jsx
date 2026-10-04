@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 import { reviewVocab, starVocab, startVocabPool, rpc } from "./api.js";
 import useAction from "./useAction.js";
 import { contextParts, normalizeRecall } from "./vocabulary-model.js";
+import useAuth from "../../hooks/useAuth.js";
+import { readLearningSettings } from "../settings/learning-settings.js";
 export function ContextPassage({ passage, words, onWord }) {
   return (
     <div className="reading-text context-passage">
@@ -67,6 +69,8 @@ export default function VocabularyLearning({
   onRefresh,
   scopeFilter = "all",
 }) {
+  const { profile } = useAuth();
+  const [defaults] = useState(() => readLearningSettings(profile.id));
   const [mode, setMode] = useState(
       ["words", "learn", "cards", "context", "typed", "test"].includes(
         initialMode,
@@ -82,9 +86,9 @@ export default function VocabularyLearning({
     [selectedWord, setSelectedWord] = useState(null),
     [typed, setTyped] = useState(""),
     [feedback, setFeedback] = useState(null),
-    [count, setCount] = useState(20),
-    [testType, setTestType] = useState("mixed"),
-    [shuffled, setShuffled] = useState(false),
+    [count, setCount] = useState(defaults.vocabularyCount),
+    [testType, setTestType] = useState(defaults.vocabularyTestType),
+    [shuffled, setShuffled] = useState(defaults.shuffleVocabulary),
     action = useAction(),
     navigate = useNavigate();
   const stored = Object.fromEntries(progress.map((p) => [p.word_id, p]));

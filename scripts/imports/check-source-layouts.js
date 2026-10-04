@@ -41,6 +41,13 @@ for (const r of manifest.filter((r) => r.resolution_status === "partial")) {
         const q = t.questions[i],
           e = r.evidence.find((e) => e.question_index === flat),
           page = normalize(raw[e.page - 1] || "");
+        if (
+          q.source_page !== e.page ||
+          q.import_metadata?.source_number !== e.number
+        )
+          throw new Error(
+            "Question provenance does not match persisted evidence",
+          );
         const supplied = [q.question, q.passage, ...q.options].join(" "),
           tokens = normalize(supplied)
             .split(" ")

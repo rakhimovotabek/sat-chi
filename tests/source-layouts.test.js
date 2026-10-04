@@ -112,3 +112,77 @@ test("trusted local validation preserves browser caps and rejects unsafe provena
     }).errors.length,
   );
 });
+
+test("PrepPro chapter adapter keeps both layout strategies and scoped keys, rejects missing keys and repeated numbers", async () => {
+  const { parsePrepProWriting } = await import(
+    "../scripts/imports/preppro-writing.js"
+  );
+  const pages = Array.from({ length: 153 }, () => ""),
+    columns = pages.map(() => ({ columns: ["", ""], crossing: [] }));
+  const question = (n, chapter) =>
+    `${n}. ${chapter === 12 ? "A wind strengthened. ______ the river overflowed.\nWhich choice completes the text with the most logical transition?" : "While researching, a student took notes.\nThe student wants a summary. Which choice uses relevant information?"}\nA) first\nB) second\nC) third\nD) fourth`;
+  columns[121].columns[0] = Array.from({ length: 35 }, (_, i) =>
+    question(i + 1, 12),
+  ).join("\n");
+  pages[135] = Array.from({ length: 18 }, (_, i) => question(i + 1, 13)).join(
+    "\n",
+  );
+  pages[152] =
+    "Chapter 12 Practice (pp. 117-122)\n" +
+    Array.from({ length: 35 }, (_, i) => `${i + 1}. B`).join("\n") +
+    "\nChapter 13: Notes\nChapter 13 Practice (pp. 131-139)\n" +
+    Array.from({ length: 18 }, (_, i) => `${i + 1}. D`).join("\n");
+  const p = parsePrepProWriting(pages.join("\f"), columns, "Synthetic.pdf");
+  assert.deepEqual(p.review, []);
+  assert.deepEqual(
+    p.payload.topics.map((t) => t.questions.length),
+    [35, 18],
+  );
+  assert.equal(p.payload.topics[0].questions[0].correctAnswer, 1);
+  assert.equal(p.payload.topics[1].questions[0].correctAnswer, 3);
+  assert.equal(p.evidence[35].page, 136);
+  columns[122].columns[0] = question(1, 12);
+  const repeated = parsePrepProWriting(
+    pages.join("\f"),
+    columns,
+    "Synthetic.pdf",
+  );
+  assert.equal(repeated.payload.topics[0].questions.length, 34);
+  assert.equal(repeated.review.filter((r) => r.number === 1).length, 2);
+  assert.throws(
+    () =>
+      parsePrepProWriting(
+        pages.join("\f").replace("35. B", ""),
+        "",
+        "Synthetic.pdf",
+      ),
+    /Incomplete/,
+  );
+});
+
+test("every retained question receives the matching page even when evidence indices have large gaps", async () => {
+  const { attachProvenance } = await import("../scripts/imports/provenance.js");
+  const questions = Array.from({ length: 6 }, (_, i) => ({
+      question: `Synthetic question ${i}`,
+    })),
+    topics = [
+      {
+        title: "One",
+        questions: questions.slice(0, 2),
+        children: [{ title: "Nested", questions: questions.slice(2, 4) }],
+      },
+      { title: "Two", questions: questions.slice(4) },
+    ],
+    evidence = questions.map((_, i) => ({
+      question_index: i,
+      page: 100 + i,
+      number: i + 1,
+    }));
+  attachProvenance(topics, evidence, "Synthetic.pdf", "test1");
+  assert.deepEqual(
+    questions.map((q) => q.source_page),
+    [100, 101, 102, 103, 104, 105],
+  );
+  assert.equal(questions[5].import_metadata.source_section, "Two");
+  assert.equal(questions[3].import_metadata.source_number, 4);
+});

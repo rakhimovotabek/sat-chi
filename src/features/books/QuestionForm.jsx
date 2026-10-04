@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { validateQuestion } from "./import-validation.js";
 import { saveQuestion } from "./api.js";
-export default function QuestionForm({ topicId, question, onSaved, onCancel }) {
+export default function QuestionForm({
+  topicId,
+  question,
+  onSaved,
+  onCancel,
+  onSubmitPayload,
+  requireAnswerSelection = false,
+}) {
   const answer = question?.question_answers;
   const key = Array.isArray(answer) ? answer[0] : answer;
   const [values, setValues] = useState({
@@ -10,7 +17,7 @@ export default function QuestionForm({ topicId, question, onSaved, onCancel }) {
     passage: question?.passage || "",
     stimulus: question?.stimulus || "",
     options: question?.options || ["", "", "", ""],
-    correctAnswer: key?.correct_answer ?? 0,
+    correctAnswer: key?.correct_answer ?? (requireAnswerSelection ? -1 : 0),
     explanation: key?.explanation || "",
     domain: question?.domain || "",
     skill: question?.skill || "",
@@ -43,7 +50,8 @@ export default function QuestionForm({ topicId, question, onSaved, onCancel }) {
     if (problems.length) return;
     setBusy(true);
     try {
-      await saveQuestion(topicId, payload, question?.id);
+      if (onSubmitPayload) await onSubmitPayload(payload);
+      else await saveQuestion(topicId, payload, question?.id);
       onSaved();
     } catch (e) {
       setErrors([e.message]);
@@ -115,6 +123,9 @@ export default function QuestionForm({ topicId, question, onSaved, onCancel }) {
             setValues((v) => ({ ...v, correctAnswer: Number(e.target.value) }))
           }
         >
+          {requireAnswerSelection && (
+            <option value={-1}>Select verified answer</option>
+          )}
           {values.options.map((_, i) => (
             <option value={i} key={i}>
               {String.fromCharCode(65 + i)}
