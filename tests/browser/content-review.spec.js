@@ -9,9 +9,10 @@ test("admin sees source outcomes, real catalog counts and import checkpoint hist
     page.getByRole("heading", { name: "Content Review", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Partially imported", { exact: true }),
+    page.getByText("Extraction blocked", { exact: false }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Inspect source" }).click();
+  await page.getByText("Developer details", { exact: true }).click();
   await expect(
     page.getByText("layout1 · Last checkpoint", { exact: false }),
   ).toBeVisible();
@@ -33,6 +34,7 @@ test("admin filters review queue, edits a persistent question and approves only 
   const store = await reviewFixture(page);
   await page.goto("/admin/content-review");
   await page.getByRole("button", { name: "Review queue", exact: true }).click();
+  await page.getByLabel("Review bucket").selectOption("legacy");
   await page.getByLabel("Warning contains").fill("OCR");
   await expect(page.getByRole("button", { name: "Inspect item" })).toHaveCount(
     1,
@@ -63,6 +65,7 @@ test("admin filters review queue, edits a persistent question and approves only 
   expect(store.items[1].status).toBe("pending");
   await page.reload();
   await page.getByRole("button", { name: "Review queue", exact: true }).click();
+  await page.getByLabel("Review bucket").selectOption("legacy");
   await page.getByLabel("Review status").selectOption("approved");
   await expect(
     page.getByText("Which value satisfies the equation?", { exact: true }),
@@ -74,6 +77,7 @@ test("admin rejection and duplicate decisions remain visible in audit history", 
   const store = await reviewFixture(page);
   await page.goto("/admin/content-review");
   await page.getByRole("button", { name: "Review queue", exact: true }).click();
+  await page.getByLabel("Review bucket").selectOption("legacy");
   await page.getByRole("button", { name: "Inspect item" }).first().click();
   await page
     .getByLabel("Review note")
@@ -114,6 +118,7 @@ test("mobile source and review lists remain within the viewport", async ({
     page.getByRole("heading", { name: "Content Review", exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Review queue", exact: true }).click();
+  await page.getByLabel("Review bucket").selectOption("legacy");
   await expect(
     page.getByRole("button", { name: "Inspect item" }).first(),
   ).toBeVisible();
@@ -184,6 +189,7 @@ test("vocabulary exercise correction preserves supplied type and physical source
   });
   await page.goto("/admin/content-review");
   await page.getByRole("button", { name: "Review queue", exact: true }).click();
+  await page.getByLabel("Review bucket").selectOption("legacy");
   await page.getByLabel("Item type").selectOption("exercise");
   await page.getByRole("button", { name: "Inspect item" }).click();
   await page.getByRole("button", { name: "Edit item", exact: true }).click();
@@ -194,13 +200,58 @@ test("vocabulary exercise correction preserves supplied type and physical source
     .getByRole("button", { name: "Save question", exact: true })
     .click();
   await expect(
-    page
-      .getByRole("region", { name: "Review item" })
-      .getByRole("heading", {
-        name: "Which word completes this sentence correctly?",
-      }),
+    page.getByRole("region", { name: "Review item" }).getByRole("heading", {
+      name: "Which word completes this sentence correctly?",
+    }),
   ).toBeVisible();
   const item = store.items.find((r) => r.id === "exercise-1");
   expect(item.payload.questionType).toBe("sentence_completion");
   expect(item.payload.sourcePage).toBe(13);
+});
+
+test("triage excludes audit candidates, confirms safe bulk approval, and routes blocked sources", async ({
+  page,
+}) => {
+  const store = await reviewFixture(page);
+  await page.goto("/admin/content-review");
+  await page
+    .getByRole("button", { name: "Approve safe items", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Inspect item", exact: true }),
+  ).toHaveCount(1);
+  await page
+    .getByRole("button", { name: "Approve all safe records", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Approve 1 validated content items?" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Approval does not publish any book.", { exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "local-imports/review-triage-desktop.png",
+    fullPage: true,
+  });
+  await page
+    .getByRole("button", { name: "Confirm approval", exact: true })
+    .click();
+  expect(store.items[0].status).toBe("approved");
+  expect(store.items[1].status).toBe("pending");
+  await page
+    .getByRole("button", { name: "Inspect blocked sources", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Inspect source", exact: true }),
+  ).toHaveCount(1);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: "local-imports/review-triage-mobile.png",
+    fullPage: true,
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });

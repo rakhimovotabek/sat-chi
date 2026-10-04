@@ -62,3 +62,15 @@ Completed hashes/parser versions are resumed. Exact source repeats and exact cat
 Students open **Settings** (`/settings`); administrators use `/admin/settings`. Display name and student daily study minutes persist to the account. Changing the daily goal preserves today's work, historical completed tasks, study days and selected sets; future unstarted tasks are regenerated within the new budget. SAT/profile preferences remain in Profile and Study Plan.
 
 Vocabulary shuffle, test size and test type persist per account on this browser and initialize the existing vocabulary learning controls. Storage errors are shown. Theme switching is omitted because the current styling does not provide a complete theme system. The existing account bar remains the single logout action.
+
+## Actionable triage (October 4 continuation)
+
+The home page separates **Ready to approve**, **Needs human check**, **Blocked sources**, **Possible duplicates**, **Approved**, and **Rejected**. Unimported candidates and source diagnostics remain in **Audit / history only**; they do not inflate the human content workload. A compact source table replaces the repetitive cards. Source titles inspect the source; catalog titles navigate to the book. Parser/checkpoint evidence sits under Developer details.
+
+Readiness is computed from the actual entity, its source/book/set relationship, explicit provenance and physical page, the existing `validate_review_payload` validator, and unresolved warnings/duplicates. Passing the payload validator alone is insufficient. Passage pages deliberately unknown since migration 014 need verification; they are not copied from word-table pages. Missing/removed catalog entities remain audit-only.
+
+Safe bulk approval supports selected items, all visible safe items, one source/book, or the safe catalog. Preview lists automatically excluded buckets. Confirmation sends the exact IDs and versions; the server locks/revalidates the inventory and refuses a stale confirmation. Every approval uses the existing audited approval RPC. No book is published. Rejected/deferred/duplicate/audit-only items cannot enter a safe bulk batch.
+
+Blocked Sources groups extraction tasks by source. Inspection shows pages, extraction method, diagnosis and potential-question estimates. Recovery actions record an audited retry request, unsupported decision or ignore decision with a required explanation. **Request extraction retry does not execute shell code from the browser**: the local importer must handle it. PDFs/page renderings remain local. Manual transcription is available after source inspection and returns to the audit candidate bucket for a separate review.
+
+Reviewers can move Previous/Next through the current page, or use left/right arrow keys outside form controls; Escape closes the reviewer. All legacy filters and raw diagnostic records remain available in the explicitly labeled Developer queue.

@@ -14,7 +14,13 @@ const wordFields = [
   "translation",
   "notes",
 ];
-export default function ReviewItem({ id, onClose, onChanged }) {
+export default function ReviewItem({
+  id,
+  onClose,
+  onChanged,
+  onPrevious,
+  onNext,
+}) {
   const panel = useRef(null);
   useEffect(() => {
     panel.current?.scrollIntoView({ block: "start" });
@@ -51,6 +57,30 @@ export default function ReviewItem({ id, onClose, onChanged }) {
       setBusy(false);
     }
   }
+  useEffect(() => {
+    function keydown(e) {
+      if (
+        e.target.closest("input,textarea,select,button") ||
+        editing ||
+        busy ||
+        e.altKey ||
+        e.ctrlKey ||
+        e.metaKey
+      )
+        return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        onPrevious?.();
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        onNext?.();
+      }
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", keydown);
+    return () => window.removeEventListener("keydown", keydown);
+  }, [onPrevious, onNext, onClose, editing, busy]);
   const editable = ["question", "exercise", "word", "passage"].includes(
     r?.item_type,
   );
@@ -63,6 +93,24 @@ export default function ReviewItem({ id, onClose, onChanged }) {
     >
       <div className="section-heading">
         <h2>Review item</h2>
+        <div className="button-row">
+          {onPrevious && (
+            <button
+              className="button button-secondary button-compact"
+              onClick={onPrevious}
+            >
+              Previous item
+            </button>
+          )}
+          {onNext && (
+            <button
+              className="button button-secondary button-compact"
+              onClick={onNext}
+            >
+              Next item
+            </button>
+          )}
+        </div>
         <button
           className="button button-secondary button-compact"
           onClick={onClose}
@@ -100,7 +148,11 @@ export default function ReviewItem({ id, onClose, onChanged }) {
                     ))}
                   </ol>
                   <p>
-                    Detected answer:{" "}
+                    {p.domain || "Domain unclassified"} ·{" "}
+                    {p.skill || "Skill unclassified"}
+                  </p>
+                  <p>
+                    Proposed correct answer:{" "}
                     {Number.isInteger(p.correctAnswer)
                       ? String.fromCharCode(65 + p.correctAnswer)
                       : "Not supplied — must be verified"}
@@ -225,6 +277,9 @@ export default function ReviewItem({ id, onClose, onChanged }) {
                     : {
                         title: String(data.get("title") || ""),
                         passage: String(data.get("passage") || ""),
+                        ...(data.get("source_page")
+                          ? { source_page: Number(data.get("source_page")) }
+                          : {}),
                       };
                 if (r.item_type === "word" && p.source_page)
                   payload.source_page = p.source_page;
@@ -243,6 +298,18 @@ export default function ReviewItem({ id, onClose, onChanged }) {
                     />
                   </label>
                 ),
+              )}
+              {r.item_type === "passage" && (
+                <label>
+                  Physical source page
+                  <input
+                    name="source_page"
+                    type="number"
+                    min="1"
+                    max="100000"
+                    defaultValue={r.source_page || ""}
+                  />
+                </label>
               )}
               <div className="button-row">
                 <button className="button button-primary" disabled={busy}>

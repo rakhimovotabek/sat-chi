@@ -13,7 +13,10 @@ export async function reviewFixture(page, role = "admin") {
       updated_at: "2026-10-04T10:00:00Z",
       question_count: 1,
       word_count: 0,
-      review_count: 2,
+      review_count: 1,
+      triage: { ready: 1, human: 0, audit: 1 },
+      blocked: true,
+      pages: 20,
       warning_count: 1,
       detected_questions: 2,
       skipped_count: 1,
@@ -81,6 +84,14 @@ export async function reviewFixture(page, role = "admin") {
         return json({ message: "Administrator access required" }, 403);
       if (name === "content_review_overview")
         return json({
+          ready: items.filter(
+            (r) => r.entity_id && r.status === "pending" && !r.warnings.length,
+          ).length,
+          human: 0,
+          audit: 1,
+          approved: items.filter((r) => r.status === "approved").length,
+          rejected: items.filter((r) => r.status === "rejected").length,
+          blocked_sources: 1,
           sources: 1,
           questions: 1,
           words: 0,
@@ -99,10 +110,23 @@ export async function reviewFixture(page, role = "admin") {
       if (name === "content_review_sources")
         return json({ rows: [source], total: 1 });
       if (name === "content_review_source") return json(source);
-      if (name === "content_review_queue") {
+      if (
+        name === "content_review_triage_queue" ||
+        name === "content_review_queue"
+      ) {
         const rows = items
           .filter(
             (r) =>
+              (!b.p_bucket ||
+                (b.p_bucket === "audit"
+                  ? !r.entity_id
+                  : b.p_bucket === "ready"
+                    ? r.entity_id &&
+                      r.status === "pending" &&
+                      !r.warnings.length
+                    : b.p_bucket === "human"
+                      ? r.entity_id && r.warnings.length
+                      : r.status === b.p_bucket)) &&
               (!b.p_status || r.status === b.p_status) &&
               (!b.p_warning ||
                 r.warnings
@@ -120,8 +144,30 @@ export async function reviewFixture(page, role = "admin") {
             ...r,
             label: r.payload.question,
             source_title: source.title,
+            bucket: r.entity_id ? "ready" : "audit",
           }));
         return json({ rows, total: rows.length });
+      }
+      if (name === "content_review_bulk") {
+        const safe = items
+          .filter(
+            (r) =>
+              r.entity_id &&
+              r.status === "pending" &&
+              !r.warnings.length &&
+              (!b.p_ids || b.p_ids.includes(r.id)),
+          )
+          .map((r) => ({ id: r.id, version: r.updated_at }));
+        if (b.p_confirm) {
+          for (const x of safe)
+            items.find((r) => r.id === x.id).status = "approved";
+        }
+        return json({
+          safe,
+          count: safe.length,
+          excluded: { audit: 1 },
+          ...(b.p_confirm ? { approved: safe.length } : {}),
+        });
       }
       if (name === "content_review_detail")
         return json({

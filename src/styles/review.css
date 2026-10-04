@@ -58,3 +58,124 @@
     justify-self: start;
   }
 }
+.review-quick-actions,
+.review-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-color, #dce2eb);
+}
+.review-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border-bottom: 1px solid #dce2eb;
+}
+.review-stats .card {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  flex: 1;
+  min-width: 145px;
+  padding: 14px 18px 14px 0;
+}
+.review-stats strong {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.8rem;
+}
+.review-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 18px 0;
+}
+.review-source-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.875rem;
+  text-align: left;
+}
+.review-source-table th {
+  font-size: 0.75rem;
+  color: #526078;
+  background: #f3f5f8;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.review-source-table th,
+.review-source-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #dce2eb;
+  vertical-align: top;
+}
+.review-source-table td {
+  font-variant-numeric: tabular-nums;
+}
+.review-source-table tbody tr:hover {
+  background: #f6f8fb;
+}
+.review-source-table small {
+  display: block;
+  color: #526078;
+  margin-top: 5px;
+  max-width: 32ch;
+  overflow-wrap: anywhere;
+}
+.review-title-link {
+  display: block;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #234fa1;
+  text-align: left;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.review-title-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.review-title-link:focus-visible {
+  outline: 2px solid #234fa1;
+  outline-offset: 3px;
+}
+.review-source-table .review-title-link + .review-title-link,
+.review-source-table .button + .review-title-link {
+  margin-top: 10px;
+}
+.review-source-row {
+  padding: 14px 0;
+  border: 0;
+  border-bottom: 1px solid #dce2eb;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  margin: 0;
+}
+.review-confirm {
+  padding: 20px;
+  background: #eff4fc;
+  border: 1px solid #c5d4ed;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+.review-detail {
+  border-radius: 8px;
+}
+@media (max-width: 700px) {
+  .review-stats .card {
+    min-width: 50%;
+  }
+  .review-quick-actions .button {
+    flex: 1 1 160px;
+  }
+  .review-source-table {
+    min-width: 850px;
+  }
+  .review-source-row {
+    padding: 16px 0;
+  }
+}

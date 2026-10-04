@@ -113,7 +113,9 @@ test("content review enforces admin ownership, actual counts, persistent edits, 
     let overview = await call("content_review_overview");
     assert.equal(overview.sources, 1);
     assert.equal(overview.questions, 1);
-    assert.equal(overview.awaiting_review, 2);
+    assert.equal(overview.awaiting_review, 1);
+    assert.equal(overview.ready, 1);
+    assert.equal(overview.audit, 1);
     const sources = await call("content_review_sources");
     assert.equal(sources.rows[0].question_count, 1);
     assert.equal(sources.rows[0].outcome, "imported_review");
@@ -231,7 +233,7 @@ test("content review enforces admin ownership, actual counts, persistent edits, 
       ],
       ["uuid", "text", "jsonb", "text", "timestamptz"],
     );
-    assert.equal((await call("content_review_overview")).duplicates, 1);
+    assert.equal((await call("content_review_overview")).duplicates || 0, 0); // Unimported candidates remain audit-only.
     detail = await call("content_review_detail", [excluded], ["uuid"]);
     await call(
       "update_content_review",
@@ -324,6 +326,78 @@ test("content review enforces admin ownership, actual counts, persistent edits, 
       ).rows[0].source_page,
       null,
     );
+    const triage = await call(
+      "content_review_triage_queue",
+      [vsource, "human"],
+      ["uuid", "text"],
+    );
+    assert.equal(triage.total, 1);
+    assert.match(triage.rows[0].reason, /passage source page/);
+    let bulk = await call("content_review_bulk", [vsource], ["uuid"]);
+    assert.equal(bulk.count, 2); // Word + keyed exercise; unknown passage page excluded.
+    assert.equal(bulk.excluded.human, 1);
+    const stale = bulk.safe;
+    await call(
+      "update_content_review",
+      [
+        exercise.id,
+        "edit",
+        { ...ed.payload, question: "Which word completes the final sentence?" },
+        "Corrected source wording",
+        ed.updated_at,
+      ],
+      ["uuid", "text", "jsonb", "text", "timestamptz"],
+    );
+    await assert.rejects(
+      call(
+        "content_review_bulk",
+        [vsource, null, null, stale],
+        ["uuid", "uuid[]", "uuid", "jsonb"],
+      ),
+      /inventory changed/,
+    );
+    bulk = await call("content_review_bulk", [vsource], ["uuid"]);
+    const approved = await call(
+      "content_review_bulk",
+      [vsource, null, null, bulk.safe],
+      ["uuid", "uuid[]", "uuid", "jsonb"],
+    );
+    assert.equal(approved.approved, 2);
+    assert.equal(
+      (await db.query("select published from public.vocabulary_books")).rows[0]
+        .published,
+      false,
+    );
+    assert.equal(
+      (
+        await call(
+          "content_review_triage_queue",
+          [vsource, "human"],
+          ["uuid", "text"],
+        )
+      ).total,
+      1,
+    );
+    assert.equal(
+      (
+        await call(
+          "content_review_triage_queue",
+          [source, "audit"],
+          ["uuid", "text"],
+        )
+      ).total,
+      1,
+    );
+    await call(
+      "content_review_source_action",
+      [source, "retry", "Retry with source-specific layout adapter"],
+      ["uuid", "text", "text"],
+    );
+    assert.ok(
+      (
+        await db.query("select action from public.content_review_audit")
+      ).rows.some((r) => r.action === "source_retry"),
+    );
     await role(student);
     await call(
       "save_account_settings",
@@ -374,6 +448,13 @@ test("content review enforces admin ownership, actual counts, persistent edits, 
     for (const [name, args, casts] of [
       ["content_review_overview", [], []],
       ["content_review_sources", [], []],
+      ["content_review_triage_queue", [], []],
+      ["content_review_bulk", [], []],
+      [
+        "content_review_source_action",
+        [source, "retry", "Please retry this source"],
+        ["uuid", "text", "text"],
+      ],
       ["content_review_detail", [clean], ["uuid"]],
       [
         "update_content_review",
