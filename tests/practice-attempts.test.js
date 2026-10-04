@@ -92,7 +92,24 @@ test("bank checks keep every attempt, private keys, accurate question time and o
         true,
       ).includes("correct"),
     );
+    const metrics = await call("practice_analytics");
+    assert.equal(metrics.practiced, 1);
+    assert.equal(metrics.first_accuracy, 0);
+    assert.equal(metrics.eventual_accuracy, 100);
+    assert.equal(metrics.average_attempts, 2);
+    assert.equal(metrics.average_seconds, 31);
+    assert.equal(metrics.median_seconds, 31);
+    assert.deepEqual(metrics.areas, []);
+    const detail = await call(
+      "practice_question_analytics",
+      [null, "retried", 0],
+      ["uuid", "text", "integer"],
+    );
+    assert.equal(detail.total, 1);
+    assert.equal(detail.rows[0].attempts, 2);
+    assert.equal(detail.rows[0].source, "Analytics fixture");
     await role(other);
+    await assert.rejects(call("practice_analytics", [student], ["uuid"]));
     assert.equal(
       (await db.query("select * from public.question_check_attempts")).rows
         .length,

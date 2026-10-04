@@ -78,7 +78,7 @@ export async function learningFixture(page, role = "student") {
       },
     ]);
   const regex =
-    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(start_vocabulary_typed_test|vocabulary_typed_history|vocabulary_typed_test|answer_vocabulary_typed_test|finish_vocabulary_typed_test|refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|vocabulary_catalog|question_bank_facets|vocabulary_book_detail|set_vocabulary_publication|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
+    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(practice_analytics|practice_question_analytics|start_vocabulary_typed_test|vocabulary_typed_history|vocabulary_typed_test|answer_vocabulary_typed_test|finish_vocabulary_typed_test|refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|vocabulary_catalog|question_bank_facets|vocabulary_book_detail|set_vocabulary_publication|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
   await page.route(regex, async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
@@ -330,6 +330,8 @@ export async function learningFixture(page, role = "student") {
       });
     if (table === "practice_mistake")
       return json(start("bank", "Review a question mistake"));
+    if (table === "practice_analytics") return json(store.analytics || {practiced:0,solved:0,unresolved:0,areas:[],activity:[]});
+    if (table === "practice_question_analytics") return json(store.questionAnalytics || {total:0,rows:[]});
     if (table === "learning_metrics")
       return json({
         attempted: store.session?.submitted_at

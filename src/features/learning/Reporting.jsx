@@ -1,3 +1,4 @@
+import PracticeAnalytics from "./PracticeAnalytics.jsx";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
 import useAuth from "../../hooks/useAuth.js";
@@ -164,6 +165,7 @@ export function Progress() {
         <>
           <MetricCards data={state.data} />
           <VocabularyOverview />
+          <PracticeAnalytics />
           <div className="button-row">
             <Link className="button button-secondary" to="/mistakes">
               Review Mistakes
@@ -422,6 +424,7 @@ export function StudentDetail() {
             </p>
           </section>
           <MetricCards data={state.data.metrics} />
+          <PracticeAnalytics student={studentId} />
           <Activity rows={state.data.metrics.activity} />
         </>
       )}
@@ -461,8 +464,22 @@ export function AdminSession() {
           </section>
           <div className="item-list">
             {state.data.items.map((i, n) => (
-              <article className="card learning-panel" key={i.id}>
+              <article className="card learning-panel" key={i.id} id={i.id}>
                 <h3>Question {n + 1}</h3>
+                <p>
+                  {formatTime(i.active_seconds || 0)} active time ·{" "}
+                  {i.attempts?.length || 0} checks ·{" "}
+                  {i.solved_at ? "Solved" : "Unresolved"}
+                </p>
+                {i.attempts?.map((a) => (
+                  <p key={a.id}>
+                    Attempt {a.attempt_order} ·{" "}
+                    {String.fromCharCode(65 + a.selected_answer)} ·{" "}
+                    {a.correct ? "Correct" : "Incorrect"} ·{" "}
+                    {formatTime(a.between_seconds)} since prior check ·{" "}
+                    {formatTime(a.active_seconds)} cumulative
+                  </p>
+                ))}
                 <p className="reading-text">{i.question.question_text}</p>
                 <p>
                   Student answer:{" "}

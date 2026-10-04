@@ -42,3 +42,16 @@ test("bank Check shows only attempted choices, retries and preserves overview/re
   await expect(page.locator(".correct-choice")).toHaveCount(1);
   await expect(page.getByText(/Attempt 1: A/)).toBeVisible();
 });
+test("Progress and admin student detail render server summaries and bounded question lists",async({page})=>{
+ const store=await learningFixture(page,"admin");
+ store.analytics={practiced:12,solved:9,unresolved:3,first_accuracy:50,eventual_accuracy:75,average_attempts:2.3,average_seconds:42,median_seconds:33,areas:[{level:"domain",label:"Algebra",samples:12,first_accuracy:50,eventual_accuracy:75,attempts:2.3,seconds:42,review_marks:4}],activity:[]};
+ store.questionAnalytics={total:26,rows:[{id:"item-one",session_id:"session",question:"A difficult question",source:"SAT Book",domain:"Algebra",skill:"Equations",active_seconds:120,attempts:3,solved_at:null}]};
+ await page.goto("/admin/students/d0000000-0000-0000-0000-000000000010");
+ await expect(page.getByRole("heading",{name:"Practice learning analytics"})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Hardest areas"})).toBeVisible();
+ await expect(page.getByRole("link",{name:"A difficult question"})).toHaveAttribute("href","/admin/sessions/session#item-one");
+ await page.getByLabel("Show questions").selectOption("retried");
+ await expect.poll(()=>store.requests.filter(r=>r.path.endsWith("practice_question_analytics")).at(-1)?.body.p_sort).toBe("retried");
+ await page.getByRole("button",{name:"Next questions",exact:true}).click();
+ await expect.poll(()=>store.requests.filter(r=>r.path.endsWith("practice_question_analytics")).at(-1)?.body.p_page).toBe(1);
+});
