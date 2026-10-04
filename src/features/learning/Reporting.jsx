@@ -21,6 +21,7 @@ function VocabularyOverview() {
     </>
   );
 }
+import { performanceAreas } from "./study-plan-model.js";
 const percent = (correct, total) =>
   total ? `${Math.round((correct / total) * 100)}%` : "—";
 export function MetricCards({ data }) {
@@ -36,6 +37,7 @@ export function MetricCards({ data }) {
         ],
         ["Vocabulary mastered", data.vocabulary_known],
         ["Current streak", `${data.streak || 0} days`],
+        ["Longest streak", `${data.longest_streak || 0} days`],
       ].map(([name, value]) => (
         <article className="card metric-card" key={name}>
           <small>{name}</small>
@@ -162,6 +164,47 @@ export function Progress() {
         <>
           <MetricCards data={state.data} />
           <VocabularyOverview />
+          <div className="button-row">
+            <Link className="button button-secondary" to="/mistakes">
+              Review Mistakes
+            </Link>
+            <Link className="primary-link" to="/study-plan">
+              Open Study Plan →
+            </Link>
+          </div>
+          <div className="learning-columns">
+            {[
+              ["Strong Areas", "strong"],
+              ["Needs Attention", "attention"],
+            ].map(([label, key]) => (
+              <section className="card learning-panel" key={key}>
+                <h2>{label}</h2>
+                {performanceAreas(state.data.attention)[key].length ? (
+                  performanceAreas(state.data.attention)[key].map((row) => (
+                    <p key={row.section + row.domain}>
+                      <strong>{row.domain}</strong> ·{" "}
+                      {percent(row.correct, row.attempted)} from {row.attempted}{" "}
+                      answers in the last 30 days
+                    </p>
+                  ))
+                ) : (
+                  <p className="empty-copy">
+                    At least 10 answers in an area are needed before it receives
+                    a label.
+                  </p>
+                )}
+              </section>
+            ))}
+          </div>
+          <section className="card learning-panel">
+            <h2>Recent performance</h2>
+            <p>
+              {state.data.recent_attempted || 0} SAT questions answered in the
+              last 14 days ·{" "}
+              {percent(state.data.recent_correct, state.data.recent_attempted)}{" "}
+              accuracy
+            </p>
+          </section>
           <section className="card learning-panel">
             <div className="section-heading">
               <h2>Performance breakdown</h2>

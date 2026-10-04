@@ -2,6 +2,8 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router";
 import StudentLayout from "./layouts/StudentLayout.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
+const StudyPlan = lazy(() => import("./features/learning/StudyPlan.jsx"));
+const Mistakes = lazy(() => import("./features/learning/Mistakes.jsx"));
 const StudentDashboard = lazy(() =>
   import("./features/learning/Reporting.jsx").then((m) => ({
     default: m.StudentDashboard,
@@ -98,6 +100,8 @@ export default function App() {
               element={<VocabularySet />}
             />
             <Route path="/progress" element={<Progress />} />
+            <Route path="/study-plan" element={<StudyPlan />} />
+            <Route path="/mistakes" element={<Mistakes />} />
             <Route path="/standings" element={<Standings />} />
             {studentNavigation
               .filter(
@@ -110,6 +114,7 @@ export default function App() {
                     "question-bank",
                     "vocabulary",
                     "progress",
+                    "study-plan",
                     "standings",
                   ].includes(p.slug),
               )

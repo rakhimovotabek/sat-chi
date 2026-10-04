@@ -3,12 +3,13 @@ import { Link, useSearchParams } from "react-router";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
-import { vocabPool, vocabPassages } from "./api.js";
+import { vocabPool, vocabPassages, rpc } from "./api.js";
 import VocabularyLearning from "./VocabularyLearning.jsx";
-export default function VocabularyStudy() {
+export default function VocabularyStudy({ embedded = false, filterOverride }) {
   const [params] = useSearchParams(),
     sets = (params.get("sets") || "").split(",").filter(Boolean),
-    filter = params.get("filter") || "all",
+    filter = filterOverride || params.get("filter") || "all",
+    task = params.get("task"),
     [page, setPage] = useState(0),
     [search, setSearch] = useState(""),
     [query, setQuery] = useState("");
@@ -20,7 +21,9 @@ export default function VocabularyStudy() {
     return () => clearTimeout(timeout);
   }, [search]);
   const state = useContent(async () => {
-    const pool = await vocabPool(sets, filter, query, page);
+    const pool = task
+      ? await rpc("study_task_vocabulary", { p_task: task })
+      : await vocabPool(sets, filter, query, page);
     const visibleSets = [
       ...new Set(pool.words.flatMap((w) => w.source_sets || [w.set_id])),
     ];
@@ -28,22 +31,24 @@ export default function VocabularyStudy() {
       ...pool,
       passages: visibleSets.length ? await vocabPassages(visibleSets) : [],
     };
-  }, [sets.join(","), filter, query, page]);
+  }, [sets.join(","), filter, query, page, task]);
   return (
     <>
-      <PageHeader
-        title={
-          filter === "due"
-            ? "Review due words"
-            : filter === "starred"
-              ? "Starred words"
-              : filter === "weak"
-                ? "Words I Miss"
-                : "Study selected sets"
-        }
-        eyebrow="Vocabulary studio"
-        description={`${sets.length ? `${sets.length} original sets selected` : "Your published vocabulary library"}. Every word keeps its source set.`}
-      />
+      {!embedded && (
+        <PageHeader
+          title={
+            filter === "due"
+              ? "Review due words"
+              : filter === "starred"
+                ? "Starred words"
+                : filter === "weak"
+                  ? "Words I Miss"
+                  : "Study selected sets"
+          }
+          eyebrow="Vocabulary studio"
+          description={`${sets.length ? `${sets.length} original sets selected` : "Your published vocabulary library"}. Every word keeps its source set.`}
+        />
+      )}
       <Link className="primary-link" to="/vocabulary">
         ← Vocabulary library
       </Link>
@@ -62,13 +67,20 @@ export default function VocabularyStudy() {
           key={`${page}/${query}/${filter}`}
           words={state.data.words}
           passages={state.data.passages}
-          setIds={sets}
+          setIds={
+            task ? [...new Set(state.data.words.map((w) => w.set_id))] : sets
+          }
           scopeFilter={filter}
           total={state.data.total}
           initialMode={params.get("mode") || "words"}
           hasMore={(page + 1) * 100 < state.data.total}
           nextPage={() => setPage((p) => p + 1)}
         />
+      )}
+      {task && (
+        <Link className="button button-secondary" to="/study-plan">
+          Return to Study Plan
+        </Link>
       )}
       <div className="button-row">
         {page > 0 && (

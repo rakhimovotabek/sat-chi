@@ -401,3 +401,50 @@ test("multiple sets can be selected, cleared and combined with original set labe
   await expect(page).toHaveURL(/sets=vset,second/);
   await expect(page.locator(".vocab-word")).toHaveCount(5);
 });
+
+test("study preferences generate real tasks and open an owned practice session", async ({
+  page,
+}) => {
+  const store = await learningFixture(page);
+  await page.goto("/study-plan");
+  await expect(
+    page.getByRole("heading", { name: "Make a plan that fits your week" }),
+  ).toBeVisible();
+  await page.getByLabel("Available minutes per study day").fill("45");
+  await page.getByRole("button", { name: "Save study preferences" }).click();
+  await expect(page.getByText("Targeted Algebra")).toBeVisible();
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await expect(page).toHaveURL(/practice\//);
+  expect(store.session.title).toBe("Study Plan practice");
+});
+test("mistake center switches between submitted SAT mistakes and weak vocabulary", async ({
+  page,
+}) => {
+  const store = await learningFixture(page);
+  store.mistakes = [
+    {
+      item_id: "missed",
+      session_id: "original",
+      submitted_at: new Date().toISOString(),
+      question: {
+        question_text: "A missed source question",
+        section: "Math",
+        domain: "Algebra",
+        skill: "Linear equations",
+        source: "Source book",
+      },
+    },
+  ];
+  await page.goto("/mistakes");
+  await expect(page.getByText("A missed source question")).toBeVisible();
+  await page.getByRole("button", { name: "Vocabulary", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Flashcards", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Questions", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Practice Again", exact: true })
+    .click();
+  await expect(page).toHaveURL(/practice\//);
+  expect(store.session.title).toBe("Review a question mistake");
+});

@@ -54,6 +54,26 @@ export default function Vocabulary({ admin = false }) {
             </button>
             <button
               className="button button-secondary"
+              onClick={() =>
+                setSelected(
+                  summary.data?.sets
+                    .filter((s) => s.learned > 0)
+                    .map((s) => s.set_id) || [],
+                )
+              }
+            >
+              Select learned sets
+            </button>
+            {selected.length > 0 && (
+              <Link
+                className="primary-link"
+                to={`/study-plan?sets=${selected.join(",")}`}
+              >
+                Use in Study Plan →
+              </Link>
+            )}
+            <button
+              className="button button-secondary"
               onClick={() => setSelected([])}
             >
               Clear Selection

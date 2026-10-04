@@ -77,7 +77,7 @@ export async function learningFixture(page, role = "student") {
       },
     ]);
   const regex =
-    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
+    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
   await page.route(regex, async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
@@ -205,6 +205,41 @@ export async function learningFixture(page, role = "student") {
       );
       return json(id);
     }
+    if (table === "refresh_study_plan")
+      return json(store.plan || { preferences: null, tasks: [] });
+    if (table === "save_study_preferences") {
+      store.plan = {
+        preferences: {
+          minutes_per_day: body.p_minutes,
+          preferred_days: body.p_days,
+        },
+        today: new Date().toISOString().slice(0, 10),
+        tasks: [
+          {
+            id: "plan-task",
+            study_date: new Date().toISOString().slice(0, 10),
+            slot: 0,
+            kind: "questions",
+            title: "Targeted Algebra",
+            minutes: 15,
+            target_count: 5,
+            completed_at: null,
+          },
+        ],
+      };
+      return json(null);
+    }
+    if (table === "start_study_task")
+      return json({ session_id: start("bank", "Study Plan practice") });
+    if (table === "study_task_vocabulary")
+      return json({ total: store.words.length, words: store.words });
+    if (table === "question_mistakes")
+      return json({
+        total: (store.mistakes || []).length,
+        items: store.mistakes || [],
+      });
+    if (table === "practice_mistake")
+      return json(start("bank", "Review a question mistake"));
     if (table === "learning_metrics")
       return json({
         attempted: store.session?.submitted_at

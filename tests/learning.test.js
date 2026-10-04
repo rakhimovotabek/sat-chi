@@ -699,6 +699,180 @@ test("real PostgreSQL learning workflows preserve ownership, private keys, froze
       ).rows.length,
       1,
     );
+    // Real graded attempts provide enough evidence for domain targeting.
+    for (let iteration = 0; iteration < 5; iteration++) {
+      const weakSession = await call(
+        "start_bank_practice",
+        [JSON.stringify({ domain: "Algebra" }), 2, false],
+        ["jsonb", "integer", "boolean"],
+      );
+      const weakItems = (
+        await db.query(
+          "select id from public.book_practice_items where session_id=$1",
+          [weakSession],
+        )
+      ).rows;
+      await call(
+        "save_book_practice",
+        [
+          weakSession,
+          JSON.stringify(
+            weakItems.map((i) => ({
+              id: i.id,
+              selected_answer: 0,
+              marked: false,
+              eliminated: [],
+            })),
+          ),
+        ],
+        ["uuid", "jsonb"],
+      );
+      await call("finish_book_practice", [weakSession], ["uuid"]);
+    }
+    const mistakes = await call(
+      "question_mistakes",
+      ["{}", 0],
+      ["jsonb", "integer"],
+    );
+    assert.ok(mistakes.total > 0 && mistakes.total <= 10);
+    assert.equal(
+      new Set(mistakes.items.map((i) => i.question.id)).size,
+      mistakes.total,
+      "repeated mistakes deduplicate by original question",
+    );
+    const retryMistake = await call(
+      "practice_mistake",
+      [mistakes.items[0].item_id],
+      ["uuid"],
+    );
+    await assert.rejects(
+      call("review_book_practice", [retryMistake], ["uuid"]),
+    );
+    const weakMetrics = await call("learning_metrics");
+    assert.ok(
+      weakMetrics.attention.some(
+        (r) => r.domain === "Algebra" && r.attempted >= 10,
+      ),
+    );
+    await call(
+      "save_study_preferences",
+      [45, [0, 1, 2, 3, 4, 5, 6], "UTC", null, 1200, 1450],
+      ["integer", "integer[]", "text", "date", "integer", "integer"],
+    );
+    await assert.rejects(
+      call(
+        "save_study_preferences",
+        [5, [1], "UTC", null, 1200, 1450],
+        ["integer", "integer[]", "text", "date", "integer", "integer"],
+      ),
+    );
+    const plan = await call("refresh_study_plan");
+    assert.equal(plan.preferences.minutes_per_day, 45);
+    assert.ok(plan.tasks.length > 0);
+    assert.ok(
+      plan.tasks.some(
+        (t) => t.kind === "questions" && t.filters.domain === "Algebra",
+      ),
+    );
+    const daily = new Map();
+    for (const task of plan.tasks)
+      daily.set(
+        task.study_date,
+        (daily.get(task.study_date) || 0) + task.minutes,
+      );
+    assert.ok([...daily.values()].every((minutes) => minutes <= 45));
+    assert.ok(plan.tasks.some((task) => task.kind === "vocabulary_due"));
+    const todayTasks = plan.tasks.filter((t) => t.study_date === plan.today),
+      task = todayTasks.find(
+        (t) => t.kind === "questions" || t.kind === "mistakes",
+      );
+    assert.ok(task);
+    const started = await call("start_study_task", [task.id], ["uuid"]);
+    assert.ok(started.session_id);
+    assert.equal(
+      (await call("start_study_task", [task.id], ["uuid"])).session_id,
+      started.session_id,
+      "starting twice resumes one session",
+    );
+    const planItems = (
+      await db.query(
+        "select id from public.book_practice_items where session_id=$1",
+        [started.session_id],
+      )
+    ).rows;
+    await call(
+      "save_book_practice",
+      [
+        started.session_id,
+        JSON.stringify(
+          planItems.map((i) => ({
+            id: i.id,
+            selected_answer: 1,
+            marked: false,
+            eliminated: [],
+          })),
+        ),
+      ],
+      ["uuid", "jsonb"],
+    );
+    await call("finish_book_practice", [started.session_id], ["uuid"]);
+    const completed = await call("refresh_study_plan");
+    assert.ok(completed.tasks.find((t) => t.id === task.id)?.completed_at);
+    const vocabTask = todayTasks.find((t) => t.kind === "vocabulary_due");
+    assert.ok(vocabTask);
+    await call("start_study_task", [vocabTask.id], ["uuid"]);
+    const taskWords = await call(
+      "study_task_vocabulary",
+      [vocabTask.id],
+      ["uuid"],
+    );
+    assert.equal(taskWords.total, vocabTask.target_count);
+    for (const [i, w] of taskWords.words.entries())
+      await call(
+        "review_vocabulary",
+        [
+          w.id,
+          "know",
+          10,
+          `e2000000-0000-0000-0000-${String(i + 1).padStart(12, "0")}`,
+          "learn",
+          null,
+        ],
+        ["uuid", "text", "integer", "uuid", "text", "text"],
+      );
+    assert.ok(
+      (await call("refresh_study_plan")).tasks.find(
+        (t) => t.id === vocabTask.id,
+      )?.completed_at,
+    );
+    const intelligence = await call("learning_metrics");
+    assert.ok(intelligence.streak >= 1);
+    assert.ok(intelligence.longest_streak >= intelligence.streak);
+    await role(other);
+    assert.equal(
+      (await db.query("select * from public.study_plan_tasks")).rows.length,
+      0,
+    );
+    await assert.rejects(call("start_study_task", [task.id], ["uuid"]));
+    await assert.rejects(
+      call("study_task_vocabulary", [vocabTask.id], ["uuid"]),
+    );
+    assert.equal(
+      (await call("question_mistakes", ["{}", 0], ["jsonb", "integer"])).total,
+      0,
+    );
+    await role(student);
+    await db.exec("reset role");
+    await db.query(
+      "update public.study_plan_tasks set study_date=study_date-interval '1 day' where id=$1",
+      [task.id],
+    );
+    await role(student);
+    const preserved = await call("refresh_study_plan");
+    assert.ok(
+      preserved.tasks.some((t) => t.id === task.id && t.completed_at),
+      "past completed days survive replanning",
+    );
     await role(other);
     assert.equal(
       (await db.query("select * from public.vocabulary_progress")).rows.length,

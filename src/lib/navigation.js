@@ -166,3 +166,9 @@ adminNavigation.push({
   emptyTitle: "Platform settings",
   emptyDescription: "Platform configuration tools will be available here.",
 });
+
+studentNavigation.splice(2, 0, {
+  slug: "study-plan",
+  label: "Study Plan",
+  icon: "homework",
+});
