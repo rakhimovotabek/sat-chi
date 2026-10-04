@@ -24,6 +24,8 @@ export default function Player() {
   const [index, setIndex] = useState(0);
   const [error, setError] = useState("");
   const [overviewOpen, setOverviewOpen] = useState(false);
+  const [toolsTarget, setToolsTarget] = useState(null);
+  const [workspace, setWorkspace] = useState(null);
   const checkEvent = useRef(null);
   const [checking, setChecking] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -335,7 +337,15 @@ export default function Player() {
           )}
           {session.time_limit ? ` / ${formatTime(session.time_limit)}` : ""}
         </span>
-        {q.section === "Math" && <MathTools />}
+        {practice ? (
+          <span
+            className="player-math-tools"
+            ref={setToolsTarget}
+            hidden={q.section !== "Math"}
+          />
+        ) : (
+          q.section === "Math" && <MathTools />
+        )}
 
         <span role="status">
           {submitted
@@ -354,120 +364,131 @@ export default function Player() {
           {current.marked ? "Marked for review" : "Mark for review"}
         </button>
       </div>
-      <div className="question-player">
-        <Stimulus question={q} />
-        <section
-          className="answer-panel"
-          aria-label="Question and answer choices"
-        >
-          <div className="question-meta">
-            <span>{q.domain || "SAT practice"}</span>
-            <span>{q.difficulty}</span>
-          </div>
-          <p className="answer-state">
-            {current.selected_answer == null
-              ? "No answer selected"
-              : `Answer ${String.fromCharCode(65 + current.selected_answer)} selected`}
-          </p>
-          <h2 className="question-text">{q.question_text}</h2>
-          <fieldset
-            className="answer-choices"
-            disabled={
-              submitted ||
-              submitting ||
-              checking ||
-              (practice && Boolean(current.solved_at)) ||
-              !usableChoices
-            }
+      <div className="practice-workspace" ref={setWorkspace}>
+        {practice && workspace && (
+          <MathTools
+            key={sessionId}
+            workspace={workspace}
+            toolbar={toolsTarget}
+            sessionId={sessionId}
+            enabled={q.section === "Math"}
+          />
+        )}
+        <div className="question-player">
+          <Stimulus question={q} />
+          <section
+            className="answer-panel"
+            aria-label="Question and answer choices"
           >
-            <legend className="visually-hidden">Choose your answer</legend>
-            {!usableChoices && (
-              <p role="alert">
-                This question’s answer choices need recovery. It is excluded
-                from new graded practice.
-              </p>
-            )}
-            {usableChoices &&
-              q.options.map((option, i) => {
-                const eliminated = current.eliminated.includes(i);
-                return (
-                  <div
-                    key={i}
-                    className={`answer-choice ${current.selected_answer === i ? "selected" : ""} ${eliminated ? "eliminated" : ""} ${(submitted && answer?.correct_answer === i) || (practice && current.attempts?.some((a) => a.selected_answer === i && a.correct)) ? "correct-choice" : ""} ${(submitted && current.selected_answer === i && current.correct === false) || (practice && current.attempts?.some((a) => a.selected_answer === i && !a.correct)) ? "incorrect-choice" : ""}`}
-                  >
-                    <label>
-                      <input
-                        type="radio"
-                        name={`answer-${current.id}`}
-                        value={i}
-                        checked={current.selected_answer === i}
-                        disabled={eliminated}
-                        onChange={() => change({ selected_answer: i })}
-                      />
-                      <span className="choice-letter">
-                        {String.fromCharCode(65 + i)}
-                      </span>
-                      <span>{option}</span>
-                    </label>
-                    {!submitted && !current.solved_at && (
-                      <button
-                        className="eliminate-choice"
-                        type="button"
-                        aria-label={`${eliminated ? "Restore" : "Eliminate"} choice ${String.fromCharCode(65 + i)}`}
-                        aria-pressed={eliminated}
-                        onClick={() =>
-                          change({
-                            eliminated: eliminated
-                              ? current.eliminated.filter((v) => v !== i)
-                              : [...current.eliminated, i],
-                            selected_answer: current.selected_answer,
-                          })
-                        }
-                      >
-                        {eliminated ? "↶" : "×"}
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-          </fieldset>
-          {practice && current.attempts?.length > 0 && (
-            <div className="attempt-feedback" aria-live="polite">
-              <p>
-                {current.solved_at
-                  ? "Solved. Continue to the next question."
-                  : "That answer is incorrect. Try another choice."}
-              </p>
-              <ol>
-                {current.attempts.map((a) => (
-                  <li key={a.id}>
-                    Attempt {a.attempt_order}:{" "}
-                    {String.fromCharCode(65 + a.selected_answer)} ·{" "}
-                    {a.correct ? "Correct" : "Incorrect"} ·{" "}
-                    {formatTime(a.active_seconds)} active time
-                  </li>
-                ))}
-              </ol>
+            <div className="question-meta">
+              <span>{q.domain || "SAT practice"}</span>
+              <span>{q.difficulty}</span>
             </div>
-          )}
-          {submitted && answer && (
-            <section className="question-explanation">
-              <h3>
-                {current.selected_answer == null
-                  ? "Unanswered"
-                  : current.correct
-                    ? "Correct"
-                    : "Incorrect"}{" "}
-                · Correct answer:{" "}
-                {String.fromCharCode(65 + answer.correct_answer)}
-              </h3>
-              <p className="reading-text">
-                {answer.explanation ||
-                  "No explanation was provided for this question."}
-              </p>
-            </section>
-          )}
-        </section>
+            <p className="answer-state">
+              {current.selected_answer == null
+                ? "No answer selected"
+                : `Answer ${String.fromCharCode(65 + current.selected_answer)} selected`}
+            </p>
+            <h2 className="question-text">{q.question_text}</h2>
+            <fieldset
+              className="answer-choices"
+              disabled={
+                submitted ||
+                submitting ||
+                checking ||
+                (practice && Boolean(current.solved_at)) ||
+                !usableChoices
+              }
+            >
+              <legend className="visually-hidden">Choose your answer</legend>
+              {!usableChoices && (
+                <p role="alert">
+                  This question’s answer choices need recovery. It is excluded
+                  from new graded practice.
+                </p>
+              )}
+              {usableChoices &&
+                q.options.map((option, i) => {
+                  const eliminated = current.eliminated.includes(i);
+                  return (
+                    <div
+                      key={i}
+                      className={`answer-choice ${current.selected_answer === i ? "selected" : ""} ${eliminated ? "eliminated" : ""} ${(submitted && answer?.correct_answer === i) || (practice && current.attempts?.some((a) => a.selected_answer === i && a.correct)) ? "correct-choice" : ""} ${(submitted && current.selected_answer === i && current.correct === false) || (practice && current.attempts?.some((a) => a.selected_answer === i && !a.correct)) ? "incorrect-choice" : ""}`}
+                    >
+                      <label>
+                        <input
+                          type="radio"
+                          name={`answer-${current.id}`}
+                          value={i}
+                          checked={current.selected_answer === i}
+                          disabled={eliminated}
+                          onChange={() => change({ selected_answer: i })}
+                        />
+                        <span className="choice-letter">
+                          {String.fromCharCode(65 + i)}
+                        </span>
+                        <span>{option}</span>
+                      </label>
+                      {!submitted && !current.solved_at && (
+                        <button
+                          className="eliminate-choice"
+                          type="button"
+                          aria-label={`${eliminated ? "Restore" : "Eliminate"} choice ${String.fromCharCode(65 + i)}`}
+                          aria-pressed={eliminated}
+                          onClick={() =>
+                            change({
+                              eliminated: eliminated
+                                ? current.eliminated.filter((v) => v !== i)
+                                : [...current.eliminated, i],
+                              selected_answer: current.selected_answer,
+                            })
+                          }
+                        >
+                          {eliminated ? "↶" : "×"}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+            </fieldset>
+            {practice && current.attempts?.length > 0 && (
+              <div className="attempt-feedback" aria-live="polite">
+                <p>
+                  {current.solved_at
+                    ? "Solved. Continue to the next question."
+                    : "That answer is incorrect. Try another choice."}
+                </p>
+                <ol>
+                  {current.attempts.map((a) => (
+                    <li key={a.id}>
+                      Attempt {a.attempt_order}:{" "}
+                      {String.fromCharCode(65 + a.selected_answer)} ·{" "}
+                      {a.correct ? "Correct" : "Incorrect"} ·{" "}
+                      {formatTime(a.active_seconds)} active time
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+            {submitted && answer && (
+              <section className="question-explanation">
+                <h3>
+                  {current.selected_answer == null
+                    ? "Unanswered"
+                    : current.correct
+                      ? "Correct"
+                      : "Incorrect"}{" "}
+                  · Correct answer:{" "}
+                  {String.fromCharCode(65 + answer.correct_answer)}
+                </h3>
+                <p className="reading-text">
+                  {answer.explanation ||
+                    "No explanation was provided for this question."}
+                </p>
+              </section>
+            )}
+          </section>
+        </div>
       </div>
       <div className="player-footer">
         <button
