@@ -259,7 +259,7 @@ test("real reporting pages handle empty records and remain responsive", async ({
   });
 });
 
-test("expired timed practice auto-submits saved answers and shows results", async ({
+test("timed bank practice remains open for Check after the suggested time", async ({
   page,
 }) => {
   const store = await learningFixture(page);
@@ -271,10 +271,12 @@ test("expired timed practice auto-submits saved answers and shows results", asyn
   await page.getByRole("button", { name: "Timed", exact: true }).click();
   await page.getByRole("button", { name: "Start Practice Session" }).click();
   await expect(
-    page.getByRole("region", { name: "Practice results" }),
+    page.getByRole("button", { name: "Question 1 of 3", exact: true }),
   ).toBeVisible();
-  expect(store.session.submitted_at).toBeTruthy();
-  await expect(page.getByText("3", { exact: true }).first()).toBeVisible();
+  expect(store.session.submitted_at).toBeNull();
+  await page.getByRole("radio", { name: "B 4", exact: true }).check();
+  await page.getByRole("button", { name: "Check", exact: true }).click();
+  await expect(page.locator(".correct-choice")).toHaveCount(1);
 });
 test("admin practice keeps the admin layout and student attempts open read-only", async ({
   page,

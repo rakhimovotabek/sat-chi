@@ -319,9 +319,37 @@ export async function contentFixture(
             : [],
       );
     if (table === "book_practice_items") return json(store.items);
+    if (table === "question_check_attempts") return json(store.checks || []);
+    if (table === "check_bank_answer") {
+      store.checks ||= [];
+      const item = store.items.find((i) => i.id === body.p_item);
+      const answer = store.questions.find((q) => q.id === item.question.id)
+        .question_answers.correct_answer;
+      const attempt = {
+        id: body.p_event,
+        item_id: item.id,
+        attempt_order:
+          store.checks.filter((a) => a.item_id === item.id).length + 1,
+        selected_answer: body.p_choice,
+        correct: body.p_choice === answer,
+        active_seconds: item.active_seconds || 0,
+        created_at: new Date().toISOString(),
+      };
+      store.checks.push(attempt);
+      Object.assign(item, {
+        correct: attempt.correct,
+        solved_at: attempt.correct ? attempt.created_at : null,
+      });
+      if (store.items.every((i) => i.solved_at))
+        store.session.submitted_at = attempt.created_at;
+      return json(attempt);
+    }
     if (table === "practice_heartbeat") {
       store.session.current_position = body.p_position;
-      store.session.elapsed_seconds += Math.min(30, body.p_seconds);
+      store.session.elapsed_seconds += Math.min(120, body.p_seconds);
+      const item = store.items.find((i) => i.position === body.p_position);
+      if (item)
+        item.active_seconds = (item.active_seconds || 0) + body.p_seconds;
       return json(store.session.elapsed_seconds);
     }
     if (table === "save_book_practice") {

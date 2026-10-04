@@ -10,13 +10,16 @@ export function practiceSummary(items) {
     accuracy: answered ? Math.round((correct / answered) * 100) : null,
   };
 }
-export function questionState(item, current, submitted) {
+export function questionState(item, current, submitted, practice = false) {
   const states = [
     current ? "current" : "",
     item.selected_answer == null ? "unanswered" : "answered",
     item.marked ? "marked" : "",
   ];
-  if (submitted && item.selected_answer != null)
+  if (
+    (submitted || (practice && item.attempts?.length)) &&
+    item.selected_answer != null
+  )
     states.push(item.correct ? "correct" : "incorrect");
   return states.filter(Boolean);
 }

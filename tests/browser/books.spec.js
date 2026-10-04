@@ -190,7 +190,7 @@ test("student topic practice saves choices and marks, resumes, grades and review
     page.getByRole("button", { name: "Marked for review" }),
   ).toBeVisible();
   await page
-    .getByText("Question overview · 3 questions", { exact: true })
+    .getByRole("button", { name: /Question [0-9]+ of 3/ })
     .click();
   await page.getByRole("button", { name: /Question 2, / }).click();
   await expect(

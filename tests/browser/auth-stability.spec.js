@@ -116,9 +116,7 @@ test("active practice retains question, answer, elimination, mark and overview t
     .getByRole("button", { name: "Mark for review", exact: true })
     .click();
   await expect(page.getByRole("status")).toHaveText("All changes saved");
-  await page
-    .getByText("Question overview · 3 questions", { exact: true })
-    .click();
+  await page.getByRole("button", { name: /Question [0-9]+ of 3/ }).click();
   const origin = await rememberDocument(page, ".question-player");
   const beforeProfiles = reads(store, "/profiles"),
     beforePractice = reads(store, "/book_practice_items");
@@ -147,7 +145,9 @@ test("active practice retains question, answer, elimination, mark and overview t
   await expect(
     page.getByRole("button", { name: "Marked for review" }),
   ).toBeVisible();
-  await expect(page.locator(".question-overview")).toHaveAttribute("open", "");
+  await expect(
+    page.getByRole("dialog", { name: "Question Overview" }),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", { name: /Question 2, .*current/ }),
   ).toHaveAttribute("aria-current", "step");
@@ -158,6 +158,7 @@ test("active practice retains question, answer, elimination, mark and overview t
       (r) => r.path.endsWith("/auth/v1/token") && r.body?.refresh_token,
     ),
   ).toBe(true);
+  await page.getByRole("button", { name: "Close Question Overview" }).click();
   await page
     .getByRole("button", { name: "Log out", exact: true })
     .first()

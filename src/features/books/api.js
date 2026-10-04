@@ -157,7 +157,27 @@ export async function getPractice(id) {
     review = await checked(
       supabase.rpc("review_book_practice", { p_session_id: id }),
     );
-  return { session, items, review };
+  const attempts =
+    session.kind === "bank"
+      ? await checked(
+          supabase
+            .from("question_check_attempts")
+            .select("*")
+            .in(
+              "item_id",
+              items.map((i) => i.id),
+            )
+            .order("attempt_order"),
+        )
+      : [];
+  return {
+    session,
+    items: items.map((i) => ({
+      ...i,
+      attempts: attempts.filter((a) => a.item_id === i.id),
+    })),
+    review,
+  };
 }
 export const savePractice = (id, items) =>
   checked(
@@ -176,4 +196,15 @@ export const finishPractice = (id) =>
   checked(
     supabase.rpc("finish_book_practice", { p_session_id: id }),
     "Could not submit practice. Your saved answers remain available.",
+  );
+
+export const checkBankAnswer = (session, item, choice, event) =>
+  checked(
+    supabase.rpc("check_bank_answer", {
+      p_session: session,
+      p_item: item,
+      p_choice: choice,
+      p_event: event,
+    }),
+    "Could not check your answer. Retry to save this attempt.",
   );

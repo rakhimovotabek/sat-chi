@@ -3,7 +3,12 @@ import { useParams, useNavigate, Navigate } from "react-router";
 import useAuth from "../../hooks/useAuth.js";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
-import { getPractice, savePractice, finishPractice } from "../books/api.js";
+import {
+  getPractice,
+  savePractice,
+  finishPractice,
+  checkBankAnswer,
+} from "../books/api.js";
 import useStudyTimer from "./useStudyTimer.js";
 import MathTools from "./MathTools.jsx";
 import { formatTime, sectionResults } from "../learning/homework-model.js";
@@ -18,6 +23,9 @@ export default function Player() {
   const [items, setItems] = useState([]);
   const [index, setIndex] = useState(0);
   const [error, setError] = useState("");
+  const [overviewOpen, setOverviewOpen] = useState(false);
+  const checkEvent = useRef(null);
+  const [checking, setChecking] = useState(false);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const queue = useRef(Promise.resolve());
@@ -30,7 +38,10 @@ export default function Player() {
     sessionId,
     index,
     state.data?.session,
-    items.length > 0 && ownsSession,
+    items.length > 0 &&
+      ownsSession &&
+      !overviewOpen &&
+      !items[index]?.solved_at,
   );
   useEffect(() => {
     alive.current = true;
@@ -64,6 +75,7 @@ export default function Player() {
     if (
       !items.length ||
       !ownsSession ||
+      s?.kind === "bank" ||
       !s?.timed ||
       !s.time_limit ||
       s.submitted_at ||
@@ -109,11 +121,54 @@ export default function Player() {
     return request;
   }
   function change(patch) {
+    checkEvent.current = null;
     const updated = { ...items[index], ...patch };
     setItems((previous) =>
       previous.map((item) => (item.id === updated.id ? updated : item)),
     );
     persist([updated]);
+  }
+  async function check() {
+    const item = items[index];
+    if (item.selected_answer == null || checking) return;
+    checkEvent.current ||= crypto.randomUUID();
+    setChecking(true);
+    setError("");
+    try {
+      await queue.current;
+      await study.flush();
+      const attempt = await checkBankAnswer(
+        sessionId,
+        item.id,
+        item.selected_answer,
+        checkEvent.current,
+      );
+      setItems((rows) =>
+        rows.map((i) =>
+          i.id === item.id
+            ? {
+                ...i,
+                correct: attempt.correct,
+                solved_at: attempt.correct ? attempt.created_at : null,
+                attempts: [
+                  ...(i.attempts || []).filter((a) => a.id !== attempt.id),
+                  attempt,
+                ],
+              }
+            : i,
+        ),
+      );
+      checkEvent.current = null;
+      if (
+        attempt.correct &&
+        items.every((i) => i.id === item.id || i.solved_at)
+      )
+        state.reload();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setChecking(false);
+    }
   }
   async function submit() {
     if (
@@ -172,6 +227,7 @@ export default function Player() {
     return <Navigate to={`/admin/sessions/${sessionId}`} replace />;
   const { session, review } = state.data;
   const submitted = Boolean(session.submitted_at);
+  const practice = session.kind === "bank";
   const current = items[index];
   const q = current.question;
   const usableChoices =
@@ -187,7 +243,11 @@ export default function Player() {
       <div className="practice-heading">
         <div>
           <p className="eyebrow">
-            {submitted ? "Practice review" : "Book practice"}
+            {submitted
+              ? "Practice review"
+              : session.kind === "bank"
+                ? "Question Bank practice"
+                : "Book practice"}
           </p>
           <h1>{session.title}</h1>
         </div>
@@ -276,9 +336,7 @@ export default function Player() {
           {session.time_limit ? ` / ${formatTime(session.time_limit)}` : ""}
         </span>
         {q.section === "Math" && <MathTools />}
-        <strong>
-          Question {index + 1} of {items.length}
-        </strong>
+
         <span role="status">
           {submitted
             ? "Submitted"
@@ -314,7 +372,13 @@ export default function Player() {
           <h2 className="question-text">{q.question_text}</h2>
           <fieldset
             className="answer-choices"
-            disabled={submitted || submitting || !usableChoices}
+            disabled={
+              submitted ||
+              submitting ||
+              checking ||
+              (practice && Boolean(current.solved_at)) ||
+              !usableChoices
+            }
           >
             <legend className="visually-hidden">Choose your answer</legend>
             {!usableChoices && (
@@ -329,7 +393,7 @@ export default function Player() {
                 return (
                   <div
                     key={i}
-                    className={`answer-choice ${current.selected_answer === i ? "selected" : ""} ${eliminated ? "eliminated" : ""} ${submitted && answer?.correct_answer === i ? "correct-choice" : ""} ${submitted && current.selected_answer === i && current.correct === false ? "incorrect-choice" : ""}`}
+                    className={`answer-choice ${current.selected_answer === i ? "selected" : ""} ${eliminated ? "eliminated" : ""} ${(submitted && answer?.correct_answer === i) || (practice && current.attempts?.some((a) => a.selected_answer === i && a.correct)) ? "correct-choice" : ""} ${(submitted && current.selected_answer === i && current.correct === false) || (practice && current.attempts?.some((a) => a.selected_answer === i && !a.correct)) ? "incorrect-choice" : ""}`}
                   >
                     <label>
                       <input
@@ -345,7 +409,7 @@ export default function Player() {
                       </span>
                       <span>{option}</span>
                     </label>
-                    {!submitted && (
+                    {!submitted && !current.solved_at && (
                       <button
                         className="eliminate-choice"
                         type="button"
@@ -367,6 +431,25 @@ export default function Player() {
                 );
               })}
           </fieldset>
+          {practice && current.attempts?.length > 0 && (
+            <div className="attempt-feedback" aria-live="polite">
+              <p>
+                {current.solved_at
+                  ? "Solved. Continue to the next question."
+                  : "That answer is incorrect. Try another choice."}
+              </p>
+              <ol>
+                {current.attempts.map((a) => (
+                  <li key={a.id}>
+                    Attempt {a.attempt_order}:{" "}
+                    {String.fromCharCode(65 + a.selected_answer)} ·{" "}
+                    {a.correct ? "Correct" : "Incorrect"} ·{" "}
+                    {formatTime(a.active_seconds)} active time
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
           {submitted && answer && (
             <section className="question-explanation">
               <h3>
@@ -394,31 +477,52 @@ export default function Player() {
         >
           Previous
         </button>
-        <span>
-          {items.filter((i) => i.selected_answer != null).length} /{" "}
-          {items.length} answered
-        </span>
+        <button
+          className="button button-secondary overview-trigger"
+          onClick={() => setOverviewOpen(true)}
+          aria-haspopup="dialog"
+        >
+          Question {index + 1} of {items.length}
+        </button>
         <div className="inline-actions">
           <button
-            className="button button-secondary"
-            disabled={index === items.length - 1 || submitting}
+            className={`button ${practice && current.solved_at ? "" : "button-secondary"}`}
+            disabled={index === items.length - 1 || submitting || checking}
             onClick={() => setIndex((i) => i + 1)}
           >
             Next
           </button>
-          {!submitted && (
+          {practice && !submitted && !current.solved_at && (
+            <button
+              className="button"
+              disabled={
+                checking ||
+                saving ||
+                current.selected_answer == null ||
+                current.eliminated.includes(current.selected_answer)
+              }
+              onClick={check}
+            >
+              {checking ? "Checking…" : "Check"}
+            </button>
+          )}
+          {!practice && !submitted && (
             <button className="button" disabled={submitting} onClick={submit}>
               {submitting ? "Submitting…" : "Submit practice"}
             </button>
           )}
         </div>
       </div>
-      <Navigator
-        items={items}
-        current={index}
-        onNavigate={setIndex}
-        submitted={submitted}
-      />
+      {overviewOpen && (
+        <Navigator
+          items={items}
+          current={index}
+          onNavigate={setIndex}
+          submitted={submitted}
+          practice={practice}
+          onClose={() => setOverviewOpen(false)}
+        />
+      )}
     </div>
   );
 }
