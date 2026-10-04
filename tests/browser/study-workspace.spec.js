@@ -124,3 +124,59 @@ test("student vocabulary catalog hides drafts and question bank fits laptop and 
     fullPage: true,
   });
 });
+test("cover-led books and selected vocabulary modes keep direct navigation on desktop and mobile", async ({
+  page,
+}) => {
+  await learningFixture(page);
+  await page.goto("/books");
+  await expect(page.getByText("3 questions · 1 topic")).toBeVisible();
+  await page.screenshot({
+    path: "local-imports/design-books-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: "local-imports/design-books-mobile.png",
+    fullPage: true,
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.goto("/vocabulary/vbook");
+  await page.getByLabel("Select Set 1", { exact: true }).check();
+  await expect(
+    page.getByRole("button", { name: "Remove Set 1 from study pool" }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "local-imports/design-vocab-sets-mobile.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.screenshot({
+    path: "local-imports/design-vocab-sets-desktop.png",
+    fullPage: true,
+  });
+  await page
+    .getByRole("button", { name: "Remove Set 1 from study pool" })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Study Selected Sets" }),
+  ).toBeDisabled();
+  for (const [mode, route] of [
+    ["multiple", /mode=test&testType=meaning/],
+    ["due", /mode=cards&filter=due/],
+    ["context", /mode=context/],
+  ]) {
+    await page.getByLabel("Select Set 1", { exact: true }).check();
+    await page.getByLabel("Study selected sets mode").selectOption(mode);
+    await page.getByRole("button", { name: "Study Selected Sets" }).click();
+    await expect(page).toHaveURL(route);
+    if (mode === "multiple")
+      await expect(
+        page.getByRole("combobox", { name: "Question types" }),
+      ).toHaveValue("meaning");
+    await page.goto("/vocabulary/vbook");
+  }
+});

@@ -401,6 +401,8 @@ test("multiple sets can be selected, cleared and combined with original set labe
   await page.getByRole("button", { name: "Select All", exact: true }).click();
   await page.getByRole("button", { name: "Study Selected Sets" }).click();
   await expect(page).toHaveURL(/sets=vset,second/);
+  await expect(page.locator(".vocabulary-lesson")).toBeVisible();
+  await page.getByRole("button", { name: "Words", exact: true }).click();
   await expect(page.locator(".vocab-word")).toHaveCount(5);
 });
 

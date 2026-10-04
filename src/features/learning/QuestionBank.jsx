@@ -65,10 +65,23 @@ export default function QuestionBank({ admin = false }) {
         description="Choose what to work on. Build a session around your goals."
       />
       <section className="bank-workspace" aria-label="Practice configuration">
+        <div className="bank-workspace-summary">
+          <div>
+            <strong>{filters.section || "All SAT sections"}</strong>
+            <span>
+              {filters.domains?.length || filters.skills?.length
+                ? `${filters.domains?.length || 0} domains · ${filters.skills?.length || 0} individual skills selected`
+                : "Select a focus, then configure your practice"}
+            </span>
+          </div>
+          <span className="bank-summary-count">
+            {state.loading ? "…" : matching.toLocaleString()} matching questions
+          </span>
+        </div>
         <div className="bank-columns">
           <section className="bank-domains" aria-label="Domain selection">
             <div className="bank-section-heading">
-              <h2>Select domains</h2>
+              <h2>Practice focus</h2>
               <span
                 className="count-badge"
                 aria-label="Matching question count"

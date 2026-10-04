@@ -17,6 +17,7 @@ export default function Vocabulary({ admin = false }) {
   const { bookId } = useParams(),
     navigate = useNavigate(),
     [selected, setSelected] = useState([]),
+    [studyMode, setStudyMode] = useState("learn"),
     [page, setPage] = useState(0),
     [search, setSearch] = useState(""),
     [query, setQuery] = useState(""),
@@ -88,7 +89,34 @@ export default function Vocabulary({ admin = false }) {
       )}
       {!admin && bookId && (
         <section className="vocabulary-selection">
-          <strong>{selected.length} sets selected</strong>
+          <div className="selection-summary">
+            <strong>
+              {selected.length
+                ? `${selected.length} ${selected.length === 1 ? "set" : "sets"} selected`
+                : "Build your study pool"}
+            </strong>
+            <span>
+              {selected.length
+                ? `${(rows || []).filter((s) => selected.includes(s.id)).reduce((n, s) => n + (s.words || 0), 0)} words from your selected sets`
+                : "Select any combination of sets below"}
+            </span>
+          </div>
+          <div className="selected-set-chips">
+            {(rows || [])
+              .filter((s) => selected.includes(s.id))
+              .map((s) => (
+                <button
+                  key={s.id}
+                  aria-label={`Remove ${shortSetTitle(s.title, book?.title)} from study pool`}
+                  onClick={() =>
+                    setSelected((v) => v.filter((id) => id !== s.id))
+                  }
+                >
+                  {shortSetTitle(s.title, book?.title)}{" "}
+                  <span aria-hidden="true">×</span>
+                </button>
+              ))}
+          </div>
           <div className="button-row">
             <button
               className="button button-secondary"
@@ -122,11 +150,35 @@ export default function Vocabulary({ admin = false }) {
             >
               Clear Selection
             </button>
+            <label className="study-mode-select">
+              Study mode
+              <select
+                aria-label="Study selected sets mode"
+                value={studyMode}
+                onChange={(e) => setStudyMode(e.target.value)}
+              >
+                {[
+                  ["learn", "Learn"],
+                  ["cards", "Flashcards"],
+                  ["multiple", "Multiple Choice"],
+                  ["context", "Read in Context"],
+                  ["typed", "Type the Word"],
+                  ["test", "Test"],
+                  ["due", "Review Due"],
+                ].map(([value, label]) => (
+                  <option value={value} key={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               className="button"
               disabled={!selected.length}
               onClick={() =>
-                navigate(`/vocabulary/study?sets=${selected.join(",")}`)
+                navigate(
+                  `/vocabulary/study?sets=${selected.join(",")}&mode=${studyMode === "due" ? "cards" : studyMode === "multiple" ? "test" : studyMode}${studyMode === "due" ? "&filter=due" : studyMode === "multiple" ? "&testType=meaning" : ""}`,
+                )
               }
             >
               Study Selected Sets
@@ -249,7 +301,9 @@ export default function Vocabulary({ admin = false }) {
             <article
               key={row.id}
               className={
-                bookId ? "study-set-row" : "card learning-panel vocabulary-book"
+                bookId
+                  ? `study-set-row ${selected.includes(row.id) ? "is-selected" : ""}`
+                  : "card learning-panel vocabulary-book"
               }
             >
               <Link
@@ -322,8 +376,8 @@ export default function Vocabulary({ admin = false }) {
                   .map((s) => (
                     <div key={s.set_id}>
                       <p>
-                        {s.total} words · {s.learned} learned · {s.reviewing}{" "}
-                        reviewing · {s.new} new
+                        {s.learned} learned · {s.reviewing} reviewing · {s.new}{" "}
+                        new
                       </p>
                       <progress
                         value={s.mastered}

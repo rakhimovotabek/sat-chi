@@ -162,7 +162,23 @@ export async function contentFixture(
                   },
                 ],
               }
-            : r,
+            : key === "books" &&
+                url.searchParams.get("select")?.includes("book_topics")
+              ? {
+                  ...r,
+                  book_topics: store.topics
+                    .filter((t) => t.book_id === r.id)
+                    .map((t) => ({
+                      questions: [
+                        {
+                          count: store.questions.filter(
+                            (q) => q.topic_id === t.id,
+                          ).length,
+                        },
+                      ],
+                    })),
+                }
+              : r,
         );
         if (
           key === "questions" ||

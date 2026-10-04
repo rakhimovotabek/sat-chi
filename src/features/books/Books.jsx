@@ -26,13 +26,19 @@ export default function Books({ admin = false }) {
     <>
       <PageHeader
         title="Books"
-        eyebrow={admin ? "Learning library" : "Your learning library"}
         description={
           admin
             ? "Create structured books, topics, and SAT questions."
             : "Explore a book and build your understanding, one topic at a time."
         }
       />
+      <div className="library-heading">
+        <h2>Browse the library</h2>
+        <span>
+          {state.data?.total ?? "…"}{" "}
+          {state.data?.total === 1 ? "book" : "books"}
+        </span>
+      </div>
       <div className="content-toolbar">
         <label className="search-field">
           Search books
@@ -90,7 +96,18 @@ export default function Books({ admin = false }) {
                     </span>
                   )}
                   <h2>{b.title}</h2>
-                  <p>{b.description || "Explore the topics in this book."}</p>
+                  {b.question_count != null && (
+                    <p className="book-inventory">
+                      {b.question_count.toLocaleString()} questions ·{" "}
+                      {b.topic_count} {b.topic_count === 1 ? "topic" : "topics"}
+                    </p>
+                  )}
+                  {b.description && (
+                    <p className="book-summary">{b.description}</p>
+                  )}
+                  <span className="book-browse-label">
+                    Browse topics <span aria-hidden="true">→</span>
+                  </span>
                 </div>
               </Link>
             ))}

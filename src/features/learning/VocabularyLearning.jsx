@@ -62,6 +62,7 @@ export default function VocabularyLearning({
   passages = [],
   setIds,
   initialMode = "words",
+  initialTestType,
   admin = false,
   total = words.length,
   hasMore = false,
@@ -87,7 +88,13 @@ export default function VocabularyLearning({
     [typed, setTyped] = useState(""),
     [feedback, setFeedback] = useState(null),
     [count, setCount] = useState(defaults.vocabularyCount),
-    [testType, setTestType] = useState(defaults.vocabularyTestType),
+    [testType, setTestType] = useState(
+      ["meaning", "reverse", "mixed", "source", "typed"].includes(
+        initialTestType,
+      )
+        ? initialTestType
+        : defaults.vocabularyTestType,
+    ),
     [shuffled, setShuffled] = useState(defaults.shuffleVocabulary),
     action = useAction(),
     navigate = useNavigate();

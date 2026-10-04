@@ -73,6 +73,7 @@ export default function VocabularyStudy({ embedded = false, filterOverride }) {
           scopeFilter={filter}
           total={state.data.total}
           initialMode={params.get("mode") || "words"}
+          initialTestType={params.get("testType")}
           hasMore={(page + 1) * 100 < state.data.total}
           nextPage={() => setPage((p) => p + 1)}
         />

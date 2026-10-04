@@ -19,7 +19,7 @@ export async function getBookCatalog(page = 0, search = "") {
   const { data, count, error } = await supabase
     .from("books")
     .select(
-      "id,title,description,category,cover_url,cover_path,published,created_at",
+      "id,title,description,category,cover_url,cover_path,published,created_at,book_topics(questions(count))",
       {
         count: "exact",
       },
@@ -33,7 +33,21 @@ export async function getBookCatalog(page = 0, search = "") {
       "Could not load books. Check your connection and try again.",
     );
   return {
-    books: await resolveCovers(data, supabase),
+    books: await resolveCovers(
+      data.map((book) => ({
+        ...book,
+        ...(Array.isArray(book.book_topics)
+          ? {
+              topic_count: book.book_topics.length,
+              question_count: book.book_topics.reduce(
+                (total, t) => total + (t.questions?.[0]?.count || 0),
+                0,
+              ),
+            }
+          : {}),
+      })),
+      supabase,
+    ),
     total: count ?? data.length,
   };
 }
