@@ -1,6 +1,6 @@
 # Daily Homework backend
 
-Daily Homework shares the existing `book_practice_sessions` player with `kind = 'homework'`. It keeps homework's final-answer grading; Question Bank retry/check is not enabled for these sessions. Migration `20261004002800_daily_homework.sql` adds the backend model. Student/admin UI, dashboard counts, streak aggregates and frontend RPC integration are a subsequent milestone.
+Daily Homework shares the existing `book_practice_sessions` player with `kind = 'homework'`. It keeps homework's final-answer grading; Question Bank retry/check is not enabled for these sessions. Migration `20261004002800_daily_homework.sql` adds the backend model. Admin/student UI, dashboard counts and lifetime analytics are implemented on top of this model; additive migrations 029–032 harden grants and add reporting/result metadata.
 
 ## Model
 
@@ -44,7 +44,7 @@ Internal roster/scheduling/trigger functions have no browser execution grants. `
 
 Run `node --test tests/daily-homework.test.js` for the executed PostgreSQL model/access suite; `npm test` also includes it. Existing learning/books/attempt tests load every migration and protect shared session behavior.
 
-Migrations 026–028 were applied and catalog-audited on the verified linked production project on October 4, 2026. Additive migration 029 closes the default PUBLIC execution grant on the recreated submission function. All public tables have RLS and anonymous security-definer execution is zero. The next milestone must connect One-time/Daily recurring in the existing form, Today/Missed/history and admin template monitoring, dashboard counts, daily completion/streak aggregates, and their browser regressions. Avoid creating another recurring schema or another homework player.
+Migrations 026–028 were applied and catalog-audited on the verified linked production project on October 4, 2026. Additive migration 029 closes the default PUBLIC execution grant on the recreated submission function. All public tables have RLS and anonymous security-definer execution is zero. The existing Homework area now connects One-time/Daily recurring, Today/Missed/history, admin template monitoring, Dashboard counts and daily completion/streak aggregates. Browser regressions are in `tests/browser/daily-homework.spec.js`. Avoid creating another recurring schema or another homework player.
 
 ## Frontend and analytics (October 4 continuation)
 
