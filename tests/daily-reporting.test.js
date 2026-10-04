@@ -89,6 +89,68 @@ test("daily reporting counts scheduled unopened days and keeps aggregate access 
     assert.equal(completed.today[0].completed, 1);
     assert.equal(completed.students[0].accuracy, 100);
     assert.equal(completed.students[0].completion_rate, 33.3);
+    const stats = await call("daily_homework_statistics");
+    assert.equal(stats.completion_rate, 33.3);
+    assert.equal(stats.accuracy, 100);
+    assert.equal(stats.current_streak, 1);
+    assert.equal(stats.longest_streak, 1);
+    assert.equal(stats.missed_days, 2);
+    await assert.rejects(
+      call("daily_homework_statistics", [other], ["uuid"]),
+      /Account unavailable/,
+    );
+    const yesterday = (await db.query("select ($1::date-1)::text d", [day]))
+      .rows[0].d;
+    const lateSid = await call(
+      "start_daily_homework",
+      [tid, yesterday],
+      ["uuid", "date"],
+    );
+    const lateItems = (
+      await db.query(
+        "select id from public.book_practice_items where session_id=$1",
+        [lateSid],
+      )
+    ).rows;
+    await call(
+      "save_book_practice",
+      [
+        lateSid,
+        JSON.stringify(
+          lateItems.map((i) => ({ id: i.id, selected_answer: 1 })),
+        ),
+      ],
+      ["uuid", "jsonb"],
+    );
+    await call("finish_book_practice", [lateSid], ["uuid"]);
+    const lateStats = await call("daily_homework_statistics");
+    assert.equal(lateStats.completion_rate, 66.7);
+    assert.equal(
+      lateStats.current_streak,
+      1,
+      "late completion does not extend on-time streak",
+    );
+    assert.equal(lateStats.missed_days, 1);
+    await db.exec("reset role");
+    await db.query(
+      "update public.daily_homework_versions set data=jsonb_set(data,'{allowRepeat}','true') where template_id=$1",
+      [tid],
+    );
+    await role(student);
+    const before = (await db.query("select ($1::date-2)::text d", [day]))
+      .rows[0].d;
+    await call("start_daily_homework", [tid, before], ["uuid", "date"]);
+    const selected = (
+      await db.query(
+        "select question_ids from public.daily_homework_instances where template_id=$1",
+        [tid],
+      )
+    ).rows.flatMap((r) => r.question_ids);
+    assert.equal(
+      new Set(selected).size,
+      6,
+      "reuse enabled still avoids duplicates before exhaustion",
+    );
     await role(admin);
     await assert.rejects(
       call(
@@ -100,6 +162,10 @@ test("daily reporting counts scheduled unopened days and keeps aggregate access 
     );
     await db.exec("reset role;set role anon");
     await assert.rejects(call("daily_homework_report"), /permission denied/);
+    await assert.rejects(
+      call("daily_homework_statistics"),
+      /permission denied/,
+    );
   } finally {
     await db.close();
   }

@@ -302,6 +302,7 @@ export async function learningFixture(page, role = "student") {
         return {
           ...r,
           session_id: store.session.id,
+          session_submitted_at: store.session.submitted_at,
           answered,
           active_seconds: store.session.elapsed_seconds,
           completed_at: completed ? store.session.submitted_at : null,

@@ -28,3 +28,5 @@ export const startDaily = (row) =>
     p_template: row.template_id,
     p_day: row.study_date,
   });
+export const dailyStatistics = (student) =>
+  dailyRpc("daily_homework_statistics", { p_student: student || null });

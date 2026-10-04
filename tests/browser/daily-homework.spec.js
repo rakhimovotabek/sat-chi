@@ -110,6 +110,23 @@ test("student starts today, saves answers and review marks, resumes and complete
   store.dailyRows = [dailyRow()];
   await page.goto("/homework");
   await expect(page.getByText(/Due by midnight/)).toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.screenshot({
+    path: "local-imports/design-daily-student-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: "local-imports/design-daily-student-mobile.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Check", exact: true }),
@@ -218,6 +235,38 @@ test("dashboard uses daily counts and shows completion from saved activity", asy
     page.getByText("Today's homework complete", { exact: true }),
   ).toBeVisible();
 });
+test("admin student daily analytics shows server metrics and historical missed work", async ({
+  page,
+}) => {
+  const store = await learningFixture(page, "admin");
+  store.dailyStats = {
+    assigned: 10,
+    completed: 8,
+    completion_rate: 80,
+    accuracy: 90,
+    average_seconds: 840,
+    current_streak: 2,
+    longest_streak: 5,
+    missed_days: 2,
+  };
+  store.dailyRows = [
+    dailyRow({
+      is_today: false,
+      study_date: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
+      status: "Missed",
+    }),
+  ];
+  await page.goto(`/admin/students/${student}`);
+  const panel = page
+    .getByRole("heading", { name: "Daily Homework performance" })
+    .locator("..");
+  await expect(panel.getByText("80%", { exact: true })).toBeVisible();
+  await expect(panel.getByText("90%", { exact: true })).toBeVisible();
+  await expect(panel.getByText("5 days", { exact: true })).toBeVisible();
+  await expect(
+    panel.getByRole("cell", { name: "Missed", exact: true }),
+  ).toBeVisible();
+});
 test("daily deadline refresh derives missed state while Homework stays open", async ({
   page,
 }) => {
@@ -292,4 +341,42 @@ test("daily homework desktop and mobile remain usable without document overflow"
     path: "local-imports/design-daily-admin-mobile.png",
     fullPage: true,
   });
+});
+test("timed incomplete results remain readable after midnight when late work is disabled", async ({
+  page,
+}) => {
+  const store = await learningFixture(page);
+  store.dailyRows = [dailyRow()];
+  await page.goto("/homework");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Question 1 of 3", exact: true }),
+  ).toBeVisible();
+  store.session.submitted_at = new Date().toISOString();
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  store.dailyRows = [
+    dailyRow({
+      is_today: false,
+      study_date: yesterday,
+      status: "Missed",
+      session_id: store.session.id,
+      session_submitted_at: store.session.submitted_at,
+      allow_late: false,
+    }),
+  ];
+  await page.goto("/homework");
+  await expect(
+    page.getByRole("button", { name: "View results", exact: true }),
+  ).toBeEnabled();
+  const before = store.requests.filter((r) =>
+    r.path.endsWith("start_daily_homework"),
+  ).length;
+  await page.getByRole("button", { name: "View results", exact: true }).click();
+  await expect(
+    page.getByRole("region", { name: "Practice results" }),
+  ).toBeVisible();
+  expect(
+    store.requests.filter((r) => r.path.endsWith("start_daily_homework"))
+      .length,
+  ).toBe(before);
 });

@@ -45,3 +45,15 @@ Internal roster/scheduling/trigger functions have no browser execution grants. `
 Run `node --test tests/daily-homework.test.js` for the executed PostgreSQL model/access suite; `npm test` also includes it. Existing learning/books/attempt tests load every migration and protect shared session behavior.
 
 Migrations 026–028 were applied and catalog-audited on the verified linked production project on October 4, 2026. Additive migration 029 closes the default PUBLIC execution grant on the recreated submission function. All public tables have RLS and anonymous security-definer execution is zero. The next milestone must connect One-time/Daily recurring in the existing form, Today/Missed/history and admin template monitoring, dashboard counts, daily completion/streak aggregates, and their browser regressions. Avoid creating another recurring schema or another homework player.
+
+## Frontend and analytics (October 4 continuation)
+
+Admin → Homework includes recurring creation, lifecycle controls, date-window history and student reporting. Student Homework shows today's work, missed work and retained results; Dashboard uses actual server totals. The shared final-answer player persists answers, review marks, position and active time. Deadline states refresh while the page remains open and on focus.
+
+Migration **030** adds `daily_homework_report`, with complete aggregates before 50-student pagination and 31-day history windows. Migration **031** adds `daily_homework_statistics(p_student uuid default null)`, reporting all-time completion, current/longest streak, missed days, weighted completed-work accuracy and average completed-work active time. All RPCs enforce active-account/ownership/admin access; the internal rows projection has no browser grant.
+
+Completion rate includes due assignments and any completed work; unfinished work still due today is not a failure. A streak requires **all assignments on a scheduled day completed on time**. Days without assignments are skipped. Late work counts toward completion and accuracy, but cannot repair an on-time streak. Missed days count dates with at least one overdue unfinished assignment. Historical windows in the UI do not truncate lifetime metrics.
+
+Migration 031 also ranks never-assigned questions ahead of reused questions even when repetition is enabled. Migration **032** adds `session_submitted_at` to directory rows so a timed partial result remains readable after midnight with late work disabled. Result buttons navigate directly to the saved session; no late start RPC or completion credit is needed.
+
+All migrations through 032 are applied on the verified linked project. New production assignments/learning fixtures were not created by development or QA. Browser tests use isolated fixtures; PostgreSQL tests execute the real migrations and RPCs.

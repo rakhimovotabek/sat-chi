@@ -1,3 +1,4 @@
+import DailyHomeworkAnalytics from "./DailyHomeworkAnalytics.jsx";
 import PracticeAnalytics from "./PracticeAnalytics.jsx";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
@@ -31,9 +32,9 @@ export function MetricCards({ data }) {
       {[
         ["Questions answered", data.attempted],
         ["Accuracy", percent(data.correct, data.attempted)],
-        ["Study time", formatTime(data.study_seconds)],
+        ["Total study time", formatTime(data.study_seconds)],
         [
-          "Homework completed",
+          "One-time homework completed",
           `${data.homework_completed} / ${data.homework_total}`,
         ],
         ["Vocabulary mastered", data.vocabulary_known],
@@ -425,6 +426,7 @@ export function StudentDetail() {
           </section>
           <MetricCards data={state.data.metrics} />
           <PracticeAnalytics student={studentId} />
+          <DailyHomeworkAnalytics student={studentId} />
           <Activity rows={state.data.metrics.activity} />
         </>
       )}
@@ -471,6 +473,21 @@ export function AdminSession() {
                   {i.attempts?.length || 0} checks ·{" "}
                   {i.solved_at ? "Solved" : "Unresolved"}
                 </p>
+                {state.data.session.kind === "bank" && (
+                  <p>
+                    Time to first attempt:{" "}
+                    {i.attempts?.length
+                      ? formatTime(i.attempts[0].active_seconds)
+                      : "No attempt"}{" "}
+                    · Time until solved:{" "}
+                    {i.solved_at
+                      ? formatTime(
+                          i.attempts?.find((a) => a.correct)?.active_seconds ||
+                            0,
+                        )
+                      : "Not solved"}
+                  </p>
+                )}
                 {i.attempts?.map((a) => (
                   <p key={a.id}>
                     Attempt {a.attempt_order} ·{" "}

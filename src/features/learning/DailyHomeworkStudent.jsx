@@ -17,7 +17,9 @@ import {
 } from "./daily-homework-model.js";
 import { formatTime } from "./homework-model.js";
 function DailyAssignment({ row, action, navigate }) {
-  const locked = !row.is_today && !row.allow_late && !dailyDone(row);
+  const submitted = !!row.session_submitted_at || row.status === "Incomplete";
+  const locked =
+    !row.is_today && !row.allow_late && !dailyDone(row) && !submitted;
   const incomplete = row.status === "Incomplete";
   return (
     <article className="daily-assignment">
@@ -56,10 +58,14 @@ function DailyAssignment({ row, action, navigate }) {
         className="button button-secondary"
         disabled={action.busy || locked}
         onClick={() =>
-          action.run(async () => navigate(`/practice/${await startDaily(row)}`))
+          action.run(async () =>
+            navigate(
+              `/practice/${submitted || dailyDone(row) ? row.session_id : await startDaily(row)}`,
+            ),
+          )
         }
       >
-        {dailyDone(row) || incomplete
+        {dailyDone(row) || submitted
           ? "View results"
           : row.session_id
             ? "Continue"

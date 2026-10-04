@@ -57,7 +57,7 @@ export default function Homework({ admin = false }) {
         <ContentState {...state} onRetry={state.reload} />
       ) : !state.data.length ? (
         <section className="card empty-state">
-          <h2>No homework assigned</h2>
+          <h2>No one-time homework assigned</h2>
           <p>
             {admin
               ? "Create a homework assignment when published questions and active students are available."

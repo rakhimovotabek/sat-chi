@@ -592,7 +592,7 @@ progress {
     gap: 12px;
   }
 }
-.daily-admin-actions {
+.learning-panel .daily-admin-actions {
   flex-wrap: nowrap;
   width: max-content;
   gap: 8px;

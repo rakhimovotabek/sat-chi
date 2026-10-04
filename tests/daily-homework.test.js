@@ -504,6 +504,10 @@ test("daily homework backend preserves local deadlines, recurring history, gradi
         const row = (await directory(null, timed)).rows[0];
         assert.equal(row.completed_at, null);
         assert.equal(row.status, "Incomplete");
+        assert.ok(
+          row.session_submitted_at,
+          "read-only timed results stay distinguishable after their deadline",
+        );
         assert.equal(row.answered, 0);
         assert.ok(
           (
@@ -570,7 +574,10 @@ test("daily homework backend preserves local deadlines, recurring history, gradi
         );
         await db.exec("reset role;set role anon");
         await assert.rejects(call("daily_homework_directory"));
-        await assert.rejects(call("finish_book_practice", [session], ["uuid"]), /permission denied/);
+        await assert.rejects(
+          call("finish_book_practice", [session], ["uuid"]),
+          /permission denied/,
+        );
         await assert.rejects(
           db.query("select * from public.daily_homework_instances"),
         );
