@@ -109,7 +109,9 @@ test("public landing, working navigation, signup validation and confirmation", a
   await page.getByRole("button", { name: "Sign Up", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("Check your email");
 });
-test("email confirmation lands on login without creating a session", async ({ page }) => {
+test("email confirmation lands on login without creating a session", async ({
+  page,
+}) => {
   await fixture(page);
   let tokenExchanges = 0;
   page.on("request", (request) => {
@@ -120,20 +122,28 @@ test("email confirmation lands on login without creating a session", async ({ pa
   await expect(page.getByRole("status")).toHaveText(
     "Email verified successfully. You can now sign in.",
   );
-  await expect(page.getByRole("button", { name: "Sign In", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Sign In", exact: true }),
+  ).toBeVisible();
   expect(tokenExchanges).toBe(0);
   await page.getByLabel("Email", { exact: true }).fill("learner@example.test");
   await page.getByLabel("Password", { exact: true }).fill("test-password-123");
   await page.getByRole("button", { name: "Sign In", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 });
-test("expired email confirmation shows a safe login error", async ({ page }) => {
+test("expired email confirmation shows a safe login error", async ({
+  page,
+}) => {
   await fixture(page);
-  await page.goto("/login#error=access_denied&error_code=otp_expired&error_description=private-details");
+  await page.goto(
+    "/login#error=access_denied&error_code=otp_expired&error_description=private-details",
+  );
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("alert")).toContainText("invalid or expired");
   await expect(page.getByRole("alert")).not.toContainText("private-details");
-  await expect(page.getByRole("button", { name: "Sign In", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Sign In", exact: true }),
+  ).toBeVisible();
 });
 test("student session refresh, all routes, admin guard, responsive menu, logout", async ({
   page,
@@ -183,7 +193,7 @@ test("student session refresh, all routes, admin guard, responsive menu, logout"
     ),
   ).toBe(true);
   await page.getByRole("button", { name: "Open navigation" }).click();
-  await page.locator(".sidebar-logout").click();
+  await page.getByRole("button", { name: "Log out", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
 });
 test("first login onboarding persists required fields and does not repeat", async ({

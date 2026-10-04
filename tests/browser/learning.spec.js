@@ -448,3 +448,74 @@ test("mistake center switches between submitted SAT mistakes and weak vocabulary
   await expect(page).toHaveURL(/practice\//);
   expect(store.session.title).toBe("Review a question mistake");
 });
+
+test("desktop sidebar collapse persists while mobile uses a dismissible drawer and one logout", async ({
+  page,
+}) => {
+  await learningFixture(page);
+  await page.goto("/dashboard");
+  await expect(
+    page.getByRole("button", { name: "Log out", exact: true }),
+  ).toHaveCount(1);
+  await page.getByRole("button", { name: "Collapse sidebar" }).click();
+  await expect(page.locator(".app-shell")).toHaveClass(/sidebar-collapsed/);
+  await page.reload();
+  await expect(page.locator(".app-shell")).toHaveClass(/sidebar-collapsed/);
+  await expect(
+    page.getByRole("link", { name: "Vocabulary", exact: true }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  await expect(page.locator(".sidebar-scrim")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".sidebar-scrim")).toHaveCount(0);
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  await page.getByRole("link", { name: "Study Plan", exact: true }).click();
+  await expect(page).toHaveURL(/study-plan$/);
+  await expect(page.locator(".sidebar-scrim")).toHaveCount(0);
+});
+
+test("admin vocabulary review accepts singular source warnings and shows real word counts", async ({
+  page,
+}) => {
+  await learningFixture(page, "admin");
+  await page.route("**/rest/v1/import_jobs**", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify([
+        {
+          id: "vocab-source",
+          title: "Vocabulary source",
+          source_file: "Vocabulary.pdf",
+          status: "imported",
+          source_type: "vocabulary",
+          word_count: "1400",
+          detected_vocabulary_sets: 56,
+          detected_topics: 56,
+          detected_questions: 560,
+          imported_count: 559,
+          skipped_count: 1,
+          needs_review_count: 1,
+          warnings: [],
+          errors: [],
+          source_metadata: {
+            review_items: [
+              {
+                set: "Original Set 6",
+                number: 9,
+                page: 44,
+                reason: "Incomplete options or explicit answer-table mapping",
+              },
+            ],
+          },
+        },
+      ]),
+    }),
+  );
+  await page.goto("/admin/imports");
+  await expect(page.getByText("56 sets · 1400 words")).toBeVisible();
+  await page.getByText("Question review evidence").click();
+  await expect(
+    page.getByText(/Original Set 6 · Question 9 · PDF page 44/),
+  ).toBeVisible();
+});

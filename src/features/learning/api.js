@@ -70,13 +70,23 @@ export const heartbeat = (session, position, seconds) =>
     p_position: position,
     p_seconds: seconds,
   });
-export const importJobs = () =>
+export const importJobs = (page = 0) =>
   checked(
     supabase
       .from("import_jobs")
-      .select("*")
+      .select(
+        "id,source_file,source_path,title,status,source_type,category,detected_topics,detected_questions,detected_vocabulary_sets,imported_count,skipped_count,needs_review_count,warnings,errors,book_id,vocabulary_book_id,word_count:source_metadata->>detected_words",
+      )
       .order("created_at", { ascending: false })
-      .limit(100),
+      .range(page * 25, page * 25 + 24),
+  );
+export const importEvidence = (id) =>
+  checked(
+    supabase
+      .from("import_jobs")
+      .select("source_metadata")
+      .eq("id", id)
+      .single(),
   );
 export const vocabBooks = () =>
   checked(

@@ -1,29 +1,30 @@
-import { useState } from "react";
 import { Link, NavLink } from "react-router";
 import Icon from "./Icon.jsx";
 import useAuth from "../hooks/useAuth.js";
 
-export default function Sidebar({ workspace, navigation, open, onNavigate }) {
+export default function Sidebar({
+  workspace,
+  navigation,
+  open,
+  onNavigate,
+  collapsed,
+  onToggleCollapse,
+}) {
   const isAdmin = workspace === "admin";
-  const { profile, signOut } = useAuth();
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-  async function logout() {
-    setBusy(true);
-    try {
-      if (await signOut()) setError("Could not log out. Try again.");
-    } catch {
-      setError("Could not log out. Try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
+  const { profile } = useAuth();
   return (
     <aside
       id="workspace-sidebar"
       className={`sidebar ${open ? "sidebar-open" : ""}`}
     >
+      <button
+        className="sidebar-collapse"
+        onClick={onToggleCollapse}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        aria-expanded={!collapsed}
+      >
+        <Icon name="menu" />
+      </button>
       <Link
         className="brand"
         to={isAdmin ? "/admin/dashboard" : "/dashboard"}
@@ -54,7 +55,9 @@ export default function Sidebar({ workspace, navigation, open, onNavigate }) {
             <NavLink
               key={item.slug}
               to={isAdmin ? `/admin/${item.slug}` : `/${item.slug}`}
-              end
+              end={item.slug === "dashboard"}
+              aria-label={item.label}
+              title={collapsed ? item.label : undefined}
               className={({ isActive }) =>
                 `nav-link ${isActive ? "nav-link-active" : ""}`
               }
@@ -69,6 +72,7 @@ export default function Sidebar({ workspace, navigation, open, onNavigate }) {
         <Link
           to={isAdmin ? "/admin/settings" : "/profile"}
           className="sidebar-account"
+          aria-label={isAdmin ? "Admin settings" : "Your profile and goals"}
           onClick={onNavigate}
         >
           <span className="avatar">
@@ -83,18 +87,6 @@ export default function Sidebar({ workspace, navigation, open, onNavigate }) {
             <small>{isAdmin ? "Admin settings" : "Your profile & goals"}</small>
           </span>
         </Link>
-        <button
-          className="button button-secondary sidebar-logout"
-          onClick={logout}
-          disabled={busy}
-        >
-          {busy ? "Logging out…" : "Log out"}
-        </button>
-        {error && (
-          <p className="form-error" role="alert">
-            {error}
-          </p>
-        )}
       </div>
     </aside>
   );

@@ -1,6 +1,6 @@
 # Local book import report
 
-Audited 2026-10-03T23:57:07.686Z. Source scope: `~/Desktop/Books` only. Project: `ileffhbbaomfimwulvpw`.
+Audited 2026-10-04T00:22:52.118Z. Source scope: `~/Desktop/Books` only. Project: `ileffhbbaomfimwulvpw`.
 
 Completed checkpoints were resumed, not restarted. Counts below are actual remote counts; candidate counts in parentheses are extraction heuristics, not verified inventories. Extracted material is private in ignored `local-imports/`. Newly imported content stays draft. Existing admin publication decisions are preserved.
 
