@@ -185,3 +185,11 @@ Embedded text was measured before OCR. Counts of sparse pages use fewer than 100
 - Diagnosis: Three-page transition reference charts only; no questions or answer key. Unsupported for question ingestion; retained source available for manual reference-content review.
 - Actual imported SAT questions: 0; excluded/skipped checkpoint markers: 0. These are not a complete inventory for unsupported layouts. Review region records: 0; a source-level manual task is retained.
 - Sample physical pages: 1, 2, 3. No automatic catalog records accepted; samples establish the documented blocker.
+
+## Cover reconciliation — October 4, 2026
+
+The design/cover phase imported no additional content. Counts remain **1,789 SAT questions / 56 vocabulary sets / 1,400 words / 56 passages / 559 exercises**. All source diagnoses and review requirements above remain in force.
+
+First physical pages were rendered and attached to **13 existing imported books (12 SAT books and Vocabook)**. **0 failures, 0 blank pages, 0 unmatched imported-book sources**. The remaining **14 source PDFs have no imported catalog book**, so no books were created merely to hold covers. Reconciliation is idempotent and preserves existing cover overrides. Original PDFs remain local; WebP derivatives are stored privately with source provenance and publication-controlled access.
+
+Per-source outcomes and dimensions: [book-cover-report.md](book-cover-report.md). Commands, storage rules and replacement/removal: [book-cover-workflow.md](book-cover-workflow.md). Automatically imported content remains draft until actual administrator review; cover generation does not approve it.

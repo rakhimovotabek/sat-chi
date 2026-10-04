@@ -148,6 +148,26 @@ await processSequentially(
       report.applied_parser_version = report.parser_version;
       report.applied_at = new Date().toISOString();
       delete report.deployment_error;
+      if (recorded.book_id || recorded.vocabulary_book_id) {
+        try {
+          const { stdout: coverOutput } = await run(
+            "node",
+            [
+              "scripts/imports/backfill-covers.js",
+              "--apply",
+              "--source",
+              report.source_file,
+            ],
+            { timeout: 180000, maxBuffer: 1024 * 1024 },
+          );
+          report.cover_checkpoint = JSON.parse(coverOutput.trim()).totals;
+          delete report.cover_warning;
+        } catch {
+          report.cover_warning =
+            "Cover backfill failed; content import remains intact. Retry import:covers.";
+        }
+      }
+
       console.log(
         `${report.source_path}: ${report.status}; ${report.imported_count} imported, ${report.skipped_count} skipped`,
       );

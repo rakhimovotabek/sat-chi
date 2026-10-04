@@ -19,7 +19,8 @@
     "format:check": "prettier --check src/features/learning/Vocabulary*.jsx src/features/learning/vocabulary-*.js",
     "import:report": "node scripts/imports/report.js",
     "import:check-vocabulary": "node scripts/imports/check-vocabulary.js",
-    "lint": "eslint src scripts tests"
+    "lint": "eslint src scripts tests",
+    "import:covers": "node scripts/imports/backfill-covers.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

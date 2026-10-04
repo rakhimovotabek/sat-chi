@@ -33,3 +33,11 @@ Full targeted review of Question Bank and vocabulary library/set administration.
 Verification: unit/PostgreSQL tests exercise union filtering, real facets, unpublished visibility, readiness and audited lifecycle actions. Browser tests exercise selection/counts, zero results, timed payload, persistence, row navigation, publication blockers, auth/navigation and reduced-motion/mobile layouts. Desktop/mobile screenshots were inspected in a bounded pass; the footer issue was corrected and recaptured. The Impeccable mechanical detector reported no findings. Normal and reduced-motion interaction paths are tested; a 10%-speed developer-tools motion replay was not performed. Broader dashboard polish remains outside this checkpoint.
 
 Verdict: targeted workflow approved after corrective checks; the developer-tools slow-motion replay and broader surface audit remain unverified.
+
+## P1 follow-up
+
+Cover/library refinement was checked using the same React/plain-CSS system. Actual grammar, Ultimate Grammar and Vocabook first-page thumbnails were inspected; none is stretched or cropped. Mobile vocabulary library capture shows a consistent cover surface, readable title/count hierarchy and an accessible main link. Compact detail covers support inspection without displacing the learning task. No broad Dashboard or Settings changes.
+
+Additional corrected findings: mobile cover gutters now follow the existing 18px panel padding; vocabulary detail book editing now selects the book form rather than the set form. A single BookCover implementation provides lazy images and a safe image-error fallback. Catalog paths sign in batches; native publication RLS protects originals and drafts. Rendered cover assets and screenshots are private/ignored, with metadata-only reports committed.
+
+Verified: all 74 unit/database tests and 56 browser tests, replacement/removal without publication/content changes, both SAT and vocabulary Storage policies, real catalog counts, source fingerprint checks, backfill idempotence, lint/format/build/diff checks. The P1 mechanical detector returned no findings. Developer-tools slow-motion replay and broader P2 surface review remain unverified; no additional motion library was added.

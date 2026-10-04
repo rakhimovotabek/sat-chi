@@ -78,7 +78,7 @@ export async function learningFixture(page, role = "student") {
       },
     ]);
   const regex =
-    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(start_vocabulary_typed_test|vocabulary_typed_history|vocabulary_typed_test|answer_vocabulary_typed_test|finish_vocabulary_typed_test|refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|question_bank_facets|vocabulary_book_detail|set_vocabulary_publication|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
+    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(start_vocabulary_typed_test|vocabulary_typed_history|vocabulary_typed_test|answer_vocabulary_typed_test|finish_vocabulary_typed_test|refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|vocabulary_catalog|question_bank_facets|vocabulary_book_detail|set_vocabulary_publication|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
   await page.route(regex, async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
@@ -185,6 +185,33 @@ export async function learningFixture(page, role = "student") {
           topic_title: "Algebra",
         })),
       });
+    }
+    if (table === "vocabulary_catalog") {
+      const rows = store.vocabBooks
+        .filter(
+          (b) =>
+            (role === "admin" || b.published) &&
+            b.title.toLowerCase().includes((body.p_search || "").toLowerCase()),
+        )
+        .slice(body.p_page * 50, body.p_page * 50 + 50);
+      return json(
+        rows.map((b) => {
+          const sets = store.sets.filter((s) => s.book_id === b.id),
+            words = store.words.filter((w) =>
+              sets.some((s) => s.id === w.set_id),
+            );
+          return {
+            ...b,
+            set_count: sets.length,
+            word_count: words.length,
+            mastered_count: words.filter((w) =>
+              store.progress.some(
+                (p) => p.word_id === w.id && p.mastery_state === "mastered",
+              ),
+            ).length,
+          };
+        }),
+      );
     }
     if (table === "vocabulary_book_detail") {
       const book = store.vocabBooks.find((b) => b.id === body.p_book);

@@ -9,6 +9,7 @@ export default function BookForm({ book, onSaved, onCancel }) {
     cover_url: book?.cover_url || "",
     published: book?.published || false,
   });
+  const [removeCover, setRemoveCover] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const field = (name) => ({
@@ -26,7 +27,8 @@ export default function BookForm({ book, onSaved, onCancel }) {
         {
           ...values,
           title: values.title.trim(),
-          cover_url: values.cover_url || null,
+          cover_url: removeCover ? null : values.cover_url || null,
+          ...(removeCover ? { cover_path: null, cover_metadata: {} } : {}),
         },
         book?.id,
       );
@@ -60,6 +62,16 @@ export default function BookForm({ book, onSaved, onCancel }) {
         Cover image URL
         <input type="url" placeholder="https://…" {...field("cover_url")} />
       </label>
+      {(book?.cover_path || book?.cover_url) && (
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={removeCover}
+            onChange={(e) => setRemoveCover(e.target.checked)}
+          />
+          Remove current cover and use fallback
+        </label>
+      )}
       <label className="checkbox-label">
         <input
           type="checkbox"

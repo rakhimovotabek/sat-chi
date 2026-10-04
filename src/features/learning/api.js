@@ -1,3 +1,4 @@
+import { resolveCovers } from "../books/cover-assets.js";
 import { supabase } from "../../lib/supabase.js";
 export async function checked(
   request,
@@ -88,16 +89,16 @@ export const importEvidence = (id) =>
       .eq("id", id)
       .single(),
   );
-export const vocabBooks = (page = 0, search = "") =>
-  checked(
-    supabase
-      .from("vocabulary_books")
-      .select("*")
-      .ilike("title", `%${search.replace(/[%_\\]/g, "").trim()}%`)
-      .order("created_at", { ascending: false })
-      .order("id")
-      .range(page * 50, page * 50 + 49),
-  );
+export async function vocabBooks(page = 0, search = "") {
+  const rows = await rpc("vocabulary_catalog", {
+    p_page: page,
+    p_search: search
+      .replace(/[%_\\]/g, "")
+      .trim()
+      .slice(0, 200),
+  });
+  return resolveCovers(rows, supabase);
+}
 export const vocabSets = (book) =>
   checked(
     supabase
@@ -192,8 +193,10 @@ export const startVocab = (id, mode) =>
 
 export const bankFacets = (filters) =>
   rpc("question_bank_facets", { p_filters: filters });
-export const vocabBookDetail = (book) =>
-  rpc("vocabulary_book_detail", { p_book: book });
+export async function vocabBookDetail(book) {
+  const detail = await rpc("vocabulary_book_detail", { p_book: book });
+  return { ...detail, book: (await resolveCovers([detail.book], supabase))[0] };
+}
 export const publishVocabBook = (book, state) =>
   checked(
     supabase.rpc("set_vocabulary_publication", {

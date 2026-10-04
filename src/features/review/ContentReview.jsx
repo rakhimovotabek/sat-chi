@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router";
+import BookCover from "../../components/BookCover.jsx";
+import { getBook } from "../books/api.js";
+import { vocabBookDetail } from "../learning/api.js";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
@@ -29,6 +32,18 @@ function Pages({ page, setPage, total, size = 25, loading }) {
     </div>
   );
 }
+function SourceCover({ source }) {
+  const state = useContent(
+    () =>
+      source.book_id
+        ? getBook(source.book_id)
+        : vocabBookDetail(source.vocabulary_book_id).then((d) => d.book),
+    [source.book_id, source.vocabulary_book_id],
+  );
+  return state.data && (state.data.cover_url || state.data.cover_image_url) ? (
+    <BookCover book={state.data} className="book-detail-cover" />
+  ) : null;
+}
 function SourceDetail({ id, onQueue }) {
   const panel = useRef(null);
   useEffect(() => {
@@ -53,6 +68,7 @@ function SourceDetail({ id, onQueue }) {
       <ContentState {...state} onRetry={state.reload} />
       {s && (
         <>
+          {(s.book_id || s.vocabulary_book_id) && <SourceCover source={s} />}
           <h2>{s.title}</h2>
           <p>
             {s.source_file} · {s.source_type} · {s.category}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+import BookCover from "../../components/BookCover.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "./useContent.js";
 import ContentState from "./ContentState.jsx";
@@ -155,11 +156,14 @@ export default function BookDetail({ admin = false }) {
       <Link className="card-link" to={admin ? "/admin/books" : "/books"}>
         ← All books
       </Link>
-      <PageHeader
-        eyebrow={book.category}
-        title={focused?.title || book.title}
-        description={book.description || "Choose a topic to begin."}
-      />
+      <div className="book-detail-heading">
+        {!focused && <BookCover book={book} className="book-detail-cover" />}
+        <PageHeader
+          eyebrow={book.category}
+          title={focused?.title || book.title}
+          description={book.description || "Choose a topic to begin."}
+        />
+      </div>
       {admin && (
         <div className="button-row">
           <span className="subtle-badge">

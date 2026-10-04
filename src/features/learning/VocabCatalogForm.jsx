@@ -29,6 +29,13 @@ export default function VocabCatalogForm({
                   title: form.get("title"),
                   description: form.get("description"),
                   source: form.get("source"),
+                  cover_url:
+                    form.get("removeCover") === "on"
+                      ? null
+                      : form.get("cover_url") || null,
+                  ...(form.get("removeCover") === "on"
+                    ? { cover_path: null, cover_metadata: {} }
+                    : {}),
                 };
           action.run(async () => {
             const table = bookId ? "vocabulary_sets" : "vocabulary_books";
@@ -70,6 +77,23 @@ export default function VocabCatalogForm({
                 defaultValue={values.description || ""}
               />
             </label>
+            <label>
+              Cover image URL
+              <input
+                type="url"
+                name="cover_url"
+                pattern="https://.*"
+                maxLength={1000}
+                defaultValue={values.cover_url || ""}
+                placeholder="https://…"
+              />
+            </label>
+            {(values.cover_path || values.cover_url) && (
+              <label className="checkbox-row">
+                <input type="checkbox" name="removeCover" />
+                Remove current cover and use fallback
+              </label>
+            )}
             <label>
               Source attribution
               <input

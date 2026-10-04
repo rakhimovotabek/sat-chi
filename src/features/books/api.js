@@ -1,3 +1,4 @@
+import { resolveCovers } from "./cover-assets.js";
 import { supabase } from "../../lib/supabase.js";
 async function checked(
   request,
@@ -16,9 +17,12 @@ export async function getBookCatalog(page = 0, search = "") {
   const title = search.replace(/[%_\\]/g, "").trim();
   const { data, count, error } = await supabase
     .from("books")
-    .select("id,title,description,category,cover_url,published,created_at", {
-      count: "exact",
-    })
+    .select(
+      "id,title,description,category,cover_url,cover_path,published,created_at",
+      {
+        count: "exact",
+      },
+    )
     .ilike("title", `%${title}%`)
     .order("created_at", { ascending: false })
     .order("id")
@@ -27,13 +31,18 @@ export async function getBookCatalog(page = 0, search = "") {
     throw new Error(
       "Could not load books. Check your connection and try again.",
     );
-  return { books: data, total: count ?? data.length };
+  return {
+    books: await resolveCovers(data, supabase),
+    total: count ?? data.length,
+  };
 }
-export const getBook = (id) =>
-  checked(
+export async function getBook(id) {
+  const book = await checked(
     supabase.from("books").select("*").eq("id", id).single(),
     "This book is unavailable.",
   );
+  return (await resolveCovers([book], supabase))[0];
+}
 export const getTopics = (book) =>
   checked(
     supabase

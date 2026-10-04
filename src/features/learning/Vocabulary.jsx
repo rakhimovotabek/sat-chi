@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router";
+import BookCover from "../../components/BookCover.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
@@ -54,15 +55,20 @@ export default function Vocabulary({ admin = false }) {
     });
   return (
     <>
-      <PageHeader
-        title={book?.title || "Vocabulary"}
-        eyebrow={admin ? "Vocabulary library" : "Words for stronger reading"}
-        description={
-          bookId
-            ? "Choose a set to learn, review, read in context, or test your knowledge."
-            : "Build lasting word knowledge with structured vocabulary sets."
-        }
-      />
+      <div className="book-detail-heading">
+        {book && (book.cover_url || book.cover_image_url) && (
+          <BookCover book={book} className="book-detail-cover" />
+        )}
+        <PageHeader
+          title={book?.title || "Vocabulary"}
+          eyebrow={admin ? "Vocabulary library" : "Words for stronger reading"}
+          description={
+            bookId
+              ? "Choose a set to learn, review, read in context, or test your knowledge."
+              : "Build lasting word knowledge with structured vocabulary sets."
+          }
+        />
+      </div>
       {!admin && <VocabularyStats data={summary.data} />}
       {!bookId && (
         <label className="vocabulary-global-search">
@@ -180,7 +186,7 @@ export default function Vocabulary({ admin = false }) {
             <button
               className="quiet-button"
               onClick={() => {
-                setEditing(book);
+                setEditing({ ...book, _book: true });
               }}
             >
               Edit vocabulary book
@@ -214,7 +220,7 @@ export default function Vocabulary({ admin = false }) {
       )}
       {editing && (
         <VocabCatalogForm
-          bookId={bookId}
+          bookId={editing._book ? undefined : bookId}
           values={editing}
           onClose={() => setEditing(null)}
           onSaved={() => {
@@ -253,6 +259,9 @@ export default function Vocabulary({ admin = false }) {
                 }
                 to={`${admin ? "/admin" : ""}/vocabulary/${bookId ? `${bookId}/sets/${row.id}` : row.id}`}
               >
+                {!bookId && (
+                  <BookCover book={row} className="vocabulary-cover" />
+                )}
                 {!bookId && admin && (
                   <span className="subtle-badge">
                     {row.archived
@@ -271,6 +280,15 @@ export default function Vocabulary({ admin = false }) {
                     {row.passages > 0 &&
                       ` · ${row.passages} passage${row.passages === 1 ? "" : "s"}`}
                     {row.exercises > 0 && ` · ${row.exercises} exercises`}
+                  </p>
+                )}
+                {!bookId && (
+                  <p className="set-metadata">
+                    {row.set_count} {row.set_count === 1 ? "set" : "sets"} ·{" "}
+                    {row.word_count} {row.word_count === 1 ? "word" : "words"}
+                    {!admin && row.mastered_count > 0
+                      ? " · " + row.mastered_count + " mastered"
+                      : ""}
                   </p>
                 )}
                 {!bookId && row.description && (

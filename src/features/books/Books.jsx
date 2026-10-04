@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import BookCover from "../../components/BookCover.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "./useContent.js";
 import ContentState from "./ContentState.jsx";
@@ -80,17 +81,7 @@ export default function Books({ admin = false }) {
                 className="book-card"
                 to={`${admin ? "/admin" : ""}/books/${b.id}`}
               >
-                <div className="book-cover">
-                  {b.cover_url ? (
-                    <img src={b.cover_url} alt="" loading="lazy" />
-                  ) : (
-                    <span aria-hidden="true">
-                      SAT’chi
-                      <br />
-                      {b.category}
-                    </span>
-                  )}
-                </div>
+                <BookCover book={b} />
                 <div className="book-card-copy">
                   <span className="subtle-badge">{b.category}</span>
                   {admin && (
