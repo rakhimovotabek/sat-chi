@@ -297,3 +297,5 @@ The practice Calculator embeds the official College Board Desmos testing calcula
 Update `src/data/sat-dates.js` when [College Board confirms new dates](https://satsuite.collegeboard.org/sat/dates-deadlines). This is a static maintained schedule; registration and late deadlines are shown without scraping at runtime. `profiles.target_test_date` is the canonical selection across onboarding, settings, dashboard and Study Plan. Changing it preserves completed and active history while regenerating future unstarted work.
 
 The unit/database test command limits concurrency to two processes so PGlite suites remain usable on a development laptop. All existing tests are retained.
+
+The recurring homework backend and its calendar, membership, grading and RPC contracts are documented in [Daily Homework model](docs/daily-homework-model.md). Its executed database checks run with `node --test tests/daily-homework.test.js` or the full `npm test` command. UI integration is pending at the current backend checkpoint.
