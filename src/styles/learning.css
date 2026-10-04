@@ -592,3 +592,8 @@ progress {
     gap: 12px;
   }
 }
+.daily-admin-actions {
+  flex-wrap: nowrap;
+  width: max-content;
+  gap: 8px;
+}

@@ -1,3 +1,4 @@
+import { DailyDashboard } from "./DailyHomeworkStudent.jsx";
 import { Link } from "react-router";
 import useAuth from "../../hooks/useAuth.js";
 import useContent from "../books/useContent.js";
@@ -31,6 +32,7 @@ export default function DashboardWork() {
     ) || [];
   return (
     <>
+      <DailyDashboard />
       {profile.target_test_date && (
         <p className="sat-countdown">
           SAT · {satDateLabel(profile.target_test_date)}{" "}

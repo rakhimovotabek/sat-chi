@@ -382,7 +382,7 @@ export default function DailyHomeworkAdmin() {
                         </td>
                         <td>{t.state}</td>
                         <td>
-                          <div className="button-row">
+                          <div className="button-row daily-admin-actions">
                             <button
                               className="button button-secondary"
                               onClick={() => setDetail(t.id)}

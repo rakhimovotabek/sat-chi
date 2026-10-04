@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
+import DailyHomeworkStudent from "./DailyHomeworkStudent.jsx";
 import DailyHomeworkAdmin from "./DailyHomeworkAdmin.jsx";
 import HomeworkForm from "./HomeworkForm.jsx";
 import useAction from "./useAction.js";
@@ -41,6 +42,12 @@ export default function Homework({ admin = false }) {
       )}
       {admin && <DailyHomeworkAdmin key={revision} />}
       {admin && <h2>One-time homework</h2>}
+      {!admin && (
+        <>
+          <DailyHomeworkStudent />
+          <h2>Other homework</h2>
+        </>
+      )}
       {action.error && (
         <p role="alert" className="form-error">
           {action.error}

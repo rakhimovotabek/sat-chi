@@ -44,7 +44,7 @@ export default function HomeworkForm({ onCreated, template }) {
     [sections, setSections] = useState([
       {
         ...newSection(),
-        title: "Daily questions",
+        title: template ? "Daily questions" : "",
         count: initial.count || 5,
         filters: initial.filters || {},
         mode: initial.questionIds?.length ? "specific" : "random",
