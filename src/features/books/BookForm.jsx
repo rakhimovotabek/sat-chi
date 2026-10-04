@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { useState } from "react";
 import { CATEGORIES } from "./import-validation.js";
 import { saveBook } from "./api.js";
@@ -21,7 +22,11 @@ export default function BookForm({ book, onSaved, onCancel }) {
     setBusy(true);
     setError("");
     try {
-      if (values.cover_url && new URL(values.cover_url).protocol !== "https:")
+      if (
+        !removeCover &&
+        values.cover_url &&
+        new URL(values.cover_url.trim()).protocol !== "https:"
+      )
         throw new Error("Use an HTTPS cover URL.");
       const result = await saveBook(
         {
@@ -60,7 +65,13 @@ export default function BookForm({ book, onSaved, onCancel }) {
       </label>
       <label>
         Cover image URL
-        <input type="url" placeholder="https://…" {...field("cover_url")} />
+        <input
+          type="url"
+          disabled={removeCover}
+          maxLength={2048}
+          placeholder="https://…"
+          {...field("cover_url")}
+        />
       </label>
       {(book?.cover_path || book?.cover_url) && (
         <label className="checkbox-label">
@@ -72,6 +83,16 @@ export default function BookForm({ book, onSaved, onCancel }) {
           Remove current cover and use fallback
         </label>
       )}
+      <p className="book-save-status">
+        {book?.published
+          ? "Currently published — visible to students"
+          : "Currently draft — visible to administrators"}
+      </p>
+      {book?.cover_path && !values.cover_url && !removeCover && (
+        <p className="empty-copy">
+          The generated first-page cover will be kept. A cover is optional.
+        </p>
+      )}
       <label className="checkbox-label">
         <input
           type="checkbox"
@@ -80,11 +101,14 @@ export default function BookForm({ book, onSaved, onCancel }) {
             setValues((v) => ({ ...v, published: e.target.checked }))
           }
         />
-        Published — visible to students
+        Publish this book after saving
       </label>
       {error && (
         <p className="form-error" role="alert">
           {error}
+          {error.includes("Content Review") && (
+            <Link to="/admin/content-review">Review imported content</Link>
+          )}
         </p>
       )}
       <div className="button-row">

@@ -14,7 +14,7 @@ test("admin creates, edits and deletes books, subtopics and questions with valid
   await page.goto("/admin/books");
   await page.getByRole("button", { name: "Create book", exact: true }).click();
   await page.getByLabel("Book title").fill("Admin SAT Book");
-  await page.getByLabel("Published").check();
+  await page.getByLabel("Publish this book after saving").check();
   await page.getByRole("button", { name: "Save book", exact: true }).click();
   await page.getByRole("link", { name: /Admin SAT Book/ }).click();
   await expect(
@@ -354,4 +354,71 @@ test("private Math question assets are signed for practice and never loaded from
   });
   await expect(image).toBeVisible();
   await expect(image).toHaveAttribute("src", /object\/sign\/question-assets/);
+});
+
+test("book publication failure shows the review blocker and preserves draft metadata; approved publication and published editing succeed without a cover", async ({
+  page,
+}) => {
+  const store = await contentFixture(page, "admin");
+  store.books[0].published = false;
+  let approved = false;
+  await page.route("**/rest/v1/books*", async (route) => {
+    if (
+      route.request().method() === "PATCH" &&
+      route.request().postDataJSON()?.published &&
+      !approved
+    )
+      return route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({
+          code: "P0001",
+          message: "Review imported catalog items before publishing",
+        }),
+      });
+    return route.fallback();
+  });
+  await page.goto(`/admin/books/${bookId}`);
+  await page.getByRole("button", { name: "Edit book", exact: true }).click();
+  await page.getByLabel("Publish this book after saving").check();
+  await page.getByRole("button", { name: "Save book", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Content Review before publishing",
+  );
+  await expect(
+    page.getByText("Currently draft — visible to administrators", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(store.books[0].published).toBe(false);
+  await page.getByLabel("Publish this book after saving").uncheck();
+  await page
+    .getByLabel("Book title", { exact: true })
+    .fill("Edited draft with fallback cover");
+  await page.getByRole("button", { name: "Save book", exact: true }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Edited draft with fallback cover",
+      exact: true,
+    }),
+  ).toBeVisible();
+  approved = true;
+  await page.getByRole("button", { name: "Edit book", exact: true }).click();
+  await page.getByLabel("Publish this book after saving").check();
+  await page.getByRole("button", { name: "Save book", exact: true }).click();
+  await expect(page.getByText("Published", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Edit book", exact: true }).click();
+  await expect(
+    page.getByText("Currently published — visible to students", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page
+    .getByLabel("Book title", { exact: true })
+    .fill("Edited published book");
+  await page.getByRole("button", { name: "Save book", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Edited published book", exact: true }),
+  ).toBeVisible();
+  expect(store.books[0].published).toBe(true);
 });

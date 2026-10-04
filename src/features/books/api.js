@@ -1,3 +1,4 @@
+import { bookSavePayload, bookSaveError } from "./book-save.js";
 import { resolveCovers } from "./cover-assets.js";
 import { supabase } from "../../lib/supabase.js";
 async function checked(
@@ -52,13 +53,14 @@ export const getTopics = (book) =>
       .order("position")
       .order("id"),
   );
-export const saveBook = (values, id) =>
-  checked(
-    id
-      ? supabase.from("books").update(values).eq("id", id).select().single()
-      : supabase.from("books").insert(values).select().single(),
-    "Could not save the book. Check its title and cover URL.",
-  );
+export async function saveBook(values, id) {
+  const payload = bookSavePayload(values);
+  const { data, error } = await (id
+    ? supabase.from("books").update(payload).eq("id", id).select().single()
+    : supabase.from("books").insert(payload).select().single());
+  if (error) throw new Error(bookSaveError(error));
+  return data;
+}
 export const deleteBook = (id) =>
   checked(
     supabase.from("books").delete().eq("id", id),
