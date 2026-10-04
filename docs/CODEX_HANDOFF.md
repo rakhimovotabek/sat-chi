@@ -102,3 +102,23 @@ Run `npm test`, `npm run test:e2e`, and `npm run build` after changes. Tests cov
 - Tests: 61 unit/database tests, 38 browser tests, lint, format check, build and diff check passed. New regressions cover sequential failure isolation, collapsed/mobile navigation and one logout, plus vocabulary admin warnings. Old auth logout test now targets the single visible action; the authentication behavior/assertions remain.
 - Current milestone: vocabulary test depth and final product polish.
 - Exact next action: add a persisted, paginated typed-recall test with real results/mistake replay (current typed mode saves individual reviews only); keep answer keys/private progress server-controlled. Then audit book-catalog pagination and remaining UX gaps, with full tests and checkpoint commits.
+
+## In-progress checkpoint — saved typed tests
+
+- Applied migration: `20261004000600_vocabulary_typed_tests.sql` (linked production push succeeded). Private frozen sessions/items/keys; no browser mutations or key SELECT; strict RPC grading and idempotent answers; snapshot mistake replay; 100-item pages; 20-session history; active seconds/streak integration. No source/publication changes.
+- Completed locally: typed test UI, All available (maximum 10,000), first-unanswered resume, submission/results and incorrect-word replay, saved library history. Source memberships retained.
+- Tests: full unit/database suite 61 passed, lint/format/build/diff passed before final route-isolation refinement. Full 39-browser suite currently running; production RLS re-audit and final checks still required before commit/push.
+- Books/vocabulary remain 822 SAT questions / 1,400 draft vocabulary words, 56 passages, 559 quizzes; eighteen review-only sources. All prior checkpoints still apply.
+- Current work: complete browser validation and typed-test checkpoint; then bounded book catalog/search and visual spacing audit.
+- Exact next action: inspect `local-imports/typed-e2e.log` for the full browser result, fix any failure, rerun lint/build/diff and executed SQL regressions after final edits, audit production typed permissions, then commit and push. Never reapply/edit an applied migration; use another additive migration for necessary changes.
+
+## Checkpoint — persisted typed recall and results
+
+- Completed: saved typed vocabulary tests, All available (10,000-word safety bound), combined-set deduplication/source memberships, 100-question pages, first-unanswered resume, strict server grading, active-time tracking, final score/accuracy/correct/incorrect/unanswered/current-mastery results, mistake filtering and snapshot-only incorrect-word replay. Library history loads twenty tests per page.
+- Applied: `20261004000600_vocabulary_typed_tests.sql`; all preceding migrations remain applied. Typed tables have RLS; browser key SELECT and item UPDATE/session INSERT are false; anonymous definer execution remains zero. Removed/edited source words preserve frozen results without granting mismatched progress.
+- Validation: 61 unit/database tests and 39 browser tests passed; focused final SQL workflow, lint, scoped formatting, build and diff check passed. Tests exercise ownership, private keys, retry/time idempotence, exact recall, result/mistake replay and >100-item pagination. Desktop vocabulary/mobile drawer visually inspected using isolated synthetic fixtures; screenshots are private.
+- Books/vocabulary: unchanged 822 SAT questions, 1,400 draft words, 56 source passages, 559 exercises. Eighteen sources remain NEEDS_REVIEW; original admin publication remains intact.
+- Current milestone: bounded library catalogs and remaining UI/performance polish.
+- Known limits: multiple-choice/source tests retain the explicit 200-item bound. Typed tests support the larger paginated pool. Source passage requests remain limited to ten visible-set passages. No new automatic source publication.
+- Unfinished: catalog search/pagination; remaining specialized PDF adapters/OCR/manual visual review; optional further question/filter UX and supported-tooling upgrade. All learning workflows are deterministic, without external AI dependencies.
+- Exact next action: paginate/search SAT and vocabulary book catalogs on the database; add searchable bounded book selectors to question administration/bank filters, keeping chosen books visible; add meaningful browser pagination/search regressions and compact mobile vocabulary modes; test, checkpoint and push.

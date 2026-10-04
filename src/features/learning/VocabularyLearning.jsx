@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { reviewVocab, starVocab, startVocabPool } from "./api.js";
+import { reviewVocab, starVocab, startVocabPool, rpc } from "./api.js";
 import useAction from "./useAction.js";
 import { contextParts, normalizeRecall } from "./vocabulary-model.js";
 export function ContextPassage({ passage, words, onWord }) {
@@ -221,11 +221,22 @@ export default function VocabularyLearning({
     return () => window.removeEventListener("keydown", key);
   }, [mode, sequence.length, action.busy]);
   const start = (practiceMode) =>
-    action.run(async () =>
-      navigate(
-        `/practice/${await startVocabPool(setIds, practiceMode, count, ["due", "weak", "starred"].includes(filter) ? filter : scopeFilter)}`,
-      ),
-    );
+    action.run(async () => {
+      const poolFilter = ["due", "weak", "starred"].includes(filter)
+        ? filter
+        : scopeFilter;
+      if (practiceMode === "typed") {
+        const id = await rpc("start_vocabulary_typed_test", {
+          p_sets: setIds,
+          p_count: count === 200 ? 0 : count,
+          p_filter: poolFilter,
+        });
+        navigate(`/vocabulary/test/${id}`);
+      } else
+        navigate(
+          `/practice/${await startVocabPool(setIds, practiceMode, count, poolFilter)}`,
+        );
+    });
   return (
     <>
       <div
@@ -626,7 +637,11 @@ export default function VocabularyLearning({
               >
                 {[10, 20, 25, 50, 200].map((n) => (
                   <option key={n} value={n}>
-                    {n === 200 ? "All available (up to 200)" : n}
+                    {n === 200
+                      ? testType === "typed"
+                        ? "All available"
+                        : "All available (up to 200)"
+                      : n}
                   </option>
                 ))}
               </select>
@@ -642,6 +657,7 @@ export default function VocabularyLearning({
                 </option>
                 <option value="meaning">Definitions</option>
                 <option value="reverse">Word selection</option>
+                <option value="typed">Typed recall</option>
                 <option value="source">Supplied context exercises</option>
               </select>
             </label>

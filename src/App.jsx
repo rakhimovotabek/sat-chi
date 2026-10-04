@@ -35,6 +35,9 @@ const Vocabulary = lazy(() => import("./features/learning/Vocabulary.jsx"));
 const VocabularyStudy = lazy(
   () => import("./features/learning/VocabularyStudy.jsx"),
 );
+const VocabularyTypedTest = lazy(
+  () => import("./features/learning/VocabularyTypedTest.jsx"),
+);
 const VocabularySet = lazy(
   () => import("./features/learning/VocabularySet.jsx"),
 );
@@ -94,6 +97,10 @@ export default function App() {
             <Route path="/question-bank" element={<QuestionBank />} />
             <Route path="/vocabulary" element={<Vocabulary />} />
             <Route path="/vocabulary/study" element={<VocabularyStudy />} />
+            <Route
+              path="/vocabulary/test/:sessionId"
+              element={<VocabularyTypedTest />}
+            />
             <Route path="/vocabulary/:bookId" element={<Vocabulary />} />
             <Route
               path="/vocabulary/:bookId/sets/:setId"

@@ -519,3 +519,49 @@ test("admin vocabulary review accepts singular source warnings and shows real wo
     page.getByText(/Original Set 6 · Question 9 · PDF page 44/),
   ).toBeVisible();
 });
+
+test("typed tests save answers, resume, grade exact recall and replay only mistakes", async ({
+  page,
+}) => {
+  const store = await learningFixture(page);
+  await page.goto("/vocabulary/vbook/sets/vset");
+  await page.getByRole("button", { name: "Test", exact: true }).click();
+  await page.getByLabel("Question types").selectOption("typed");
+  await page.getByLabel("Question count").selectOption("200");
+  await page.getByRole("button", { name: "Start test", exact: true }).click();
+  await expect(page).toHaveURL(/vocabulary\/test\/typed-/);
+  await expect(
+    page.getByText("become less intense", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("The learner was abate.", { exact: true }),
+  ).toHaveCount(0);
+  await page.getByLabel("Your word").fill("  ABATE  ");
+  await page.getByRole("button", { name: "Check answer" }).click();
+  await expect(page.getByText("Correct: abate", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Next word", exact: true }).click();
+  await page.getByLabel("Your word").fill("unrelated");
+  await page.getByRole("button", { name: "Check answer" }).click();
+  await expect(
+    page.getByText("Needs review: candid", { exact: true }),
+  ).toBeVisible();
+  await page.goto("/vocabulary");
+  await page.getByRole("link", { name: "Resume test", exact: true }).click();
+  await expect(page.getByText(/Question 3 of 4/)).toBeVisible();
+  await page.getByRole("button", { name: "Submit test", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm submission" }).click();
+  await expect(page.getByRole("heading", { name: "25% score" })).toBeVisible();
+  await expect(
+    page.getByText("1 correct · 1 incorrect · 2 unanswered", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Review mistakes", exact: true })
+    .click();
+  await expect(
+    page.getByText("Needs review: candid", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Practice incorrect words" }).click();
+  await expect(page.getByText(/Question 1 of 1/)).toBeVisible();
+  expect(store.typedTests).toHaveLength(2);
+  expect(store.typedTests[1].items[0].word.word).toBe("candid");
+});

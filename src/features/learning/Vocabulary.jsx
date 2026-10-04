@@ -8,6 +8,7 @@ import useAction from "./useAction.js";
 import * as api from "./api.js";
 import VocabCatalogForm from "./VocabCatalogForm.jsx";
 import VocabImport from "./VocabImport.jsx";
+import { VocabularyTestHistory } from "./VocabularyTypedTest.jsx";
 import VocabularyStats from "./VocabularyStats.jsx";
 import { masteryPercent } from "./vocabulary-model.js";
 export default function Vocabulary({ admin = false }) {
@@ -37,6 +38,7 @@ export default function Vocabulary({ admin = false }) {
         }
       />
       {!admin && <VocabularyStats data={summary.data} />}
+      {!admin && !bookId && <VocabularyTestHistory />}
       {!admin && summary.error && (
         <p className="form-error" role="alert">
           {summary.error}

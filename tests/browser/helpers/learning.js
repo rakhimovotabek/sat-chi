@@ -24,6 +24,7 @@ export async function learningFixture(page, role = "student") {
     position: i,
   }));
   store.tests = [];
+  store.typedTests = [];
   store.passages = [
     {
       id: "passage",
@@ -77,7 +78,7 @@ export async function learningFixture(page, role = "student") {
       },
     ]);
   const regex =
-    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
+    /\/rest\/v1\/(groups|group_members|profiles|vocabulary_books|vocabulary_sets|vocabulary_words|vocabulary_passages|vocabulary_progress|vocabulary_questions|rpc\/(start_vocabulary_typed_test|vocabulary_typed_history|vocabulary_typed_test|answer_vocabulary_typed_test|finish_vocabulary_typed_test|refresh_study_plan|save_study_preferences|start_study_task|study_task_vocabulary|question_mistakes|practice_mistake|question_bank|start_bank_practice|create_homework|homework_directory|start_homework|learning_metrics|learning_standings|admin_overview|group_summary|start_vocabulary_test|start_vocabulary_practice|vocabulary_summary|vocabulary_pool|review_vocabulary|star_vocabulary|import_vocabulary))(\?|$)/;
   await page.route(regex, async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
@@ -407,6 +408,101 @@ export async function learningFixture(page, role = "student") {
       p.next_review = new Date(Date.now() + 86400000).toISOString();
       p.study_seconds = (p.study_seconds || 0) + body.p_seconds;
       return json({ progress: p, correct });
+    }
+    if (table === "start_vocabulary_typed_test") {
+      const retry = store.typedTests.find((t) => t.id === body.p_retry);
+      const words = retry
+        ? retry.items.filter((i) => i.correct === false).map((i) => i.word)
+        : store.words.filter(
+            (w) => !body.p_sets?.length || body.p_sets.includes(w.set_id),
+          );
+      const selected = body.p_count ? words.slice(0, body.p_count) : words;
+      const test = {
+        id: `typed-${counter++}`,
+        title: "Typed vocabulary recall",
+        created_at: new Date().toISOString(),
+        submitted_at: null,
+        item_count: selected.length,
+        study_seconds: 0,
+        items: selected.map((w, i) => ({
+          id: `typed-item-${counter++}`,
+          position: i,
+          word: w,
+          question: {
+            definition: w.definition,
+            set_title: "Set 1",
+            source_sets: [w.set_id],
+          },
+          correct: null,
+          selected_text: null,
+          answered_at: null,
+        })),
+      };
+      store.typedTests.push(test);
+      return json(test.id);
+    }
+    if (table === "vocabulary_typed_history")
+      return json(
+        store.typedTests
+          .map((t) => ({
+            ...t,
+            answered: t.items.filter((i) => i.answered_at).length,
+            correct: t.items.filter((i) => i.correct).length,
+          }))
+          .reverse(),
+      );
+    if (
+      [
+        "vocabulary_typed_test",
+        "answer_vocabulary_typed_test",
+        "finish_vocabulary_typed_test",
+      ].includes(table)
+    ) {
+      const t = store.typedTests.find((t) => t.id === body.p_session);
+      if (table === "answer_vocabulary_typed_test") {
+        const i = t.items.find((i) => i.id === body.p_item);
+        if (!i.answered_at) {
+          i.selected_text = body.p_answer;
+          i.correct = body.p_answer.trim().toLowerCase() === i.word.word;
+          i.answered_at = new Date().toISOString();
+          t.study_seconds += body.p_seconds;
+        }
+        return json({
+          correct: i.correct,
+          word: i.word.word,
+          example: i.word.example,
+        });
+      }
+      if (table === "finish_vocabulary_typed_test")
+        t.submitted_at ||= new Date().toISOString();
+      const rows = t.items.filter(
+        (i) => !body.p_mistakes || i.correct === false,
+      );
+      return json({
+        session: {
+          id: t.id,
+          title: t.title,
+          created_at: t.created_at,
+          submitted_at: t.submitted_at,
+          item_count: t.item_count,
+          study_seconds: t.study_seconds,
+        },
+        answered: t.items.filter((i) => i.answered_at).length,
+        correct: t.items.filter((i) => i.correct).length,
+        incorrect: t.items.filter((i) => i.correct === false).length,
+        total: rows.length,
+        next_position: t.items.find((i) => !i.answered_at)?.position ?? null,
+        mastered: 0,
+        items: rows
+          .slice((body.p_page || 0) * 100, (body.p_page || 0) * 100 + 100)
+          .map(({ word, ...i }) => ({
+            ...i,
+            feedback:
+              i.answered_at || t.submitted_at
+                ? { word: word.word, example: word.example }
+                : {},
+          })),
+      });
     }
     if (table === "start_vocabulary_practice")
       return json(start("vocabulary", "Selected sets · Test"));

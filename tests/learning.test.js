@@ -637,6 +637,149 @@ test("real PostgreSQL learning workflows preserve ownership, private keys, froze
       2,
     );
 
+    const typedSession = await call(
+      "start_vocabulary_typed_test",
+      [[set, secondSet], 0, "all"],
+      ["uuid[]", "integer", "text"],
+    );
+    const typedPage = await call(
+      "vocabulary_typed_test",
+      [typedSession],
+      ["uuid"],
+    );
+    assert.equal(typedPage.total, 4, "combined typed pool deduplicates words");
+    assert.ok(
+      typedPage.items.every(
+        (i) => !i.feedback.word && !i.question.word && !i.question.example,
+      ),
+      "test keys/examples are hidden before answering",
+    );
+    await assert.rejects(
+      db.query("select * from public.vocabulary_typed_keys"),
+    );
+    await assert.rejects(
+      db.query("update public.vocabulary_typed_items set correct=true"),
+    );
+    await role(other);
+    await assert.rejects(
+      call("vocabulary_typed_test", [typedSession], ["uuid"]),
+    );
+    await assert.rejects(
+      call(
+        "answer_vocabulary_typed_test",
+        [typedSession, typedPage.items[0].id, "attack", 0],
+        ["uuid", "uuid", "text", "integer"],
+      ),
+    );
+    assert.equal(
+      (await db.query("select * from public.vocabulary_typed_items")).rows
+        .length,
+      0,
+    );
+    await role(student);
+    const typedItem = typedPage.items[0];
+    const expected = words.find(
+      (w) => w.definition === typedItem.question.definition,
+    ).word;
+    const graded = await call(
+      "answer_vocabulary_typed_test",
+      [typedSession, typedItem.id, "  " + expected.toUpperCase() + "  ", 30],
+      ["uuid", "uuid", "text", "integer"],
+    );
+    assert.equal(graded.correct, true);
+    assert.equal(graded.word, expected);
+    const priorCount = graded.progress.review_count;
+    await call(
+      "answer_vocabulary_typed_test",
+      [typedSession, typedItem.id, "wrong retry", 300],
+      ["uuid", "uuid", "text", "integer"],
+    );
+    assert.equal(
+      (await call("vocabulary_typed_test", [typedSession], ["uuid"])).session
+        .study_seconds,
+      30,
+      "answer retries cannot inflate time",
+    );
+    assert.equal(
+      (
+        await db.query(
+          "select review_count from public.vocabulary_progress where word_id=$1",
+          [typedItem.word_id],
+        )
+      ).rows[0].review_count,
+      priorCount,
+    );
+    await call(
+      "answer_vocabulary_typed_test",
+      [typedSession, typedPage.items[1].id, "unrelated", 30],
+      ["uuid", "uuid", "text", "integer"],
+    );
+    const typedResults = await call(
+      "finish_vocabulary_typed_test",
+      [typedSession],
+      ["uuid"],
+    );
+    assert.equal(typedResults.correct, 1);
+    assert.equal(typedResults.incorrect, 1);
+    assert.equal(typedResults.answered, 2);
+    assert.equal(typedResults.total, 4);
+    assert.ok(
+      typedResults.items.every((i) => i.feedback.word),
+      "finished tests reveal saved feedback",
+    );
+    await assert.rejects(
+      call(
+        "answer_vocabulary_typed_test",
+        [typedSession, typedPage.items[2].id, "late", 0],
+        ["uuid", "uuid", "text", "integer"],
+      ),
+    );
+    const retryTyped = await call(
+      "start_vocabulary_typed_test",
+      [[], 0, "all", typedSession],
+      ["uuid[]", "integer", "text", "uuid"],
+    );
+    assert.equal(
+      (await call("vocabulary_typed_test", [retryTyped], ["uuid"])).total,
+      1,
+    );
+    assert.equal((await call("vocabulary_typed_history")).length, 2);
+    const typedMistakes = await call(
+      "vocabulary_typed_test",
+      [typedSession, 0, true],
+      ["uuid", "integer", "boolean"],
+    );
+    assert.equal(typedMistakes.total, 1);
+    await role(admin);
+    const largeSet = await call(
+      "import_vocabulary_set",
+      [
+        vbid,
+        JSON.stringify({
+          title: "Pagination fixture",
+          words: Array.from({ length: 100 }, (_, i) => ({
+            word: `fixture${i}`,
+            definition: `Fixture meaning ${i}`,
+          })),
+        }),
+      ],
+      ["uuid", "jsonb"],
+    );
+    await role(student);
+    const largeTyped = await call(
+      "start_vocabulary_typed_test",
+      [[largeSet, set], 0, "all"],
+      ["uuid[]", "integer", "text"],
+    );
+    const secondPage = await call(
+      "vocabulary_typed_test",
+      [largeTyped, 1],
+      ["uuid", "integer"],
+    );
+    assert.equal(secondPage.total, 104);
+    assert.equal(secondPage.items.length, 4);
+    assert.equal(secondPage.items[0].position, 100);
+
     const multi = await call(
       "start_vocabulary_practice",
       [[set], "reverse", 10, "all"],
