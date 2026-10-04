@@ -157,6 +157,34 @@ test("cover Storage RLS follows publication, rejects student writes and vocabula
       "insert into storage.objects(bucket_id,name)values('book-covers',$1)",
       [vocabPath],
     );
+    const assetPath = "a".repeat(64) + "/" + "b".repeat(64) + ".webp";
+    const topic = (
+      await db.query(
+        "insert into public.book_topics(book_id,title) values($1,'Math') returning id",
+        [book],
+      )
+    ).rows[0].id;
+    await db.query("select public.save_book_question($1,$2::jsonb)", [
+      topic,
+      {
+        type: "mcq",
+        question: "Solve the preserved original source question.",
+        options: ["Choice A", "Choice B", "Choice C", "Choice D"],
+        correctAnswer: 1,
+        imageUrl:
+          "https://ileffhbbaomfimwulvpw.supabase.co/storage/v1/object/authenticated/question-assets/" +
+          assetPath,
+      },
+    ]);
+    await db.query(
+      "insert into storage.objects(bucket_id,name) values('question-assets',$1)",
+      [assetPath],
+    );
+    assert.equal(
+      (await db.query("select public.can_read_question_asset('%') allowed"))
+        .rows[0].allowed,
+      false,
+    );
     await role(student);
     assert.equal(
       (await db.query("select * from storage.objects")).rows.length,
@@ -181,7 +209,15 @@ test("cover Storage RLS follows publication, rejects student writes and vocabula
     await role(student);
     assert.equal(
       (await db.query("select * from storage.objects")).rows.length,
-      2,
+      3,
+    );
+    assert.equal(
+      (
+        await db.query("select public.can_read_question_asset($1) allowed", [
+          assetPath,
+        ])
+      ).rows[0].allowed,
+      true,
     );
     const catalog = (await db.query("select public.vocabulary_catalog() v"))
       .rows[0].v;

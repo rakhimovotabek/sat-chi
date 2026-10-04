@@ -320,3 +320,38 @@ test("reference image failures recover on the next question and tables render in
     fullPage: true,
   });
 });
+
+test("private Math question assets are signed for practice and never loaded from authenticated object URLs", async ({
+  page,
+}) => {
+  const store = await contentFixture(page);
+  const path = "a".repeat(64) + "/" + "b".repeat(64) + ".webp";
+  store.questions[0].image_url =
+    "https://ileffhbbaomfimwulvpw.supabase.co/storage/v1/object/authenticated/question-assets/" +
+    path;
+  await page.route("**/storage/v1/object/sign/question-assets/**", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        signedURL: "/object/sign/question-assets/" + path + "?token=fixture",
+      }),
+    }),
+  );
+  await page.route(
+    "**/storage/v1/object/sign/question-assets/**?token=fixture",
+    (route) =>
+      route.fulfill({
+        contentType: "image/svg+xml",
+        body: '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="350"><text x="30" y="50">Preserved original mathematical notation</text></svg>',
+      }),
+  );
+  await page.goto(`/books/${bookId}/topics/${topicId}`);
+  await page
+    .getByRole("button", { name: "Start topic practice", exact: true })
+    .click();
+  const image = page.getByRole("img", {
+    name: "Original source question and mathematical notation",
+  });
+  await expect(image).toBeVisible();
+  await expect(image).toHaveAttribute("src", /object\/sign\/question-assets/);
+});

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import QuestionForm from "../books/QuestionForm.jsx";
+import QuestionImage from "../../components/QuestionImage.jsx";
 import { reviewRpc } from "./api.js";
 const wordFields = [
   "word",
@@ -159,9 +160,7 @@ export default function ReviewItem({
                   </p>
                   {p.explanation && <p>{p.explanation}</p>}
                   {p.imageUrl && (
-                    <a href={p.imageUrl} target="_blank" rel="noreferrer">
-                      Source figure
-                    </a>
+                    <QuestionImage key={p.imageUrl} src={p.imageUrl} />
                   )}
                 </>
               ) : r.item_type === "word" ? (

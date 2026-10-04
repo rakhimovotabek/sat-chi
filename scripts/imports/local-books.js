@@ -92,15 +92,18 @@ try {
           ? "preppro"
           : null;
     const version =
-      specialized === "satakror"
-        ? SATakrorVersion
-        : specialized === "satoplam"
-          ? SAToplamVersion
-          : specialized === "preppro"
-            ? PrepProVersion
-            : /vocab/i.test(relative)
-              ? "2026-10-04.vocab1"
-              : PARSER_VERSION;
+      cached?.parser_version?.startsWith("2026-10-04.math-regions") &&
+      !process.argv.includes("--reprocess")
+        ? cached.parser_version
+        : specialized === "satakror"
+          ? SATakrorVersion
+          : specialized === "satoplam"
+            ? SAToplamVersion
+            : specialized === "preppro"
+              ? PrepProVersion
+              : /vocab/i.test(relative)
+                ? "2026-10-04.vocab1"
+                : PARSER_VERSION;
     const prior = cached?.parser_version === version ? cached : null;
     if (
       prior &&

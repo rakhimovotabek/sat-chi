@@ -179,3 +179,11 @@
     padding: 16px 0;
   }
 }
+.review-detail figure {
+  margin: 16px 0;
+}
+.review-detail figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}

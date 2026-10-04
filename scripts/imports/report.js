@@ -13,7 +13,8 @@ const sql = `select j.source_file,j.fingerprint,j.status,j.source_metadata->>'re
 (select count(*) from public.vocabulary_words w join public.vocabulary_sets s on s.id=w.set_id where s.book_id=j.vocabulary_book_id) actual_words,
 (select count(*) from public.vocabulary_passages p join public.vocabulary_sets s on s.id=p.set_id where s.book_id=j.vocabulary_book_id) actual_passages,
 (select count(*) from public.vocabulary_questions q join public.vocabulary_sets s on s.id=q.set_id where s.book_id=j.vocabulary_book_id) actual_exercises,
-(select count(*) from public.content_review_items r where r.source_id=j.id and r.status in ('pending','deferred')) pending_review,
+(select count(*) from public.content_review_items r where r.source_id=j.id and public.review_triage(r)->>'bucket' in ('ready','human','duplicates')) pending_review,
+(select count(*) from public.content_review_items r where r.source_id=j.id and public.review_triage(r)->>'bucket'='audit') audit_only,
 (select count(*) from public.content_review_items r where r.source_id=j.id and (r.status='duplicate' or r.warnings @> '["Possible duplicate"]')) possible_duplicates,
 (select count(*) from public.content_review_items r where r.source_id=j.id and r.entity_id is not null and r.extraction_method ilike '%ocr%') ocr_catalog
 from public.import_jobs j left join public.books b on b.id=j.book_id order by j.source_file`;
@@ -107,7 +108,7 @@ for (const r of rows) {
 }
 report += "\n## Catalog totals\n\n";
 report += `Sources: ${rows.length}. Imported: ${outcomes.imported || 0}; imported needing review: ${outcomes.imported_review || 0}; partial: ${outcomes.partial || 0}; manual review: ${outcomes.manual || 0}; unsupported: ${outcomes.unsupported || 0}; failed: ${outcomes.failed || 0}. SAT questions: **${rows.reduce((n, r) => n + r.actual_questions, 0)}** (before this phase: 822). Vocabulary: **${rows.reduce((n, r) => n + r.actual_words, 0)} words / ${rows.reduce((n, r) => n + r.actual_sets, 0)} sets / ${rows.reduce((n, r) => n + r.actual_passages, 0)} passages / ${rows.reduce((n, r) => n + r.actual_exercises, 0)} exercises**. OCR-derived catalog items: **0**; OCR is diagnostic only, never silently approved.\n`;
-report += `\nAwaiting admin review: **${rows.reduce((n, r) => n + r.pending_review, 0)} records**, including inserted draft catalog items, quarantined candidates and source diagnostic tasks. Possible duplicates: **${rows.reduce((n, r) => n + r.possible_duplicates, 0)}** (flagged, not deleted). OCR-derived catalog items: **${rows.reduce((n, r) => n + r.ocr_catalog, 0)}**. Review workflow: [content-review-workflow.md](content-review-workflow.md).\n`;
+report += `\nActionable imported-content review: **${rows.reduce((n, r) => n + r.pending_review, 0)} records**, excluding unimported candidates and source diagnostics. Audit-only preserved records: **${rows.reduce((n, r) => n + r.audit_only, 0)}**. Possible duplicates: **${rows.reduce((n, r) => n + r.possible_duplicates, 0)}** (flagged, not deleted). OCR-derived catalog items: **${rows.reduce((n, r) => n + r.ocr_catalog, 0)}**. Review workflow: [content-review-workflow.md](content-review-workflow.md).\n`;
 report +=
   "\nAll **967 new SAT questions** were audited against exact source-content fingerprints, explicit keys and complete page/parser provenance. The final audit found 1,756 of 1,789 total questions with stored physical pages; 33 legacy questions require explicit page verification in review. Page/visual validation blocks approval until missing references are corrected. Existing admin publication decisions remain unchanged.\n";
 let samples = [];

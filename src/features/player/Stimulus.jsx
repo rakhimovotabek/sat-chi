@@ -1,31 +1,4 @@
-import { useState } from "react";
-function ReferenceImage({ src }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <figure>
-      {failed ? (
-        <>
-          <figcaption>
-            Reference image could not load. Check your connection before
-            answering.
-          </figcaption>
-          <button
-            className="button button-secondary button-compact"
-            onClick={() => setFailed(false)}
-          >
-            Retry image
-          </button>
-        </>
-      ) : (
-        <img
-          src={src}
-          alt="Question reference diagram"
-          onError={() => setFailed(true)}
-        />
-      )}
-    </figure>
-  );
-}
+import ReferenceImage from "../../components/QuestionImage.jsx";
 export default function Stimulus({ question }) {
   const table = question.stimulus_table;
   return (

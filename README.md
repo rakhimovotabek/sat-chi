@@ -269,3 +269,19 @@ Administrators use `/admin/content-review` for live source outcomes, paginated c
 Students use `/settings` for their account display name and daily Study Plan budget, plus per-account browser vocabulary defaults that initialize shuffle/test size/type. Administrators have account settings at `/admin/settings`. No placeholder toggles or partial theme switch are exposed.
 
 Apply additive migrations through `20261004001400`; never reset the linked production database. `npm test`, `npm run test:e2e`, `npm run lint`, `npm run format:check` and `npm run build` cover the existing and new workflows. Private source/provenance audits stay under ignored `local-imports/`.
+
+### Source-specific Math recovery
+
+Use the existing local Node runtime, Python 3, Poppler (`pdftotext`/`pdftoppm`), ImageMagick (`magick`), and Tesseract for selected scanned headers only. Source files stay under `~/Desktop/Books`; derived regions/evidence stay in ignored `local-imports/`.
+
+```bash
+node scripts/imports/recover-math.js --source="MathBook 2.0 Ready.pdf"
+# Prepare private assets and a source-scoped validated draft payload:
+node scripts/imports/recover-math.js --source="MathBook 2.0 Ready.pdf" --apply
+node scripts/imports/apply-local-imports.js --apply --source="MathBook 2.0 Ready.pdf"
+node scripts/imports/report.js
+node scripts/imports/report-math.js
+node --test tests/math-recovery.test.js
+```
+
+Supported embedded-text families: MathBook 2.0, MathBook 3.0, HardBook 2.0, PrepPros Complete Guide, and 800 Challenge. A separate selected-scan adapter for PrepPros Advanced requires the private verified key evidence from the existing local checkpoint; it does not OCR an entire book. Approve/publish separately. `refresh-math-assets.js --source="Filename.pdf"` regenerates existing crop paths without inserting questions. `reconcile-checkpoints.js` restores a manifest from complete atomic per-source reports after interrupted writers; it verifies payload hashes and makes no database writes. Run importer mutations sequentially.
