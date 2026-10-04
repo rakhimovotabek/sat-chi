@@ -5,7 +5,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { join, basename, resolve } from "node:path";
 import { homedir } from "node:os";
-import { validateImport } from "../../src/features/books/import-validation.js";
+import { validateLocalImport as validateImport } from "./local-validation.js";
 import { validateVocabulary } from "../../src/features/learning/vocabulary-validation.js";
 import { fingerprintFile, sourcePath, atomicJson } from "./source-files.js";
 const run = promisify(execFile),
@@ -108,6 +108,9 @@ await processSequentially(
         "asset_references",
         "has_tables",
         "aliases",
+        "investigation",
+        "resolution_status",
+        "verified_key_count",
       ].map((k) => [k, report[k]]),
     );
     const file = `local-imports/${report.fingerprint}.sql`;

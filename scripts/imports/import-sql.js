@@ -36,12 +36,12 @@ export function buildImportSql(safeReport, payload) {
  r=r||jsonb_build_object('status','imported','imported_count',n,'skipped_count',greatest(coalesce((r->>'detected_questions')::int,0)-n,0));end if;
  insert into public.import_jobs(fingerprint,source_file,title,status,detected_topics,detected_questions,imported_count,skipped_count,warnings,errors,book_id)
  values(r->>'fingerprint',r->>'source_file',r->>'title',r->>'status',(r->>'detected_topics')::int,(r->>'detected_questions')::int,(r->>'imported_count')::int,(r->>'skipped_count')::int,r->'warnings',r->'errors',bid)
- on conflict(fingerprint) do update set status=excluded.status,imported_count=excluded.imported_count,skipped_count=excluded.skipped_count,warnings=excluded.warnings,errors=excluded.errors,book_id=excluded.book_id;
+ on conflict(fingerprint) do update set status=excluded.status,imported_count=excluded.imported_count,skipped_count=excluded.skipped_count,warnings=excluded.warnings,errors=excluded.errors,book_id=coalesce(excluded.book_id,public.import_jobs.book_id);
  update public.import_jobs set title=r->>'title',detected_topics=(r->>'detected_topics')::int,detected_questions=(r->>'detected_questions')::int,
  source_path=coalesce(r->>'source_path',r->>'source_file'),source_type=coalesce(r->>'source_type','book'),category=coalesce(r->>'category','Other'),
  detected_vocabulary_sets=coalesce((r->>'detected_vocabulary_sets')::int,0),needs_review_count=coalesce((r->>'needs_review_count')::int,0),
- parser_version=coalesce(r->>'parser_version',''),vocabulary_book_id=vid,updated_at=now(),
- source_metadata=jsonb_build_object('evidence',coalesce(r->'evidence','[]'::jsonb),'review_items',coalesce(r->'review_items','[]'::jsonb),'asset_pages',coalesce(r->'asset_pages','[]'::jsonb),'asset_references',coalesce(r->'asset_references','[]'::jsonb),'has_tables',coalesce(r->'has_tables','false'::jsonb),'aliases',coalesce(r->'aliases','[]'::jsonb),'detected_words',coalesce(r->'detected_words','0'::jsonb))
+ parser_version=coalesce(r->>'parser_version',''),vocabulary_book_id=coalesce(vid,vocabulary_book_id),updated_at=now(),
+ source_metadata=jsonb_build_object('investigation',coalesce(r->'investigation','{}'::jsonb),'resolution_status',r->'resolution_status','verified_key_count',r->'verified_key_count','evidence',coalesce(r->'evidence','[]'::jsonb),'review_items',coalesce(r->'review_items','[]'::jsonb),'asset_pages',coalesce(r->'asset_pages','[]'::jsonb),'asset_references',coalesce(r->'asset_references','[]'::jsonb),'has_tables',coalesce(r->'has_tables','false'::jsonb),'aliases',coalesce(r->'aliases','[]'::jsonb),'detected_words',coalesce(r->'detected_words','0'::jsonb))
  where fingerprint=r->>'fingerprint';
  end ${delimiter};
  commit;
