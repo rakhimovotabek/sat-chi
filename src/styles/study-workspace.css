@@ -850,3 +850,10 @@
     flex-wrap: wrap;
   }
 }
+.book-approval {padding:20px 0;margin:20px 0;border-block:1px solid var(--border);}
+.book-approval h2 {font-size:18px;}
+.book-approval > p {font-size:13px;color:var(--text-muted);margin:8px 0;}
+.approval-counts {display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:20px 0;}
+.approval-counts dt {font-size:12px;color:var(--text-muted);}
+.approval-counts dd {margin:6px 0 0;font-size:22px;font-weight:650;font-variant-numeric:tabular-nums;}
+@media(max-width:760px){.approval-counts{grid-template-columns:repeat(3,minmax(0,1fr));}}

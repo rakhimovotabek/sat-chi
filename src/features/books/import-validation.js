@@ -62,6 +62,14 @@ export function validateQuestion(q, path = "Question") {
       text(v, `${path}.options[${i}]`, errors, 4000, true),
     );
   if (
+    q.options?.some(
+      (v) =>
+        typeof v === "string" &&
+        /^\s*Choice [A-D] in the source image\s*$/i.test(v),
+    )
+  )
+    errors.push(`${path}: recover actual answer choices before importing.`);
+  if (
     !Number.isInteger(q.correctAnswer) ||
     q.correctAnswer < 0 ||
     q.correctAnswer > 3

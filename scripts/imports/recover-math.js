@@ -26,6 +26,7 @@ const manifest = JSON.parse(
   ),
   report = manifest.find((r) => r.source_file === source);
 if (!report) throw new Error("Missing source checkpoint");
+if (report.book_id || report.imported_count > 0) throw new Error("Source already has imported regions. Use repair-math-options.js to repair existing IDs; do not create duplicate imports.");
 const pdf = await sourcePath(
   join(homedir(), "Desktop", "Books"),
   report.source_path,
@@ -61,6 +62,33 @@ const regions = JSON.parse(
     )
   ).stdout,
 );
+for (const r of regions.accepted) {
+  const side = r.bounds[0] > r.page_width / 2;
+  r.render_bounds = r.full_page
+    ? r.bounds
+    : [
+        side ? r.page_width / 2 - 8 : 0,
+        r.bounds[1],
+        r.page_width / 2 + 8,
+        r.bounds[3],
+      ];
+}
+await atomicJson(join(folder, "choice-regions.json"), regions);
+const choiceRecovery = JSON.parse(
+  (
+    await run(
+      "python3",
+      [
+        "scripts/imports/math-options.py",
+        join(folder, "bbox.xml"),
+        join(folder, "choice-regions.json"),
+      ],
+      { maxBuffer: 10 * 1024 * 1024 },
+    )
+  ).stdout,
+);
+regions.accepted = choiceRecovery.filter((r) => r.options_verified);
+regions.unresolved.push(...choiceRecovery.filter((r) => !r.options_verified));
 if (!regions.accepted.length) throw new Error("No validated MCQ regions");
 const pageGroups = Map.groupBy(regions.accepted, (r) => r.page),
   assets = [];
@@ -107,15 +135,7 @@ for (const [page, records] of pageGroups) {
       .digest("hex");
     region.asset = report.fingerprint + "/" + hash + ".webp";
     region.file = join(folder, hash + ".webp");
-    const side = region.bounds[0] > region.page_width / 2 ? 1 : 0;
-    region.render_bounds = region.full_page
-      ? region.bounds
-      : [
-          side ? region.page_width / 2 - 8 : 0,
-          region.bounds[1],
-          region.page_width / 2 + 8,
-          region.bounds[3],
-        ];
+    region.render_bounds = region.stem_bounds;
     const [x, y, w, h] = region.render_bounds.map((v) => Math.round(v * 2));
     args.push(
       "(",
@@ -144,12 +164,7 @@ for (const region of assets) {
   topic.questions.push({
     type: "mcq",
     question: `${region.section} · Question ${region.number}. Solve the problem shown in the preserved source image.`,
-    options: [
-      "Choice A in the source image",
-      "Choice B in the source image",
-      "Choice C in the source image",
-      "Choice D in the source image",
-    ],
+    options: region.options,
     correctAnswer: region.answer.charCodeAt(0) - 65,
     source,
     source_page: region.page,
@@ -167,6 +182,8 @@ for (const region of assets) {
       visual_asset: region.asset,
       region_bounds: region.render_bounds,
       review_required: true,
+      options_verified: true,
+      option_extraction_method: "embedded_single_baseline_v1",
     },
   });
 }

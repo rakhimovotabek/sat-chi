@@ -83,3 +83,30 @@ test("admin settings is real and mobile settings retain one logout action", asyn
     ),
   ).toBe(true);
 });
+test("SAT selection uses official dates and persists one canonical date across settings, dashboard and study plan", async ({
+  page,
+}) => {
+  const store = await settingsFixture(page);
+  await page.clock.setFixedTime(new Date("2026-10-04T12:00:00Z"));
+  await page.goto("/settings");
+  await expect(page.getByLabel("SAT date")).not.toContainText(
+    "October 3, 2026",
+  );
+  await expect(page.getByLabel("SAT date")).toContainText("Anticipated");
+  await page.getByLabel("SAT date").selectOption("2026-11-07");
+  await expect(
+    page.getByText(/Registration deadline: October 23, 2026/),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Save account settings" }).click();
+  await expect(page.getByText("Account settings saved.")).toBeVisible();
+  expect(store.satDate).toBe("2026-11-07");
+  await page.reload();
+  await expect(page.getByLabel("SAT date")).toHaveValue("2026-11-07");
+  await page.goto("/dashboard");
+  await expect(
+    page.getByText("34 days remaining", { exact: true }),
+  ).toBeVisible();
+  await page.goto("/study-plan");
+  await page.getByRole("button", { name: "Study preferences" }).click();
+  await expect(page.getByLabel("SAT date")).toHaveValue("2026-11-07");
+});

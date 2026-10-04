@@ -71,7 +71,7 @@ test("student starts, resumes and submits homework with section results and save
     page.getByRole("radio", { name: "B 4", exact: true }),
   ).toBeChecked();
   await page
-    .getByRole("button", { name: "Back to books", exact: true })
+    .getByRole("button", { name: "Back to practice", exact: true })
     .click();
   await expect(page).toHaveURL(/\/homework$/);
   await page.getByRole("button", { name: "Resume homework" }).click();
@@ -106,7 +106,7 @@ test("question bank filters server results and creates a stable session with mat
     page.getByRole("heading", { name: "0 questions match" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Math", exact: true }).click();
-  await page.getByRole("button", { name: "Start practice" }).click();
+  await page.getByRole("button", { name: "Start Practice Session" }).click();
   await expect(
     page.getByText("Question 1 of 3", { exact: true }),
   ).toBeVisible();
@@ -121,7 +121,7 @@ test("question bank filters server results and creates a stable session with mat
   await page.getByRole("button", { name: "Close Reference sheet" }).click();
   await page.getByRole("button", { name: "Calculator", exact: true }).click();
   await expect(
-    page.getByRole("link", { name: "Open official Desmos calculator" }),
+    page.locator('iframe[title="Desmos graphing calculator"]'),
   ).toBeVisible();
   await page.getByRole("button", { name: "Close Calculator" }).click();
   await expect(
@@ -268,8 +268,8 @@ test("expired timed practice auto-submits saved answers and shows results", asyn
   await expect(
     page.getByRole("heading", { name: "3 questions match" }),
   ).toBeVisible();
-  await page.getByLabel("Mode").selectOption("true");
-  await page.getByRole("button", { name: "Start practice" }).click();
+  await page.getByRole("button", { name: "Timed", exact: true }).click();
+  await page.getByRole("button", { name: "Start Practice Session" }).click();
   await expect(
     page.getByRole("region", { name: "Practice results" }),
   ).toBeVisible();
@@ -281,7 +281,7 @@ test("admin practice keeps the admin layout and student attempts open read-only"
 }) => {
   const store = await learningFixture(page, "admin");
   await page.goto("/admin/question-bank");
-  await page.getByRole("button", { name: "Start practice" }).click();
+  await page.getByRole("button", { name: "Start Practice Session" }).click();
   await expect(page).toHaveURL(/\/admin\/practice\//);
   await expect(page.locator(".sidebar")).toContainText("Admin Control Panel");
   store.session.student_id = "another-student";

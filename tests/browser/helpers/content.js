@@ -131,6 +131,7 @@ export async function contentFixture(
           target_sat_score: 1450,
           grade: "11",
           main_goal: "Improve Math",
+          target_test_date: store.satDate || null,
         },
       ]);
     const filter = (list) =>
@@ -144,6 +145,28 @@ export async function contentFixture(
         ),
       );
     const table = url.pathname.split("/").pop();
+    if (table === "save_sat_date") {
+      store.satDate = body.p_date;
+      return json(null);
+    }
+    if (table === "book_review_summary") {
+      const b = store.books.find((b) => b.id === body.p_book);
+      return json({
+        validated: store.review.filter((r) => r.status === "pending").length,
+        human: 0,
+        excluded: 0,
+        duplicates: 0,
+        approved: store.review.length
+          ? store.review.filter((r) => r.status === "approved").length
+          : store.questions.length,
+        published: !!b?.published,
+      });
+    }
+    if (table === "publish_approved_book") {
+      store.books.find((b) => b.id === body.p_book).published = true;
+      return json(null);
+    }
+
     if (["books", "book_topics", "questions"].includes(table)) {
       const key = {
         books: "books",

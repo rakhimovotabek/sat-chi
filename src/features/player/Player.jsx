@@ -174,6 +174,12 @@ export default function Player() {
   const submitted = Boolean(session.submitted_at);
   const current = items[index];
   const q = current.question;
+  const usableChoices =
+    q.options?.length === 4 &&
+    q.options.every(
+      (option) =>
+        option.trim() && !/^Choice [A-D] in the source image$/i.test(option),
+    );
   const answer = review.find((v) => v.item_id === current.id);
   const result = practiceSummary(items);
   return (
@@ -190,7 +196,7 @@ export default function Player() {
           onClick={leave}
           disabled={submitting}
         >
-          Back to books
+          Back to practice
         </button>
       </div>
       {submitted && (
@@ -300,57 +306,66 @@ export default function Player() {
             <span>{q.domain || "SAT practice"}</span>
             <span>{q.difficulty}</span>
           </div>
+          <p className="answer-state">
+            {current.selected_answer == null
+              ? "No answer selected"
+              : `Answer ${String.fromCharCode(65 + current.selected_answer)} selected`}
+          </p>
           <h2 className="question-text">{q.question_text}</h2>
           <fieldset
             className="answer-choices"
-            disabled={submitted || submitting}
+            disabled={submitted || submitting || !usableChoices}
           >
             <legend className="visually-hidden">Choose your answer</legend>
-            {q.options.map((option, i) => {
-              const eliminated = current.eliminated.includes(i);
-              return (
-                <div
-                  key={i}
-                  className={`answer-choice ${current.selected_answer === i ? "selected" : ""} ${eliminated ? "eliminated" : ""} ${submitted && answer?.correct_answer === i ? "correct-choice" : ""} ${submitted && current.selected_answer === i && current.correct === false ? "incorrect-choice" : ""}`}
-                >
-                  <label>
-                    <input
-                      type="radio"
-                      name={`answer-${current.id}`}
-                      value={i}
-                      checked={current.selected_answer === i}
-                      disabled={eliminated}
-                      onChange={() => change({ selected_answer: i })}
-                    />
-                    <span className="choice-letter">
-                      {String.fromCharCode(65 + i)}
-                    </span>
-                    <span>{option}</span>
-                  </label>
-                  {!submitted && (
-                    <button
-                      className="eliminate-choice"
-                      type="button"
-                      aria-label={`${eliminated ? "Restore" : "Eliminate"} choice ${String.fromCharCode(65 + i)}`}
-                      aria-pressed={eliminated}
-                      onClick={() =>
-                        change({
-                          eliminated: eliminated
-                            ? current.eliminated.filter((v) => v !== i)
-                            : [...current.eliminated, i],
-                          selected_answer:
-                            current.selected_answer === i
-                              ? null
-                              : current.selected_answer,
-                        })
-                      }
-                    >
-                      {eliminated ? "↶" : "×"}
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+            {!usableChoices && (
+              <p role="alert">
+                This question’s answer choices need recovery. It is excluded
+                from new graded practice.
+              </p>
+            )}
+            {usableChoices &&
+              q.options.map((option, i) => {
+                const eliminated = current.eliminated.includes(i);
+                return (
+                  <div
+                    key={i}
+                    className={`answer-choice ${current.selected_answer === i ? "selected" : ""} ${eliminated ? "eliminated" : ""} ${submitted && answer?.correct_answer === i ? "correct-choice" : ""} ${submitted && current.selected_answer === i && current.correct === false ? "incorrect-choice" : ""}`}
+                  >
+                    <label>
+                      <input
+                        type="radio"
+                        name={`answer-${current.id}`}
+                        value={i}
+                        checked={current.selected_answer === i}
+                        disabled={eliminated}
+                        onChange={() => change({ selected_answer: i })}
+                      />
+                      <span className="choice-letter">
+                        {String.fromCharCode(65 + i)}
+                      </span>
+                      <span>{option}</span>
+                    </label>
+                    {!submitted && (
+                      <button
+                        className="eliminate-choice"
+                        type="button"
+                        aria-label={`${eliminated ? "Restore" : "Eliminate"} choice ${String.fromCharCode(65 + i)}`}
+                        aria-pressed={eliminated}
+                        onClick={() =>
+                          change({
+                            eliminated: eliminated
+                              ? current.eliminated.filter((v) => v !== i)
+                              : [...current.eliminated, i],
+                            selected_answer: current.selected_answer,
+                          })
+                        }
+                      >
+                        {eliminated ? "↶" : "×"}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
           </fieldset>
           {submitted && answer && (
             <section className="question-explanation">

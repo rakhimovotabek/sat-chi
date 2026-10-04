@@ -10,7 +10,7 @@ export async function settingsFixture(page, role = "student") {
     "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
   };
   await page.route(
-    /\/rest\/v1\/(profiles|study_preferences|rpc\/save_account_settings)(\?|$)/,
+    /\/rest\/v1\/(profiles|study_preferences|rpc\/(save_account_settings|save_sat_date))(\?|$)/,
     async (route) => {
       const req = route.request(),
         name = new URL(req.url()).pathname.split("/").pop(),
@@ -25,6 +25,7 @@ export async function settingsFixture(page, role = "student") {
             role,
             active: true,
             display_name: store.accountName,
+            target_test_date: store.satDate || null,
             onboarding_completed: true,
             target_sat_score: 1450,
             grade: "11",
@@ -33,6 +34,10 @@ export async function settingsFixture(page, role = "student") {
         ];
       if (name === "study_preferences")
         data = { minutes_per_day: store.dailyMinutes };
+      if (name === "save_sat_date") {
+        store.satDate = body.p_date;
+        data = null;
+      }
       if (name === "save_account_settings") {
         store.accountName = body.p_display_name;
         store.dailyMinutes = body.p_daily_minutes;

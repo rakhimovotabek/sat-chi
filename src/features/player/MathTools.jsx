@@ -1,28 +1,42 @@
 import { useEffect, useRef, useState } from "react";
-import Modal from "../../components/Modal.jsx";
-let desmosLoading;
+import MathReference from "./MathReference.jsx";
+export const DESMOS_TESTING_URL =
+  "https://www.desmos.com/testing/collegeboard/graphing";
+let loading;
 function loadDesmos(key) {
   if (window.Desmos) return Promise.resolve(window.Desmos);
-  if (!desmosLoading)
-    desmosLoading = new Promise((resolve, reject) => {
+  if (!loading)
+    loading = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = `https://www.desmos.com/api/v1.12/calculator.js?api_key=${encodeURIComponent(key)}`;
-      script.onload = () => resolve(window.Desmos);
-      script.onerror = () => {
-        desmosLoading = null;
+      let timeout;
+      const fail = () => {
+        clearTimeout(timeout);
+        loading = null;
         script.remove();
-        reject(new Error("Calculator could not load. Check your connection."));
+        reject(new Error("Calculator could not load."));
       };
+      script.src = `https://www.desmos.com/api/v1.12/calculator.js?apiKey=${encodeURIComponent(key)}`;
+      script.onload = () => {
+        clearTimeout(timeout);
+        if (window.Desmos) resolve(window.Desmos);
+        else fail();
+      };
+      script.onerror = fail;
+      timeout = setTimeout(fail, 15000);
       document.head.append(script);
     });
-  return desmosLoading;
+  return loading;
 }
 function Calculator({ saved }) {
   const element = useRef(null),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [retry, setRetry] = useState(0),
+    [fallback, setFallback] = useState(
+      !import.meta.env.VITE_DESMOS_API_KEY && !window.Desmos,
+    );
   const key = import.meta.env.VITE_DESMOS_API_KEY;
   useEffect(() => {
-    if (!key) return;
+    if (fallback || (!key && !window.Desmos)) return;
     let live = true,
       calculator;
     loadDesmos(key)
@@ -30,11 +44,25 @@ function Calculator({ saved }) {
         if (!live) return;
         calculator = Desmos.GraphingCalculator(element.current, {
           expressions: true,
+          zoomButtons: true,
+          settingsMenu: true,
+          keypad: true,
+          images: false,
+          folders: false,
+          notes: false,
+          actions: false,
+          calculus: false,
+          border: false,
         });
         if (saved.current) calculator.setState(saved.current);
       })
-      .catch((e) => {
-        if (live) setError(e.message);
+      .catch(() => {
+        if (live) {
+          setError(
+            "Using the official testing calculator while the configured integration is unavailable.",
+          );
+          setFallback(true);
+        }
       });
     return () => {
       live = false;
@@ -43,86 +71,106 @@ function Calculator({ saved }) {
         calculator.destroy();
       }
     };
-  }, [key]);
+  }, [key, fallback, retry, saved]);
   return (
-    <>
-      {key ? (
-        <div ref={element} className="calculator-container" />
-      ) : (
-        <p className="empty-copy">
-          The embedded calculator will be available when your administrator
-          configures Desmos. You can use the official calculator in a separate
-          tab.
-        </p>
-      )}
+    <div className="calculator-container">
       {error && (
-        <p role="alert" className="form-error">
+        <p className="calculator-load-error" role="status">
           {error}
         </p>
       )}
-      <a
-        className="button button-secondary"
-        href="https://www.desmos.com/calculator"
-        target="_blank"
-        rel="noopener noreferrer"
+      {fallback ? (
+        <iframe
+          key={retry}
+          className="calculator-frame"
+          src={DESMOS_TESTING_URL}
+          title="Desmos graphing calculator"
+          allow="clipboard-write"
+          onError={() =>
+            setError("Calculator connection failed. Retry when online.")
+          }
+        />
+      ) : (
+        <div ref={element} style={{ height: "100%" }} />
+      )}
+      <button
+        className="quiet-button calculator-retry"
+        onClick={() => {
+          setError("");
+          setFallback(!key && !window.Desmos);
+          setRetry((v) => v + 1);
+        }}
       >
-        Open official Desmos calculator
-      </a>
-    </>
+        Reload calculator
+      </button>
+    </div>
   );
 }
 export default function MathTools() {
   const [open, setOpen] = useState(""),
+    [calculatorMounted, setCalculatorMounted] = useState(false),
     saved = useRef(null);
   return (
     <>
+      <button
+        className="button button-secondary button-compact"
+        onClick={() => {
+          setCalculatorMounted(true);
+          setOpen("Calculator");
+        }}
+      >
+        Calculator
+      </button>
       <button
         className="button button-secondary button-compact"
         onClick={() => setOpen("Reference sheet")}
       >
         Reference sheet
       </button>
-      <button
-        className="button button-secondary button-compact"
-        onClick={() => setOpen("Calculator")}
-      >
-        Calculator
-      </button>
-      {open && (
-        <Modal title={open} onClose={() => setOpen("")}>
-          {open === "Calculator" ? (
-            <Calculator saved={saved} />
-          ) : (
-            <div className="formula-grid">
-              <article>
-                <h3>Circles</h3>
-                <p>Area: A = πr²</p>
-                <p>Circumference: C = 2πr</p>
-                <p>Full circle: 360° or 2π radians</p>
-              </article>
-              <article>
-                <h3>Triangles</h3>
-                <p>Area: A = ½bh</p>
-                <p>Right triangle: a² + b² = c²</p>
-                <p>Angles add to 180°</p>
-              </article>
-              <article>
-                <h3>Special right triangles</h3>
-                <p>45–45–90: x, x, x√2</p>
-                <p>30–60–90: x, x√3, 2x</p>
-              </article>
-              <article>
-                <h3>Rectangles & solids</h3>
-                <p>Rectangle: A = lw</p>
-                <p>Rectangular prism: V = lwh</p>
-                <p>Cylinder: V = πr²h</p>
-                <p>Sphere: V = ⁴⁄₃πr³</p>
-                <p>Cone: V = ⅓πr²h</p>
-                <p>Pyramid: V = ⅓lwh</p>
-              </article>
-            </div>
-          )}
-        </Modal>
+      {calculatorMounted && (
+        <section
+          className="player-tool-window"
+          role="dialog"
+          aria-label="Calculator"
+          hidden={open !== "Calculator"}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setOpen("");
+          }}
+        >
+          <header>
+            <h2>Graphing calculator</h2>
+            <button
+              className="button button-secondary button-compact"
+              aria-label="Close Calculator"
+              onClick={() => setOpen("")}
+            >
+              Close
+            </button>
+          </header>
+          <Calculator saved={saved} />
+        </section>
+      )}
+      {open === "Reference sheet" && (
+        <section
+          className="player-tool-window reference-window"
+          role="dialog"
+          aria-label="Reference sheet"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setOpen("");
+          }}
+        >
+          <header>
+            <h2>Reference sheet</h2>
+            <button
+              className="button button-secondary button-compact"
+              aria-label="Close Reference sheet"
+              onClick={() => setOpen("")}
+            >
+              Close
+            </button>
+          </header>
+          <MathReference />
+        </section>
       )}
     </>
   );

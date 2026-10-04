@@ -422,3 +422,68 @@ test("book publication failure shows the review blocker and preserves draft meta
   ).toBeVisible();
   expect(store.books[0].published).toBe(true);
 });
+
+test("admin approves only the validated subset before publishing a partially recovered book", async ({
+  page,
+}) => {
+  const store = await contentFixture(page, "admin");
+  store.books[0].published = false;
+  let approved = false;
+  const safe = [
+    { id: "safe-one", version: "2026-10-04" },
+    { id: "safe-two", version: "2026-10-04" },
+  ];
+  await page.route(
+    /\/rest\/v1\/rpc\/(book_review_summary|content_review_bulk|publish_approved_book)/,
+    async (route) => {
+      const action = route.request().url().split("/").pop(),
+        payload = route.request().postDataJSON();
+      let data;
+      if (action === "book_review_summary")
+        data = {
+          validated: approved ? 0 : 2,
+          human: 1,
+          excluded: 408,
+          duplicates: 0,
+          approved: approved ? 2 : 0,
+          published: store.books[0].published,
+        };
+      if (action === "content_review_bulk") {
+        expect(payload.p_book).toBe(bookId);
+        if (payload.p_confirm) {
+          expect(payload.p_confirm).toEqual(safe);
+          approved = true;
+          data = { approved: 2 };
+        } else data = { count: 2, safe };
+      }
+      if (action === "publish_approved_book") {
+        expect(approved).toBe(true);
+        store.books[0].published = true;
+        data = null;
+      }
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify(data),
+      });
+    },
+  );
+  await page.goto("/admin/books/" + bookId);
+  const workflow = page.getByRole("region", { name: "Book approval workflow" });
+  await expect(workflow.getByText("408", { exact: true })).toBeVisible();
+  await expect(
+    workflow.getByRole("button", { name: "Publish approved content" }),
+  ).toBeDisabled();
+  await workflow
+    .getByRole("button", { name: "Approve all validated questions (2)" })
+    .click();
+  await workflow.getByRole("button", { name: "Confirm approval" }).click();
+  await expect.poll(() => approved).toBe(true);
+  expect(store.books[0].published).toBe(false);
+  await workflow
+    .getByRole("button", { name: "Publish approved content" })
+    .click();
+  await expect(
+    workflow.getByRole("button", { name: "Approved content is published" }),
+  ).toBeDisabled();
+  await expect(workflow.getByText("408", { exact: true })).toBeVisible();
+});

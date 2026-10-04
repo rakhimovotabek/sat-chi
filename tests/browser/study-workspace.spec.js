@@ -30,26 +30,30 @@ test("bank domain/skill union filters update immediately, preserve choices, and 
   ).toBeVisible();
   await page.getByLabel("Difficulty", { exact: true }).selectOption("easy");
   await expect(
-    page.getByRole("button", { name: "Start practice" }),
+    page.getByRole("button", { name: "Start Practice Session" }),
   ).toBeDisabled();
   await expect(
     page.getByRole("heading", { name: "No matching questions" }),
   ).toBeVisible();
   await page.getByLabel("Difficulty", { exact: true }).selectOption("hard");
-  await page.getByLabel("Question count", { exact: true }).selectOption("all");
-  await page.getByLabel("Mode", { exact: true }).selectOption("true");
+  await page
+    .getByRole("button", { name: "All questions", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Timed", exact: true }).click();
   await page.reload();
-  await expect(page.getByLabel("Question count", { exact: true })).toHaveValue(
-    "all",
-  );
-  await expect(page.getByLabel("Mode", { exact: true })).toHaveValue("true");
+  await expect(
+    page.getByRole("button", { name: "All questions", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("button", { name: "Timed", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   await expect(
     page.getByRole("heading", { name: "2 questions match" }),
   ).toBeVisible();
   const request = page.waitForRequest((r) =>
     r.url().endsWith("/rpc/start_bank_practice"),
   );
-  await page.getByRole("button", { name: "Start practice" }).click();
+  await page.getByRole("button", { name: "Start Practice Session" }).click();
   const payload = (await request).postDataJSON();
   expect(payload.p_count).toBe(2);
   expect(payload.p_timed).toBe(true);

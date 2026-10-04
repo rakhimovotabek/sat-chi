@@ -38,3 +38,26 @@ test("Math domains use explicit source sections and keep unknown strategy headin
   assert.equal(mathDomain("Functions&Function Notation"), "Advanced Math");
   assert.equal(mathDomain("Chapter 17 (pp. 149-154)"), "");
 });
+
+test("choice recovery preserves verified keys and crops before real options while excluding fractions and missing choices", () => {
+  const script = `import importlib.util,json
+s=importlib.util.spec_from_file_location('choices','scripts/imports/math-options.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+def line(y,label,value):
+ return f'<line yMin="{y}" yMax="{y+10}"><word xMin="40" yMin="{y}" xMax="55">{label}</word><word xMin="65" yMin="{y}" xMax="95">{value}</word></line>'
+xml='<root xmlns="urn:test"><page>'+line(20,'1.','Question')+''.join(line(100+i*20,c+')',str(i+1)) for i,c in enumerate('ABCD'))+'</page></root>'
+r={'page':1,'key_page':3,'answer':'C','asset':'private/question.webp','bounds':[30,10,250,170],'render_bounds':[20,10,280,170]}
+a=m.recover(xml,[r])[0]
+assert a['options_verified'] and a['options']==['1','2','3','4']
+assert a['stem_bounds']==[20,10,280,87]
+assert a['answer']=='C' and a['key_page']==3 and a['asset']==r['asset']
+caption=xml.replace(line(20,'1.','Question'),line(20,'ADVANCED MATH —','ALGEBRA')+line(45,'1.','Question'))
+assert m.recover(caption,[r])[0]['stem_bounds']==[20,32.0,280,65.0]
+assert not m.recover(xml.replace('D)','E)'),[r])[0]['options_verified']
+assert not m.recover(xml.replace('yMin="100" xMax="95"','yMin="90" xMax="95"'),[r])[0]['options_verified']
+assert not m.recover(xml.replace('>4</word>','>3</word>'),[r])[0]['options_verified']
+print('verified')`;
+  assert.equal(
+    execFileSync("python3", ["-c", script], { encoding: "utf8" }).trim(),
+    "verified",
+  );
+});

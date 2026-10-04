@@ -4,8 +4,9 @@ import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import { supabase } from "../../lib/supabase.js";
 import { checked, homework, rpc } from "./api.js";
+import { satDateLabel, satCountdown } from "../../data/sat-dates.js";
 export default function DashboardWork() {
-  const { session } = useAuth(),
+  const { session, profile } = useAuth(),
     state = useContent(async () => {
       const [assignments, sessions, plan] = await Promise.all([
         homework(),
@@ -30,6 +31,14 @@ export default function DashboardWork() {
     ) || [];
   return (
     <>
+      {profile.target_test_date && (
+        <p className="sat-countdown">
+          SAT · {satDateLabel(profile.target_test_date)}{" "}
+          <strong>
+            {satCountdown(profile.target_test_date)} days remaining
+          </strong>
+        </p>
+      )}
       <ContentState {...state} onRetry={state.reload} />
       {state.data && (
         <>

@@ -9,8 +9,10 @@ import {
   readLearningSettings,
   saveLearningSettings,
 } from "./learning-settings.js";
+import SatDateSelect from "../../components/SatDateSelect.jsx";
 function AccountForm({ preferences, admin }) {
   const { profile, session, refreshProfile } = useAuth(),
+    [testDate, setTestDate] = useState(profile.target_test_date || ""),
     [name, setName] = useState(profile.display_name || ""),
     [minutes, setMinutes] = useState(preferences?.minutes_per_day || 30),
     [busy, setBusy] = useState(false),
@@ -34,6 +36,13 @@ function AccountForm({ preferences, admin }) {
                 Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
             });
             if (error) throw new Error(error.message);
+            if (!admin) {
+              const { error: dateError } = await supabase.rpc("save_sat_date", {
+                p_date: testDate || null,
+              });
+              if (dateError)
+                throw new Error("Could not update the SAT date. Please retry.");
+            }
             await refreshProfile();
             setSaved(true);
           } catch (e) {
@@ -61,6 +70,13 @@ function AccountForm({ preferences, admin }) {
         </label>
         {!admin && (
           <>
+            <SatDateSelect
+              value={testDate}
+              onChange={(e) => {
+                setTestDate(e.target.value);
+                setSaved(false);
+              }}
+            />
             <label>
               Daily study goal (minutes)
               <input

@@ -244,3 +244,23 @@ Counts verified from the linked database. Images are optimized question regions 
 ### College Panda scanned layout
 
 Embedded text is absent. Rendered physical pages **390 and 405** show one or two printed book pages placed at varying size near the bottom of a much larger white PDF canvas. Chapter 27 contains boxed letter/numeric answers with worked solutions; the underlying questions are chapter/exercise-scoped. Reliable recovery requires detecting/cropping the actual scan bounds and reconciling chapter + exercise + printed-page coordinates. Whole-book OCR and guessed key offsets were avoided. **0 imported**; the source is recoverable in principle and remains an automated layout-adapter task. No manual whole-book photographs requested. These two samples do not establish an exhaustive unresolved-page inventory.
+
+## Focused option and crop correction — October 4, 2026
+
+The earlier 1,586 visual-question recovery count did **not** establish reliable interactive option text. The correction below supersedes any claim that all those questions are immediately publishable. Existing IDs and printed-key mappings were preserved; no duplicate imports or automatic approvals occurred. Remote catalog totals were verified after repair.
+
+| Source                       | Existing questions | Real verified options | Excluded pending choice recovery |
+| ---------------------------- | -----------------: | --------------------: | -------------------------------: |
+| PrepPros Complete Guide Math |                586 |                   277 |                              309 |
+| MathBook 2.0 Ready           |                360 |                   109 |                              251 |
+| Mathbook 3.0                 |                291 |                   139 |                              152 |
+| HardBook 2.0                 |                283 |                   111 |                              172 |
+| 800 Challenge                |                 61 |                    14 |                               47 |
+| PrepPros Advanced Math       |                  5 |                     5 |                                0 |
+| **Total**                    |          **1,586** |               **655** |                          **931** |
+
+Embedded choices are accepted only with unambiguous A–D labels, four distinct complete strings and a single text baseline. Fraction/exponent geometry, wrapped options, graphics and absent text remain excluded. Excluded entries now contain no placeholder choices and cannot enter normal practice or pass approval. Five Advanced scan options and question-only crops were verified on physical pages **97, 102, 111, 115 and 119**, retaining printed key mappings on page **155**. The existing six unresolved Advanced selected regions and all earlier unresolved inventories above remain unchanged.
+
+The 655 verified-choice records have private optimized stimulus crops at their existing asset paths; choices are rendered interactively to the right. Scanned crops exclude branding/channel text and unrelated margins. 800 Challenge category/video headers are cropped away. Embedded watermarks crossing mathematical content remain preserved because cropping them would damage the problem. Original PDFs are never publicly uploaded. Exact excluded physical pages and reasons are recorded per region in the ignored `local-imports/math/<source fingerprint>/options-recovery.json`; these are source recovery tasks, not a requirement to transcribe the entire book.
+
+A partially recovered book may publish only its approved valid subset. Previously unresolved regions remain preserved and hidden, and never block that subset. Existing publication flags are preserved, but imported student questions require explicit valid approval after corrections. Approval does not independently publish a book.

@@ -1,4 +1,5 @@
 import { TARGET_SCORES, GOALS } from "./profile-fields.js";
+import SatDateSelect from "../components/SatDateSelect.jsx";
 export default function ProfileFields({ values, onChange, showGoal = true }) {
   const field = (name) => ({
     value: values[name],
@@ -55,10 +56,7 @@ export default function ProfileFields({ values, onChange, showGoal = true }) {
           {...field("grade")}
         />
       </label>
-      <label>
-        Target test date <span className="field-hint">Optional</span>
-        <input type="date" {...field("target_test_date")} />
-      </label>
+      <SatDateSelect label="Target test date" {...field("target_test_date")} />
       {showGoal && (
         <label className="form-span">
           Main goal

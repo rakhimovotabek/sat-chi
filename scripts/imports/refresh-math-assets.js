@@ -25,6 +25,14 @@ if ((await fingerprintFile(pdf)) !== report.fingerprint)
   throw new Error("Source changed");
 const folder = join("local-imports", "math", report.fingerprint),
   recovery = JSON.parse(await readFile(join(folder, "recovery.json"), "utf8"));
+try {
+  await readFile(join(folder, "options-recovery.json"));
+  throw new Error(
+    "Corrected stem assets exist; use repair-math-options.js instead of restoring full regions",
+  );
+} catch (error) {
+  if (error.code !== "ENOENT") throw error;
+}
 for (const [page, regions] of Map.groupBy(recovery.accepted, (r) => r.page)) {
   const args = [join(folder, `page-${page}.png`)];
   for (const r of regions) {

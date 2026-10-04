@@ -22,7 +22,10 @@ export default function QuestionBank({ admin = false }) {
   const { profile } = useAuth(),
     key = `satchi.bank.${profile.id}`;
   const [saved] = useState(() => readConfiguration(key));
-  const [filters, setFilters] = useState(saved.filters || {}),
+  const [filters, setFilters] = useState({
+      ...saved.filters,
+      section: saved.filters?.section || "Math",
+    }),
     [page, setPage] = useState(0),
     [expanded, setExpanded] = useState([]),
     [count, setCount] = useState(saved.count || "20"),
@@ -65,23 +68,10 @@ export default function QuestionBank({ admin = false }) {
         description="Choose what to work on. Build a session around your goals."
       />
       <section className="bank-workspace" aria-label="Practice configuration">
-        <div className="bank-workspace-summary">
-          <div>
-            <strong>{filters.section || "All SAT sections"}</strong>
-            <span>
-              {filters.domains?.length || filters.skills?.length
-                ? `${filters.domains?.length || 0} domains · ${filters.skills?.length || 0} individual skills selected`
-                : "Select a focus, then configure your practice"}
-            </span>
-          </div>
-          <span className="bank-summary-count">
-            {state.loading ? "…" : matching.toLocaleString()} matching questions
-          </span>
-        </div>
         <div className="bank-columns">
           <section className="bank-domains" aria-label="Domain selection">
             <div className="bank-section-heading">
-              <h2>Practice focus</h2>
+              <h2>Select domains</h2>
               <span
                 className="count-badge"
                 aria-label="Matching question count"
@@ -96,7 +86,6 @@ export default function QuestionBank({ admin = false }) {
               aria-label="Section"
             >
               {[
-                ["", "All sections"],
                 ["Reading & Writing", "Reading & Writing"],
                 ["Math", "Math"],
               ].map(([value, label]) => (
@@ -226,7 +215,10 @@ export default function QuestionBank({ admin = false }) {
           <section className="bank-advanced" aria-label="Advanced filters">
             <div className="bank-section-heading">
               <h2>Advanced filters</h2>
-              <button className="quiet-button" onClick={() => change({})}>
+              <button
+                className="quiet-button"
+                onClick={() => change({ section: filters.section })}
+              >
                 Reset filters
               </button>
             </div>
@@ -283,36 +275,48 @@ export default function QuestionBank({ admin = false }) {
           </section>
         </div>
         <footer className="bank-action-bar">
-          <label>
-            Volume
-            <select
+          <div className="bank-volume">
+            <span>Volume</span>
+            <div
+              className="segmented-control"
+              role="group"
               aria-label="Question count"
-              value={count}
-              onChange={(e) => setCount(e.target.value)}
             >
-              {[10, 20, 30, 40, 50].map((n) => (
-                <option key={n}>{n}</option>
+              {[10, 20, 30, 40, 50, "all"].map((n) => (
+                <button
+                  key={n}
+                  aria-label={n === "all" ? "All questions" : `${n} questions`}
+                  aria-pressed={String(count) === String(n)}
+                  onClick={() => setCount(String(n))}
+                >
+                  {n === "all" ? "All" : n}
+                </button>
               ))}
-              <option value="all">All (up to 500)</option>
-            </select>
-          </label>
-          <label>
-            Mode
-            <select
-              aria-label="Mode"
-              value={String(timed)}
-              onChange={(e) => setTimed(e.target.value === "true")}
-            >
-              <option value="false">Untimed</option>
-              <option value="true">Timed</option>
-            </select>
-          </label>
+            </div>
+          </div>
+          <div className="bank-volume">
+            <span>Mode</span>
+            <div className="segmented-control" role="group" aria-label="Mode">
+              {[true, false].map((v) => (
+                <button
+                  key={String(v)}
+                  aria-pressed={timed === v}
+                  onClick={() => setTimed(v)}
+                >
+                  {v ? "Timed" : "Untimed"}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="bank-start">
-            <p role="status" aria-live="polite">
+            <h2 aria-live="polite">
               {state.loading
                 ? "Updating matches…"
-                : `${matching} questions match your filters`}
-            </p>
+                : `${matching} questions match`}
+            </h2>
+            {count === "all" && matching > 500 && (
+              <small>500 questions per session</small>
+            )}
             <button
               className="button"
               disabled={
@@ -326,7 +330,7 @@ export default function QuestionBank({ admin = false }) {
                 )
               }
             >
-              Start practice
+              Start Practice Session
             </button>
           </div>
         </footer>
@@ -339,7 +343,7 @@ export default function QuestionBank({ admin = false }) {
       )}
       <section className="bank-preview" aria-busy={state.loading}>
         <div className="bank-section-heading">
-          <h2>{matching} questions match</h2>
+          <h2>Matching questions</h2>
           <span className="bank-hint">Preview · answers stay hidden</span>
         </div>
         {!state.loading && !state.error && !matching && (

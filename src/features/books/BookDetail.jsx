@@ -11,6 +11,7 @@ import {
   deleteTopic,
   startPractice,
 } from "./api.js";
+import BookApproval from "./BookApproval.jsx";
 import BookForm from "./BookForm.jsx";
 import TopicForm from "./TopicForm.jsx";
 import TopicQuestions from "./TopicQuestions.jsx";
@@ -192,6 +193,7 @@ export default function BookDetail({ admin = false }) {
           {error}
         </p>
       )}
+      {admin && <BookApproval bookId={bookId} onPublished={state.reload} />}
       {editing && (
         <BookForm
           book={book}

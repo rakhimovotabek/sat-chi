@@ -136,7 +136,7 @@ test("manual source transcription creates a pending item with a required explici
   await page.goto("/admin/content-review");
   await page.getByRole("button", { name: "Inspect source" }).click();
   await page
-    .getByRole("button", { name: "Transcribe a source question" })
+    .getByRole("button", { name: "Advanced / Recover individual question" })
     .click();
   await page.getByLabel("Manual source page").fill("12");
   await page

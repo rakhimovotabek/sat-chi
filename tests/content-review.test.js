@@ -213,6 +213,111 @@ test("content review enforces admin ownership, actual counts, persistent edits, 
     await db.query("update public.books set published=true where id=$1", [
       sources.rows[0].book_id,
     ]);
+    // A partially recovered book publishes only its approved subset.
+    const tid = (
+      await db.query(
+        "select id from public.book_topics where book_id=$1 limit 1",
+        [sources.rows[0].book_id],
+      )
+    ).rows[0].id;
+    await db.exec("reset role");
+    const pendingId = (
+      await db.query("select public.write_book_question($1,$2::jsonb) id", [
+        tid,
+        {
+          ...q,
+          question: "Which number is the value sixteen?",
+          options: ["4", "8", "12", "16"],
+          correctAnswer: 3,
+        },
+      ])
+    ).rows[0].id;
+    const badId = (
+      await db.query("select public.write_book_question($1,$2::jsonb) id", [
+        tid,
+        {
+          ...q,
+          question: "Which answer appears in the unresolved scan?",
+          options: [
+            "Choice A in the source image",
+            "Choice B in the source image",
+            "Choice C in the source image",
+            "Choice D in the source image",
+          ],
+        },
+      ])
+    ).rows[0].id;
+    await role(admin);
+    assert.equal(
+      (
+        await db.query("select published from public.books where id=$1", [
+          sources.rows[0].book_id,
+        ])
+      ).rows[0].published,
+      true,
+    );
+    await role(student);
+    assert.equal(
+      (
+        await db.query(
+          "select id from public.questions where id=any($1::uuid[])",
+          [[pendingId, badId]],
+        )
+      ).rows.length,
+      0,
+    );
+    await role(admin);
+    const subset = await call(
+      "content_review_bulk",
+      [null, null, sources.rows[0].book_id],
+      ["uuid", "uuid[]", "uuid"],
+    );
+    assert.equal(subset.count, 1);
+    await call(
+      "content_review_bulk",
+      [null, null, sources.rows[0].book_id, subset.safe],
+      ["uuid", "uuid[]", "uuid", "jsonb"],
+    );
+    await call("publish_approved_book", [sources.rows[0].book_id], ["uuid"]);
+    await role(student);
+    assert.equal(
+      (
+        await db.query(
+          "select id from public.questions where id=any($1::uuid[])",
+          [[pendingId, badId]],
+        )
+      ).rows.length,
+      1,
+    );
+    assert.equal(
+      await call("question_approved_for_students", [badId], ["uuid"]),
+      false,
+    );
+    await role(admin);
+    const badReview = (
+      await db.query(
+        "select id from public.content_review_items where entity_id=$1",
+        [badId],
+      )
+    ).rows[0].id;
+    await assert.rejects(
+      call(
+        "update_content_review",
+        [
+          badReview,
+          "approve",
+          null,
+          "",
+          (await call("content_review_detail", [badReview], ["uuid"]))
+            .updated_at,
+        ],
+        ["uuid", "text", "jsonb", "text", "timestamptz"],
+      ),
+      /actual answer choices/,
+    );
+    await db.query("delete from public.questions where id=any($1::uuid[])", [
+      [pendingId, badId],
+    ]);
     detail = await call("content_review_detail", [excluded], ["uuid"]);
     await assert.rejects(
       call(
@@ -386,7 +491,7 @@ test("content review enforces admin ownership, actual counts, persistent edits, 
           ["uuid", "text"],
         )
       ).total,
-      1,
+      2, // Removed synthetic entities remain preserved as audit records.
     );
     await call(
       "content_review_source_action",
@@ -474,6 +579,45 @@ test("content review enforces admin ownership, actual counts, persistent edits, 
         ["uuid", "jsonb", "uuid", "integer"],
       ),
       /permission denied/,
+    );
+    // Changing the canonical exam date preserves completed and active study history.
+    await db.exec("reset role;");
+    await db.query(
+      `insert into public.study_plan_tasks(student_id,study_date,slot,kind,title,minutes,target_count,started_at,completed_at)
+      values($1,current_date+10,0,'questions','Unstarted',10,5,null,null),
+      ($1,current_date+10,1,'questions','Active',10,5,now(),null),
+      ($1,current_date+10,2,'questions','Completed',10,5,now(),now()),
+      ($1,current_date-1,0,'questions','History',10,5,null,null)`,
+      [student],
+    );
+    await role(student);
+    await call("save_sat_date", ["2099-11-07"], ["date"]);
+    assert.equal(
+      (
+        await db.query(
+          "select target_test_date::text from public.profiles where id=$1",
+          [student],
+        )
+      ).rows[0].target_test_date,
+      "2099-11-07",
+    );
+    assert.deepEqual(
+      (
+        await db.query(
+          "select title from public.study_plan_tasks order by title",
+        )
+      ).rows.map((r) => r.title),
+      ["Active", "Completed", "History"],
+    );
+    await call("save_sat_date", [null], ["date"]);
+    assert.equal(
+      (
+        await db.query(
+          "select target_test_date from public.profiles where id=$1",
+          [student],
+        )
+      ).rows[0].target_test_date,
+      null,
     );
   } finally {
     await db.close();

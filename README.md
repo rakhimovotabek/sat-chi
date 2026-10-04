@@ -285,3 +285,15 @@ node --test tests/math-recovery.test.js
 ```
 
 Supported embedded-text families: MathBook 2.0, MathBook 3.0, HardBook 2.0, PrepPros Complete Guide, and 800 Challenge. A separate selected-scan adapter for PrepPros Advanced requires the private verified key evidence from the existing local checkpoint; it does not OCR an entire book. Approve/publish separately. `refresh-math-assets.js --source="Filename.pdf"` regenerates existing crop paths without inserting questions. `reconcile-checkpoints.js` restores a manifest from complete atomic per-source reports after interrupted writers; it verifies payload hashes and makes no database writes. Run importer mutations sequentially.
+
+### Focused SAT workspace corrections
+
+Admin book/source detail separates validated approval from publication. Approve the validated subset using the versioned confirmation, then publish approved content. Unresolved numeric/key/option/visual candidates remain hidden and do not block that subset. Correcting a question invalidates only its approval; it does not unpublish the rest of the book.
+
+Math recovery now requires real interactive choices. Existing imported IDs must be repaired with `node scripts/imports/repair-math-options.js --apply`, optionally scoped by `--source="Filename.pdf"`; the old full-region refresh refuses to overwrite corrected crops. This command depends on private verified local checkpoints, source fingerprints, Poppler/ImageMagick and authenticated private Storage. Never substitute placeholder choices or guessed keys. See the exact corrected counts and limitations in `docs/book-import-report.md`.
+
+The practice Calculator embeds the official College Board Desmos testing calculator by default. For the supported JavaScript integration, request an embedding key from [Desmos](https://www.desmos.com/my-api) and configure the **public browser embedding key** as `VITE_DESMOS_API_KEY` in `.env.local` and the hosting build environment, then rebuild. The API script uses v1.12 and `apiKey`; SDK failures fall back to the in-app testing calculator. Never place a Supabase service role key or another private backend secret in a `VITE_` variable. External calculator connectivity is required. [Official SDK documentation](https://www.desmos.com/api/v1.12/docs/index.html).
+
+Update `src/data/sat-dates.js` when [College Board confirms new dates](https://satsuite.collegeboard.org/sat/dates-deadlines). This is a static maintained schedule; registration and late deadlines are shown without scraping at runtime. `profiles.target_test_date` is the canonical selection across onboarding, settings, dashboard and Study Plan. Changing it preserves completed and active history while regenerating future unstarted work.
+
+The unit/database test command limits concurrency to two processes so PGlite suites remain usable on a development laptop. All existing tests are retained.

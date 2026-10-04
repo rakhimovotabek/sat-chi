@@ -8,6 +8,8 @@ import ContentState from "../books/ContentState.jsx";
 import useAction from "./useAction.js";
 import { rpc, checked } from "./api.js";
 import { planDays } from "./study-plan-model.js";
+import SatDateSelect from "../../components/SatDateSelect.jsx";
+import { satDateLabel, satCountdown } from "../../data/sat-dates.js";
 export default function StudyPlan() {
   const [params] = useSearchParams();
   const options = useContent(() =>
@@ -106,14 +108,10 @@ export default function StudyPlan() {
             }}
           >
             <div className="learning-columns">
-              <label>
-                SAT date
-                <input
-                  name="date"
-                  type="date"
-                  defaultValue={profile.target_test_date || ""}
-                />
-              </label>
+              <SatDateSelect
+                name="date"
+                defaultValue={profile.target_test_date || ""}
+              />
               <label>
                 Current SAT score (optional)
                 <input
@@ -210,7 +208,7 @@ export default function StudyPlan() {
             {pref.preferred_days.length} days per week · Goal{" "}
             {profile.target_sat_score}
             {profile.target_test_date
-              ? ` · SAT ${profile.target_test_date}`
+              ? ` · SAT ${satDateLabel(profile.target_test_date)} · ${satCountdown(profile.target_test_date)} days remaining`
               : ""}
             . Missed work is reprioritized within your normal daily limit.
           </p>

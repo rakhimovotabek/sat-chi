@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router";
+import BookApproval from "../books/BookApproval.jsx";
 import BookCover from "../../components/BookCover.jsx";
 import { getBook } from "../books/api.js";
 import { vocabBookDetail } from "../learning/api.js";
@@ -91,6 +92,9 @@ function SourceDetail({ id, onQueue }) {
             {s.investigation?.page_count || "Unknown"} pages ·{" "}
             {s.investigation?.extraction_method || "Embedded text"}
           </p>
+          {s.book_id && (
+            <BookApproval bookId={s.book_id} onPublished={state.reload} />
+          )}
           <details>
             <summary>Developer details</summary>
             <p>
@@ -146,7 +150,7 @@ function SourceDetail({ id, onQueue }) {
                 className="button button-secondary"
                 onClick={() => setManual((v) => !v)}
               >
-                Transcribe a source question
+                Advanced / Recover individual question
               </button>
               {manual && (
                 <>
