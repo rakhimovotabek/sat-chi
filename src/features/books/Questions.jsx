@@ -2,10 +2,10 @@ import { useState } from "react";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "./useContent.js";
 import ContentState from "./ContentState.jsx";
-import { getBooks, getTopics } from "./api.js";
+import { getTopics } from "./api.js";
 import TopicQuestions from "./TopicQuestions.jsx";
+import BookSelect from "./BookSelect.jsx";
 export default function Questions() {
-  const books = useContent(getBooks);
   const [book, setBook] = useState("");
   const [topic, setTopic] = useState("");
   const topics = useContent(
@@ -20,23 +20,13 @@ export default function Questions() {
         description="Choose a book and topic to author questions and manage answer keys."
       />
       <div className="card profile-fields">
-        <label>
-          Book
-          <select
-            value={book}
-            onChange={(e) => {
-              setBook(e.target.value);
-              setTopic("");
-            }}
-          >
-            <option value="">Choose a book</option>
-            {books.data?.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.title}
-              </option>
-            ))}
-          </select>
-        </label>
+        <BookSelect
+          value={book}
+          onChange={(id) => {
+            setBook(id);
+            setTopic("");
+          }}
+        />
         <label>
           Topic
           <select
@@ -53,7 +43,6 @@ export default function Questions() {
           </select>
         </label>
       </div>
-      <ContentState {...books} onRetry={books.reload} />
       {book && <ContentState {...topics} onRetry={topics.reload} />}{" "}
       {topic && topics.data?.find((t) => t.id === topic) && (
         <TopicQuestions
@@ -61,7 +50,7 @@ export default function Questions() {
           topic={topics.data.find((t) => t.id === topic)}
         />
       )}{" "}
-      {!topic && !books.loading && (
+      {!topic && (
         <p className="card page-description">
           Select a topic to view, create, edit, delete, or import questions.
         </p>

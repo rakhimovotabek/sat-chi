@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "../books/useContent.js";
@@ -15,6 +15,9 @@ export default function Vocabulary({ admin = false }) {
   const { bookId } = useParams(),
     navigate = useNavigate(),
     [selected, setSelected] = useState([]),
+    [page, setPage] = useState(0),
+    [search, setSearch] = useState(""),
+    [query, setQuery] = useState(""),
     summary = useContent(
       () => (admin ? Promise.resolve(null) : api.vocabSummary(bookId || null)),
       [bookId, admin],
@@ -22,10 +25,23 @@ export default function Vocabulary({ admin = false }) {
     [importing, setImporting] = useState(false),
     [editing, setEditing] = useState(null),
     state = useContent(
-      () => (bookId ? api.vocabSets(bookId) : api.vocabBooks()),
-      [bookId],
+      () => (bookId ? api.vocabSets(bookId) : api.vocabBooks(page, query)),
+      [bookId, page, query],
     ),
     action = useAction();
+  useEffect(() => {
+    setSelected([]);
+    setPage(0);
+    setSearch("");
+    setQuery("");
+  }, [bookId]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setQuery(search);
+      setPage(0);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [search]);
   return (
     <>
       <PageHeader
@@ -38,7 +54,17 @@ export default function Vocabulary({ admin = false }) {
         }
       />
       {!admin && <VocabularyStats data={summary.data} />}
-      {!admin && !bookId && <VocabularyTestHistory />}
+      {!bookId && (
+        <label className="vocabulary-global-search">
+          Search vocabulary books
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by title"
+          />
+        </label>
+      )}
       {!admin && summary.error && (
         <p className="form-error" role="alert">
           {summary.error}
@@ -242,6 +268,27 @@ export default function Vocabulary({ admin = false }) {
           </section>
         )
       )}
+      {!bookId && !state.loading && (
+        <div className="catalog-pagination button-row">
+          {page > 0 && (
+            <button
+              className="button button-secondary"
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Previous vocabulary books
+            </button>
+          )}
+          {state.data?.length === 50 && (
+            <button
+              className="button button-secondary"
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next vocabulary books
+            </button>
+          )}
+        </div>
+      )}
+      {!admin && !bookId && <VocabularyTestHistory />}
     </>
   );
 }

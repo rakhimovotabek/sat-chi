@@ -88,12 +88,15 @@ export const importEvidence = (id) =>
       .eq("id", id)
       .single(),
   );
-export const vocabBooks = () =>
+export const vocabBooks = (page = 0, search = "") =>
   checked(
     supabase
       .from("vocabulary_books")
       .select("*")
-      .order("created_at", { ascending: false }),
+      .ilike("title", `%${search.replace(/[%_\\]/g, "").trim()}%`)
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(page * 50, page * 50 + 49),
   );
 export const vocabSets = (book) =>
   checked(

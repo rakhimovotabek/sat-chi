@@ -313,6 +313,18 @@ export async function learningFixture(page, role = "student") {
           ([k, v]) => !v.startsWith("eq.") || String(r[k]) === v.slice(3),
         ),
       );
+      if (table === "vocabulary_books" && req.method() === "GET") {
+        const title = (url.searchParams.get("title") || "")
+          .replace(/^ilike\./, "")
+          .replace(/%/g, "")
+          .toLowerCase();
+        const matched = rows.filter((r) =>
+          r.title.toLowerCase().includes(title),
+        );
+        const offset = Number(url.searchParams.get("offset") || 0),
+          limit = Number(url.searchParams.get("limit") || 50);
+        return json(matched.slice(offset, offset + limit));
+      }
       return json(
         table === "vocabulary_sets" && url.searchParams.has("id")
           ? rows[0]

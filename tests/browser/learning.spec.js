@@ -565,3 +565,57 @@ test("typed tests save answers, resume, grade exact recall and replay only mista
   expect(store.typedTests).toHaveLength(2);
   expect(store.typedTests[1].items[0].word.word).toBe("candid");
 });
+
+test("large catalogs page and search on the server while book selectors preserve selections", async ({
+  page,
+}) => {
+  const store = await learningFixture(page);
+  store.books = Array.from({ length: 55 }, (_, i) => ({
+    id: `catalog-${i}`,
+    title: `Library ${String(i).padStart(3, "0")}`,
+    category: "Math",
+    published: true,
+  }));
+  store.vocabBooks = Array.from({ length: 55 }, (_, i) => ({
+    id: `vcat-${i}`,
+    title: `Vocabulary ${String(i).padStart(3, "0")}`,
+    published: true,
+  }));
+  await page.goto("/books");
+  await expect(page.locator(".book-card")).toHaveCount(50);
+  await page.getByRole("button", { name: "Next books", exact: true }).click();
+  await expect(page.locator(".book-card")).toHaveCount(5);
+  await page.getByLabel("Search books", { exact: true }).fill("Library 054");
+  await expect(page.locator(".book-card")).toHaveCount(1);
+  await expect(
+    page.getByRole("heading", { name: "Library 054" }),
+  ).toBeVisible();
+  await page.goto("/question-bank");
+  await page
+    .getByLabel("Find book / source", { exact: true })
+    .fill("Library 054");
+  await expect(
+    page.getByLabel("Book / source", { exact: true }).locator("option"),
+  ).toHaveCount(2);
+  await page
+    .getByLabel("Book / source", { exact: true })
+    .selectOption("catalog-54");
+  await page.getByLabel("Find book / source", { exact: true }).fill("");
+  await expect(page.getByLabel("Book / source", { exact: true })).toHaveValue(
+    "catalog-54",
+  );
+  await expect(
+    page
+      .getByLabel("Book / source", { exact: true })
+      .locator("option[value='catalog-54']"),
+  ).toHaveCount(1);
+  await page.goto("/vocabulary");
+  await expect(page.locator(".card-grid > article")).toHaveCount(50);
+  await page.getByRole("button", { name: "Next vocabulary books" }).click();
+  await expect(page.locator(".card-grid > article")).toHaveCount(5);
+  await page.getByLabel("Search vocabulary books").fill("Vocabulary 054");
+  await expect(page.locator(".card-grid > article")).toHaveCount(1);
+  expect(
+    store.requests.filter((r) => r.path === "/rest/v1/books").length,
+  ).toBeGreaterThan(0);
+});

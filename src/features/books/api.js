@@ -12,13 +12,23 @@ async function checked(
     );
   return data;
 }
-export const getBooks = () =>
-  checked(
-    supabase
-      .from("books")
-      .select("*")
-      .order("created_at", { ascending: false }),
-  );
+export async function getBookCatalog(page = 0, search = "") {
+  const title = search.replace(/[%_\\]/g, "").trim();
+  const { data, count, error } = await supabase
+    .from("books")
+    .select("id,title,description,category,cover_url,published,created_at", {
+      count: "exact",
+    })
+    .ilike("title", `%${title}%`)
+    .order("created_at", { ascending: false })
+    .order("id")
+    .range(page * 50, page * 50 + 49);
+  if (error)
+    throw new Error(
+      "Could not load books. Check your connection and try again.",
+    );
+  return { books: data, total: count ?? data.length };
+}
 export const getBook = (id) =>
   checked(
     supabase.from("books").select("*").eq("id", id).single(),

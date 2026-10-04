@@ -135,8 +135,12 @@ export async function contentFixture(
       ]);
     const filter = (list) =>
       list.filter((row) =>
-        [...url.searchParams].every(
-          ([k, v]) => !v.startsWith("eq.") || String(row[k]) === v.slice(3),
+        [...url.searchParams].every(([k, v]) =>
+          v.startsWith("ilike.")
+            ? String(row[k] || "")
+                .toLowerCase()
+                .includes(v.slice(6).replace(/%/g, "").toLowerCase())
+            : !v.startsWith("eq.") || String(row[k]) === v.slice(3),
         ),
       );
     const table = url.pathname.split("/").pop();
@@ -160,7 +164,10 @@ export async function contentFixture(
               }
             : r,
         );
-        if (key === "questions") {
+        if (
+          key === "questions" ||
+          (key === "books" && !url.searchParams.has("id"))
+        ) {
           const offset = Number(url.searchParams.get("offset") || 0),
             limit = Number(url.searchParams.get("limit") || rows.length);
           return route.fulfill({
@@ -264,7 +271,14 @@ export async function contentFixture(
       }));
       return json(sessionId);
     }
-    if (table === "book_practice_sessions") return json(url.searchParams.has("id") ? store.session : store.session ? [store.session] : []);
+    if (table === "book_practice_sessions")
+      return json(
+        url.searchParams.has("id")
+          ? store.session
+          : store.session
+            ? [store.session]
+            : [],
+      );
     if (table === "book_practice_items") return json(store.items);
     if (table === "practice_heartbeat") {
       store.session.current_position = body.p_position;

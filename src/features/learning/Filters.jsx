@@ -1,5 +1,6 @@
 import useContent from "../books/useContent.js";
-import { getBooks, getTopics } from "../books/api.js";
+import { getTopics } from "../books/api.js";
+import BookSelect from "../books/BookSelect.jsx";
 export const DOMAINS = {
   Math: [
     "Algebra",
@@ -15,11 +16,10 @@ export const DOMAINS = {
   ],
 };
 export default function Filters({ value, onChange, status = true }) {
-  const books = useContent(getBooks),
-    topics = useContent(
-      () => (value.book ? getTopics(value.book) : Promise.resolve([])),
-      [value.book],
-    );
+  const topics = useContent(
+    () => (value.book ? getTopics(value.book) : Promise.resolve([])),
+    [value.book],
+  );
   const field = (key, v) =>
     onChange({
       ...value,
@@ -77,20 +77,12 @@ export default function Filters({ value, onChange, status = true }) {
           ))}
         </select>
       </label>
-      <label>
-        Book / source
-        <select
-          value={value.book || ""}
-          onChange={(e) => field("book", e.target.value)}
-        >
-          <option value="">All books</option>
-          {books.data?.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.title}
-            </option>
-          ))}
-        </select>
-      </label>
+      <BookSelect
+        label="Book / source"
+        emptyLabel="All books"
+        value={value.book}
+        onChange={(id) => field("book", id)}
+      />
       <label>
         Topic
         <select
@@ -121,9 +113,7 @@ export default function Filters({ value, onChange, status = true }) {
           </select>
         </label>
       )}
-      {(books.error || topics.error) && (
-        <p role="alert">{books.error || topics.error}</p>
-      )}
+      {topics.error && <p role="alert">{topics.error}</p>}
     </div>
   );
 }

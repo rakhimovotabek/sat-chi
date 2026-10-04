@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "./useContent.js";
 import ContentState from "./ContentState.jsx";
-import { getBooks } from "./api.js";
+import { getBookCatalog } from "./api.js";
 import BookForm from "./BookForm.jsx";
 import ImportPanel from "./ImportPanel.jsx";
 export default function Books({ admin = false }) {
-  const state = useContent(getBooks);
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [search, setSearch] = useState("");
-  const books = (state.data || []).filter((b) =>
-    b.title.toLowerCase().includes(search.toLowerCase()),
-  );
+  const [query, setQuery] = useState(""),
+    [page, setPage] = useState(0);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setQuery(search);
+      setPage(0);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [search]);
+  const state = useContent(() => getBookCatalog(page, query), [page, query]);
+  const books = state.data?.books || [];
   return (
     <>
       <PageHeader
@@ -110,6 +117,28 @@ export default function Books({ admin = false }) {
             </p>
           </div>
         ))}
+      {!state.loading && state.data?.total > 0 && (
+        <div className="catalog-pagination button-row">
+          <span>
+            {state.data.total} books · Page {page + 1} of{" "}
+            {Math.ceil(state.data.total / 50)}
+          </span>
+          <button
+            className="button button-secondary"
+            disabled={page === 0}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            Previous books
+          </button>
+          <button
+            className="button button-secondary"
+            disabled={(page + 1) * 50 >= state.data.total}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next books
+          </button>
+        </div>
+      )}
     </>
   );
 }

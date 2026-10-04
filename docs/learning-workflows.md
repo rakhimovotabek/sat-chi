@@ -92,3 +92,9 @@ Test → Typed recall accepts 10/20/25/50 or All available (maximum 10,000 uniqu
 Each answer saves once, grades on the server and records real vocabulary review evidence. Active time counts once in vocabulary statistics, Progress and meaningful study streaks; retries do not add time or recall credit. Private key tables have no browser SELECT grants and all mutation RPCs require the owned session. Edited/withdrawn words do not invalidate frozen test results; unavailable or changed words receive no new progress credit.
 
 The vocabulary library lists twenty saved tests per page. Resume starts at the first unanswered word. Results distinguish score over the whole test from accuracy over answered words and report correct/incorrect/unanswered, active minutes and current mastery. Review mistakes filters the saved results; Practice incorrect words creates a new frozen test from only the incorrect snapshots. Unanswered questions are reported separately.
+
+## Catalog scale and navigation
+
+SAT and vocabulary book catalogs search titles through filtered database queries and load fifty books per page. SAT catalogs return exact totals; vocabulary catalogs offer the next page only when the current batch is full. The bank/homework source selector and question administration can search or page book metadata; their selected book stays visible even outside the current search/page. Existing question pages remain fifty rows, mistake lists twenty-five rows, word pools one hundred rows and saved typed histories twenty rows. No frontend bulk-load is required to browse these datasets.
+
+Desktop navigation remembers icon-only collapse. Mobile navigation uses a dismissible drawer with Escape/backdrop support and an inert content area while open. There is one logout action. Vocabulary modes scroll horizontally on small screens to keep the word list close to its controls.
