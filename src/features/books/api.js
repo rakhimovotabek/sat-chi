@@ -157,6 +157,19 @@ export async function getPractice(id) {
     review = await checked(
       supabase.rpc("review_book_practice", { p_session_id: id }),
     );
+  if (
+    ["book", "bank"].includes(session.kind) &&
+    session.submitted_at &&
+    items.some((i) => i.question.question_type === "open")
+  ) {
+    const openReview = await checked(
+      supabase.rpc("book_practice_open_review", { p_session: id }),
+    );
+    review = review.map((r) => ({
+      ...r,
+      ...openReview.find((o) => o.item_id === r.item_id),
+    }));
+  }
   const attempts =
     session.kind === "bank"
       ? await checked(
@@ -183,12 +196,24 @@ export const savePractice = (id, items) =>
   checked(
     supabase.rpc("save_book_practice", {
       p_session_id: id,
-      p_answers: items.map(({ id, selected_answer, marked, eliminated }) => ({
-        id,
-        selected_answer,
-        marked,
-        eliminated,
-      })),
+      p_answers: items.map(
+        ({
+          id,
+          selected_answer,
+          selected_response,
+          marked,
+          eliminated,
+          question,
+        }) => ({
+          id,
+          selected_answer,
+          ...(question?.question_type === "open"
+            ? { selected_response: selected_response ?? null }
+            : {}),
+          marked,
+          eliminated,
+        }),
+      ),
     }),
     "Could not save your answers. Try again before leaving.",
   );
@@ -204,6 +229,26 @@ export const checkBankAnswer = (session, item, choice, event) =>
       p_session: session,
       p_item: item,
       p_choice: choice,
+      p_event: event,
+    }),
+    "Could not check your answer. Retry to save this attempt.",
+  );
+
+export const getBookExplanation = (session, item) =>
+  checked(
+    supabase.rpc("book_practice_explanation", {
+      p_session: session,
+      p_item: item,
+    }),
+    "Could not load the explanation. Check your connection and try again.",
+  );
+
+export const checkBankResponse = (session, item, response, event) =>
+  checked(
+    supabase.rpc("check_bank_response", {
+      p_session: session,
+      p_item: item,
+      p_response: response,
       p_event: event,
     }),
     "Could not check your answer. Retry to save this attempt.",

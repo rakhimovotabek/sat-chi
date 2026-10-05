@@ -1,0 +1,16 @@
+{
+  "bookQuestions": 589,
+  "flatTopics": 5,
+  "questionImagesTested": 5,
+  "imageOptionQuestionsTested": 3,
+  "optionImagesTested": 12,
+  "bankCatalogImagesLoaded": true,
+  "refresh": true,
+  "logoutLogin": true,
+  "mobile": true,
+  "bankOpenResponseGrading": true,
+  "bookExplanationNavigation": true,
+  "calculatorBothFlows": true,
+  "rawPrivateUrlStatus": 400,
+  "studentSignedUrlStatus": 200
+}

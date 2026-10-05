@@ -196,20 +196,22 @@ test("SDK instance and expression survive docking, floating, resizing, closing a
     .poll(() => page.evaluate(() => window.sdkResizes))
     .toBeGreaterThan(1);
 });
-test("narrow tablet floats, mobile uses large overlay, and return to desktop restores docking without losing answers", async ({
+test("narrow tablet and mobile stay in the panel, and desktop restores docking without losing answers", async ({
   page,
 }) => {
   const { panel, expression } = await openCalculator(page, {
     width: 1000,
     height: 800,
   });
-  await expect(panel).toHaveAttribute("data-mode", "floating");
+  await expect(panel).toHaveAttribute("data-mode", "stacked");
   await expression.fill("y=2x");
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(panel).toHaveAttribute("data-mode", "mobile");
+  await expect(panel).toHaveAttribute("data-mode", "stacked");
   const mobile = await bounds(panel);
-  expect(mobile.width).toBe(374);
-  expect(mobile.height).toBe(828);
+  expect(mobile.width).toBeLessThanOrEqual(390);
+  expect(mobile.height).toBeLessThanOrEqual(600);
+  const question = await page.locator(".question-player").boundingBox();
+  expect(question.y).toBeGreaterThanOrEqual(mobile.y + mobile.height);
   await expect(expression).toHaveValue("y=2x");
   expect(
     await page.evaluate(

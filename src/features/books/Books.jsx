@@ -114,9 +114,7 @@ export default function Books({ admin = false }) {
           </div>
         ) : (
           <div className="empty-state">
-            <h2>
-              {search ? "No matching books" : "Your library is getting ready"}
-            </h2>
+            <h2>{search ? "No matching books" : "No books available yet."}</h2>
             <p>
               {admin
                 ? "Create a book or import your learning content."

@@ -108,7 +108,7 @@ test("admin creates, edits and deletes books, subtopics and questions with valid
   await expect(page.getByText("Equations", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Delete book", exact: true }).click();
   await expect(page).toHaveURL(/admin\/books$/);
-  await expect(page.getByText("Your library is getting ready")).toBeVisible();
+  await expect(page.getByText("No books available yet.")).toBeVisible();
 });
 test("admin previews and imports a complete book from a JSON file", async ({
   page,
@@ -189,9 +189,7 @@ test("student topic practice saves choices and marks, resumes, grades and review
   await expect(
     page.getByRole("button", { name: "Marked for review" }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: /Question [0-9]+ of 3/ })
-    .click();
+  await page.getByRole("button", { name: /Question [0-9]+ of 3/ }).click();
   await page.getByRole("button", { name: /Question 2, / }).click();
   await expect(
     page.getByRole("radio", { name: "A 2", exact: true }),
@@ -210,6 +208,7 @@ test("student topic practice saves choices and marks, resumes, grades and review
   await expect(
     page.getByRole("region", { name: "Practice results" }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Explanation", exact: true }).click();
   await expect(
     page.getByText(sampleQuestion.explanation, { exact: true }),
   ).toBeVisible();
@@ -487,3 +486,21 @@ test("admin approves only the validated subset before publishing a partially rec
   ).toBeDisabled();
   await expect(workflow.getByText("408", { exact: true })).toBeVisible();
 });
+
+for (const role of ["student", "admin"]) {
+  test(`${role} Books library handles zero imported books`, async ({
+    page,
+  }) => {
+    await contentFixture(page, role, { empty: true });
+    await page.goto(role === "admin" ? "/admin/books" : "/books");
+    await expect(
+      page.getByRole("heading", { name: "No books available yet." }),
+    ).toBeVisible();
+    await expect(page.locator(".library-heading")).toContainText("0 books");
+    await expect(page.locator(".book-card")).toHaveCount(0);
+    if (role === "admin")
+      await expect(
+        page.getByRole("button", { name: "Create book", exact: true }),
+      ).toBeVisible();
+  });
+}

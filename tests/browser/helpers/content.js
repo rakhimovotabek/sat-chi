@@ -352,11 +352,26 @@ export async function contentFixture(
         item.active_seconds = (item.active_seconds || 0) + body.p_seconds;
       return json(store.session.elapsed_seconds);
     }
+    if (table === "book_practice_explanation") {
+      const item = store.items.find((i) => i.id === body.p_item);
+      if (!item || (!item.has_answered && item.selected_answer == null))
+        return json({ message: "Select an answer first" }, 403);
+      return json({
+        explanation: store.questions.find((q) => q.id === item.question.id)
+          .question_answers.explanation,
+      });
+    }
     if (table === "save_book_practice") {
       body.p_answers.forEach((a) =>
         Object.assign(
           store.items.find((i) => i.id === a.id),
           a,
+          {
+            has_answered:
+              store.items.find((i) => i.id === a.id).has_answered ||
+              a.selected_answer != null ||
+              Boolean(a.selected_response?.trim()),
+          },
         ),
       );
       return json(null);

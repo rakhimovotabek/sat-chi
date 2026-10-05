@@ -1,0 +1,231 @@
+{
+  "title": "ALGEBRA - Official SAT Question Bank",
+  "slug": "algebra-official-sat-question-bank",
+  "fingerprint": "86e46d26b8fbbd447e198b8c6b6fba0edc3c99e98485a6ceaf4f931543b6f96f",
+  "expected": {
+    "chapters": 5,
+    "topics": 5,
+    "questions": 616,
+    "questionsWithExplanations": 616,
+    "questionsWithoutExplanations": 0,
+    "questionsWithImages": 616,
+    "imageOptionQuestions": 476,
+    "multipleChoiceQuestions": 476,
+    "openResponseQuestions": 140,
+    "needsReview": 27,
+    "assets": 3163
+  },
+  "imported": {
+    "chapters": 5,
+    "topics": 5,
+    "questions": 589,
+    "withExplanations": 589,
+    "withoutExplanations": 0,
+    "imageQuestions": 589,
+    "imageOptionQuestions": 449,
+    "openResponseQuestions": 140
+  },
+  "skipped": [
+    {
+      "id": "algebra-official-sat-question-bank_q_0148",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 153. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0159",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 165. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0163",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 170. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0174",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 183. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0189",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 198. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0239",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 248. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0252",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 262. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0263",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 274. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0291",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 306. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0294",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 310. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0317",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 333. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0329",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 346. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0332",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 350. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0334",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 352. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0340",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 359. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0402",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 424. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0413",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 437. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0419",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 444. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0516",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 543. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0531",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 560, 561. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0535",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 566. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0544",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 577. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0575",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 609. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0576",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 610. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0586",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 622. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0598",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 636. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "algebra-official-sat-question-bank_q_0613",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 652. Original pixels are preserved; inspect legibility."
+    }
+  ],
+  "database": {
+    "chapters": 5,
+    "id": "6b70f3f6-f00c-5a9c-ac6f-7d253e78503b",
+    "published": true,
+    "questions": 589,
+    "title": "ALGEBRA - Official SAT Question Bank",
+    "topics": 5
+  },
+  "assetsVerified": 3163,
+  "audit": {
+    "chapters": 5,
+    "explanations": 589,
+    "image_option_questions": 449,
+    "image_questions": 589,
+    "missing_assets": 0,
+    "open_responses": 140,
+    "playable_questions": 589,
+    "published": true,
+    "questions": 589,
+    "registered_assets": 3163,
+    "skipped_review_questions": 27,
+    "stored_assets": 3163,
+    "title": "ALGEBRA - Official SAT Question Bank",
+    "topics": 5,
+    "without_explanations": 0,
+    "compared": 589,
+    "source_mismatches": 0,
+    "allPngAssetsDecoded": true
+  },
+  "validation": {
+    "unitDatabaseTests": 103,
+    "finalStagedImportTests": 2,
+    "browserTests": 89,
+    "browserNote": "87 passed in the full run; two source-image zoom tests passed after a test selector correction.",
+    "lint": "passed",
+    "build": "passed",
+    "diffCheck": "passed",
+    "hierarchyRepairBrowserTests": 20,
+    "liveStudentTopicsVerified": 5,
+    "latestLint": "passed",
+    "latestBuild": "passed"
+  },
+  "hierarchyRepair": {
+    "collapsed": [
+      {
+        "removed_empty_parent": "f15264c9-b8fd-58d8-afb6-b0168eb9f180",
+        "retained_topic": "fd88edb7-c1cc-5e0b-a45b-20560d4275c1",
+        "title": "Linear Equations in One Variable"
+      },
+      {
+        "removed_empty_parent": "ba1762ce-b4db-597c-ae6e-7ddde718c2aa",
+        "retained_topic": "6eab95ca-edf0-52c7-a3d7-56c8fb4515b5",
+        "title": "Linear Functions"
+      },
+      {
+        "removed_empty_parent": "5ede4217-6690-58c4-aafe-66f30e177e23",
+        "retained_topic": "4a444bfd-e729-522b-a34f-ba553652b55c",
+        "title": "Linear Equations in Two Variables"
+      },
+      {
+        "removed_empty_parent": "60c30c73-268e-5ebe-aeb6-7df6d2199577",
+        "retained_topic": "d1fba589-709f-5945-a3bc-94195dfbdab1",
+        "title": "Systems of Two Linear Equations in Two Variables"
+      },
+      {
+        "removed_empty_parent": "9f44f707-7dba-5ff1-aae1-58e62b7caab6",
+        "retained_topic": "fefb0f55-1d6f-5b28-ad2b-9a720817e2c0",
+        "title": "Linear Inequalities in One or Two Variables"
+      }
+    ],
+    "questions_after": 589,
+    "questions_before": 589,
+    "topicsBefore": 10,
+    "topicsAfter": 5,
+    "preservedQuestionIds": 589,
+    "assetsReuploaded": 0,
+    "questionRecordsChanged": 0,
+    "preservedPracticeSessions": 1,
+    "preservedPracticeItems": 112
+  },
+  "studentVerification": {
+    "beforePublished": true,
+    "beforeTopicRows": 10,
+    "beforeReadableQuestions": 0,
+    "afterPublished": true,
+    "afterTopicRows": 5,
+    "afterReadableQuestions": 589,
+    "allTopicsFlat": true,
+    "sameDatabaseEnvironment": true,
+    "cause": "Duplicate same-name chapter/topic mapping plus student_questions RLS policy bound to renamed pre-package eligibility function. Catalog did not filter the book out.",
+    "liveBrowserReport": "algebra-student-live-verification.json",
+    "productionFrontendDeployed": false
+  }
+}

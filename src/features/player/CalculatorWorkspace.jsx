@@ -44,10 +44,12 @@ export default function CalculatorWorkspace({
   const dockable = canDock(available, view.width),
     mode =
       view.width <= 760
-        ? "mobile"
+        ? "stacked"
         : layout.mode === "docked" && dockable
           ? "docked"
-          : "floating";
+          : layout.mode === "docked"
+            ? "stacked"
+            : "floating";
   const box = fitFloating(layout.floating, view),
     width = dockWidth(available, layout.ratio),
     shown = open === "Calculator" && enabled;

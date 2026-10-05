@@ -613,3 +613,11 @@
   .calculator-workspace-header { padding: 8px; gap: 8px; }
   .calculator-workspace-header h2 { font-size: 13px; }
 }
+
+/* Narrow docked calculators stay in document flow instead of covering questions. */
+.calculator-workspace-window[data-mode="stacked"] { position: relative; width: 100%; height: min(600px, 75dvh); margin-bottom: 16px; }
+.calculator-workspace-window > .calculator-container { margin: 0; overflow: hidden; }
+
+.bank-question-preview { min-width: 200px; max-width: 440px; }
+.bank-question-preview figure { margin: 0; }
+.bank-question-preview img { width: 100%; height: auto; max-width: 440px; }

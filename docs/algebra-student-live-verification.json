@@ -1,0 +1,54 @@
+{
+  "studentBookVisible": true,
+  "topics": [
+    {
+      "id": "fd88edb7-c1cc-5e0b-a45b-20560d4275c1",
+      "title": "Linear Equations in One Variable",
+      "questions": 112,
+      "stemImageLoaded": true,
+      "optionImagesLoaded": false,
+      "explanationLoaded": true,
+      "gradingCorrect": true
+    },
+    {
+      "id": "6eab95ca-edf0-52c7-a3d7-56c8fb4515b5",
+      "title": "Linear Functions",
+      "questions": 162,
+      "stemImageLoaded": true,
+      "optionImagesLoaded": true,
+      "explanationLoaded": true,
+      "gradingCorrect": true
+    },
+    {
+      "id": "4a444bfd-e729-522b-a34f-ba553652b55c",
+      "title": "Linear Equations in Two Variables",
+      "questions": 122,
+      "stemImageLoaded": true,
+      "optionImagesLoaded": false,
+      "explanationLoaded": true,
+      "gradingCorrect": true
+    },
+    {
+      "id": "d1fba589-709f-5945-a3bc-94195dfbdab1",
+      "title": "Systems of Two Linear Equations in Two Variables",
+      "questions": 121,
+      "stemImageLoaded": true,
+      "optionImagesLoaded": false,
+      "explanationLoaded": true,
+      "gradingCorrect": true
+    },
+    {
+      "id": "fefb0f55-1d6f-5b28-ad2b-9a720817e2c0",
+      "title": "Linear Inequalities in One or Two Variables",
+      "questions": 72,
+      "stemImageLoaded": true,
+      "optionImagesLoaded": true,
+      "explanationLoaded": true,
+      "gradingCorrect": true
+    }
+  ],
+  "questionCount": 589,
+  "existingPlainTextQuestions": 0,
+  "actualPlainTextQuestionAvailable": false,
+  "mobileOverflow": false
+}

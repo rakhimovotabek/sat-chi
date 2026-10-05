@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router";
+import QuestionImage from "../../components/QuestionImage.jsx";
 import Icon from "../../components/Icon.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
 import useContent from "../books/useContent.js";
@@ -367,7 +368,12 @@ export default function QuestionBank({ admin = false }) {
                 <tbody>
                   {state.data?.rows.map((q) => (
                     <tr key={q.id}>
-                      <td>{q.question_text}</td>
+                      <td className="bank-question-preview">
+                        {q.question_text}
+                        {!q.question_text?.trim() && q.image_url && (
+                          <QuestionImage src={q.image_url} allowZoom={false} />
+                        )}
+                      </td>
                       <td>
                         {q.domain}
                         <small>{q.skill}</small>

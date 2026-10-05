@@ -8,11 +8,14 @@ import {
   savePractice,
   finishPractice,
   checkBankAnswer,
+  checkBankResponse,
 } from "../books/api.js";
 import useStudyTimer from "./useStudyTimer.js";
 import MathTools from "./MathTools.jsx";
 import { formatTime, sectionResults } from "../learning/homework-model.js";
 import Stimulus from "./Stimulus.jsx";
+import QuestionImage from "../../components/QuestionImage.jsx";
+import BookExplanation from "./BookExplanation.jsx";
 import Navigator from "./Navigator.jsx";
 import { practiceSummary } from "./model.js";
 export default function Player() {
@@ -125,6 +128,11 @@ export default function Player() {
   function change(patch) {
     checkEvent.current = null;
     const updated = { ...items[index], ...patch };
+    if (state.data.session.kind === "book")
+      updated.has_answered =
+        updated.has_answered ||
+        updated.selected_answer != null ||
+        Boolean(updated.selected_response?.trim());
     setItems((previous) =>
       previous.map((item) => (item.id === updated.id ? updated : item)),
     );
@@ -139,10 +147,16 @@ export default function Player() {
     try {
       await queue.current;
       await study.flush();
-      const attempt = await checkBankAnswer(
+      const attempt = await (
+        item.question.question_type === "open"
+          ? checkBankResponse
+          : checkBankAnswer
+      )(
         sessionId,
         item.id,
-        item.selected_answer,
+        item.question.question_type === "open"
+          ? item.selected_response
+          : item.selected_answer,
         checkEvent.current,
       );
       setItems((rows) =>
@@ -232,11 +246,14 @@ export default function Player() {
   const practice = session.kind === "bank";
   const current = items[index];
   const q = current.question;
+  const isBook = session.kind === "book";
+  const openResponse = q.question_type === "open";
   const usableChoices =
     q.options?.length === 4 &&
     q.options.every(
-      (option) =>
-        option.trim() && !/^Choice [A-D] in the source image$/i.test(option),
+      (option, i) =>
+        (option.trim() || q.option_image_urls?.[i]) &&
+        !/^Choice [A-D] in the source image$/i.test(option),
     );
   const answer = review.find((v) => v.item_id === current.id);
   const result = practiceSummary(items);
@@ -337,7 +354,7 @@ export default function Player() {
           )}
           {session.time_limit ? ` / ${formatTime(session.time_limit)}` : ""}
         </span>
-        {practice ? (
+        {practice || isBook ? (
           <span
             className="player-math-tools"
             ref={setToolsTarget}
@@ -365,7 +382,7 @@ export default function Player() {
         </button>
       </div>
       <div className="practice-workspace" ref={setWorkspace}>
-        {practice && workspace && (
+        {(practice || isBook) && workspace && (
           <MathTools
             key={sessionId}
             workspace={workspace}
@@ -385,72 +402,121 @@ export default function Player() {
               <span>{q.difficulty}</span>
             </div>
             <p className="answer-state">
-              {current.selected_answer == null
-                ? "No answer selected"
-                : `Answer ${String.fromCharCode(65 + current.selected_answer)} selected`}
+              {openResponse
+                ? current.selected_response?.trim()
+                  ? "Answer entered"
+                  : "No answer entered"
+                : current.selected_answer == null
+                  ? "No answer selected"
+                  : `Answer ${String.fromCharCode(65 + current.selected_answer)} selected`}
             </p>
             <h2 className="question-text">{q.question_text}</h2>
-            <fieldset
-              className="answer-choices"
-              disabled={
-                submitted ||
-                submitting ||
-                checking ||
-                (practice && Boolean(current.solved_at)) ||
-                !usableChoices
-              }
-            >
-              <legend className="visually-hidden">Choose your answer</legend>
-              {!usableChoices && (
-                <p role="alert">
-                  This question’s answer choices need recovery. It is excluded
-                  from new graded practice.
-                </p>
-              )}
-              {usableChoices &&
-                q.options.map((option, i) => {
-                  const eliminated = current.eliminated.includes(i);
-                  return (
-                    <div
-                      key={i}
-                      className={`answer-choice ${current.selected_answer === i ? "selected" : ""} ${eliminated ? "eliminated" : ""} ${(submitted && answer?.correct_answer === i) || (practice && current.attempts?.some((a) => a.selected_answer === i && a.correct)) ? "correct-choice" : ""} ${(submitted && current.selected_answer === i && current.correct === false) || (practice && current.attempts?.some((a) => a.selected_answer === i && !a.correct)) ? "incorrect-choice" : ""}`}
-                    >
-                      <label>
-                        <input
-                          type="radio"
-                          name={`answer-${current.id}`}
-                          value={i}
-                          checked={current.selected_answer === i}
-                          disabled={eliminated}
-                          onChange={() => change({ selected_answer: i })}
-                        />
-                        <span className="choice-letter">
-                          {String.fromCharCode(65 + i)}
-                        </span>
-                        <span>{option}</span>
-                      </label>
-                      {!submitted && !current.solved_at && (
-                        <button
-                          className="eliminate-choice"
-                          type="button"
-                          aria-label={`${eliminated ? "Restore" : "Eliminate"} choice ${String.fromCharCode(65 + i)}`}
-                          aria-pressed={eliminated}
-                          onClick={() =>
-                            change({
-                              eliminated: eliminated
-                                ? current.eliminated.filter((v) => v !== i)
-                                : [...current.eliminated, i],
-                              selected_answer: current.selected_answer,
-                            })
-                          }
-                        >
-                          {eliminated ? "↶" : "×"}
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-            </fieldset>
+            {openResponse ? (
+              <label className="book-open-response">
+                Your answer
+                <input
+                  type="text"
+                  inputMode="text"
+                  maxLength={200}
+                  value={current.selected_response ?? ""}
+                  disabled={
+                    submitted ||
+                    submitting ||
+                    checking ||
+                    Boolean(current.solved_at)
+                  }
+                  onChange={(e) =>
+                    change({
+                      selected_response: e.target.value,
+                      selected_answer: e.target.value.trim() ? 0 : null,
+                    })
+                  }
+                />
+              </label>
+            ) : (
+              <fieldset
+                className="answer-choices"
+                disabled={
+                  submitted ||
+                  submitting ||
+                  checking ||
+                  (practice && Boolean(current.solved_at)) ||
+                  !usableChoices
+                }
+              >
+                <legend className="visually-hidden">Choose your answer</legend>
+                {!usableChoices && (
+                  <p role="alert">
+                    This question’s answer choices need recovery. It is excluded
+                    from new graded practice.
+                  </p>
+                )}
+                {usableChoices &&
+                  q.options.map((option, i) => {
+                    const eliminated = current.eliminated.includes(i);
+                    return (
+                      <div
+                        key={i}
+                        className={`answer-choice ${current.selected_answer === i ? "selected" : ""} ${eliminated ? "eliminated" : ""} ${(submitted && answer?.correct_answer === i) || (practice && current.attempts?.some((a) => a.selected_answer === i && a.correct)) ? "correct-choice" : ""} ${(submitted && current.selected_answer === i && current.correct === false) || (practice && current.attempts?.some((a) => a.selected_answer === i && !a.correct)) ? "incorrect-choice" : ""}`}
+                      >
+                        <label>
+                          <input
+                            type="radio"
+                            name={`answer-${current.id}`}
+                            value={i}
+                            checked={current.selected_answer === i}
+                            disabled={eliminated}
+                            onChange={() => change({ selected_answer: i })}
+                          />
+                          <span
+                            className={`choice-letter ${q.option_image_urls?.[i] && q.import_metadata?.option_labels_in_images ? "visually-hidden" : ""}`}
+                          >
+                            {String.fromCharCode(65 + i)}
+                          </span>
+                          {q.option_image_urls?.[i] ? (
+                            <span className="book-option-content">
+                              <QuestionImage
+                                src={q.option_image_urls[i]}
+                                allowZoom={false}
+                                alt={`Choice ${String.fromCharCode(65 + i)}`}
+                              />
+                              {option && <span>{option}</span>}
+                            </span>
+                          ) : (
+                            <span>{option}</span>
+                          )}
+                        </label>
+                        {!submitted && !current.solved_at && (
+                          <button
+                            className="eliminate-choice"
+                            type="button"
+                            aria-label={`${eliminated ? "Restore" : "Eliminate"} choice ${String.fromCharCode(65 + i)}`}
+                            aria-pressed={eliminated}
+                            onClick={() =>
+                              change({
+                                eliminated: eliminated
+                                  ? current.eliminated.filter((v) => v !== i)
+                                  : [...current.eliminated, i],
+                                selected_answer: current.selected_answer,
+                              })
+                            }
+                          >
+                            {eliminated ? "↶" : "×"}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+              </fieldset>
+            )}
+            {(isBook || practice) && (
+              <BookExplanation
+                key={`${sessionId}/${current.id}`}
+                sessionId={sessionId}
+                item={current}
+                waitForSave={() => queue.current}
+              />
+            )}
             {practice && current.attempts?.length > 0 && (
               <div className="attempt-feedback" aria-live="polite">
                 <p>
@@ -462,8 +528,9 @@ export default function Player() {
                   {current.attempts.map((a) => (
                     <li key={a.id}>
                       Attempt {a.attempt_order}:{" "}
-                      {String.fromCharCode(65 + a.selected_answer)} ·{" "}
-                      {a.correct ? "Correct" : "Incorrect"} ·{" "}
+                      {a.selected_response ??
+                        String.fromCharCode(65 + a.selected_answer)}{" "}
+                      · {a.correct ? "Correct" : "Incorrect"} ·{" "}
                       {formatTime(a.active_seconds)} active time
                     </li>
                   ))}
@@ -479,12 +546,16 @@ export default function Player() {
                       ? "Correct"
                       : "Incorrect"}{" "}
                   · Correct answer:{" "}
-                  {String.fromCharCode(65 + answer.correct_answer)}
+                  {openResponse
+                    ? answer.accepted_answers?.join(" or ")
+                    : String.fromCharCode(65 + answer.correct_answer)}
                 </h3>
-                <p className="reading-text">
-                  {answer.explanation ||
-                    "No explanation was provided for this question."}
-                </p>
+                {isBook ? null : (
+                  <p className="reading-text">
+                    {answer.explanation ||
+                      "No explanation was provided for this question."}
+                  </p>
+                )}
               </section>
             )}
           </section>

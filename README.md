@@ -299,3 +299,14 @@ Update `src/data/sat-dates.js` when [College Board confirms new dates](https://s
 The unit/database test command limits concurrency to two processes so PGlite suites remain usable on a development laptop. All existing tests are retained.
 
 The recurring homework backend and its calendar, membership, grading and RPC contracts are documented in [Daily Homework model](docs/daily-homework-model.md). Its executed database checks run with `node --test tests/daily-homework.test.js` or the full `npm test` command. The existing admin Homework form supports One-time and Daily recurring. Students use Today, Overdue/Missed and saved history in Homework, plus real Dashboard counts; Admin → Students → detail includes lifetime daily completion/streak/accuracy/time metrics. Production migrations through `20261004003200` are applied and verified; see [migration audit](docs/daily-homework-production-audit.md). Run daily browser regressions with `npm run test:e2e -- tests/browser/daily-homework.spec.js`; aggregate database checks with `node --test tests/daily-reporting.test.js`. Run full unit and browser suites sequentially to avoid competing image/browser workloads.
+
+### Structured book ZIP imports
+
+A supplied `book.json` / `manifest.json` / `review.json` / `assets/` package can be imported without re-extracting or rewriting its questions. See [the structured package workflow](docs/book-package-import.md). Python 3's standard library validates and extracts the archive; the existing Node/Supabase tooling writes the book and permanent private PNG assets. Book Practice also supports source-image choices, supplied open-response answer lists, and an Explanation button after any answer selection.
+
+```bash
+node scripts/imports/book-package.js /absolute/path/book-satchi-import.zip
+node scripts/imports/book-package.js /absolute/path/book-satchi-import.zip --apply --verify-assets
+node --test tests/book-package.test.js
+npm run test:e2e -- tests/browser/book-explanations.spec.js
+```

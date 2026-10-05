@@ -495,3 +495,58 @@
   max-height: 240px;
   margin-top: 18px;
 }
+
+/* Package crops keep their original pixels and proportions at every width. */
+.book-option-content {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.book-option-content figure {
+  margin: 0;
+}
+.book-option-content img,
+.book-explanation-control img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.book-explanation-control {
+  margin-top: 24px;
+  overflow-wrap: anywhere;
+}
+.book-explanation-control figure {
+  margin: 12px 0;
+}
+.book-open-response {
+  display: grid;
+  gap: 10px;
+  margin-top: 26px;
+}
+.book-open-response input {
+  width: 100%;
+  min-width: 0;
+}
+.answer-panel .book-option-content,
+.answer-panel:has(.book-explanation-control) .answer-choice label {
+  min-width: 0;
+}
+.book-image-enlarge {
+  margin-top: 12px;
+}
+.book-image-zoom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+}
+.book-image-viewer {
+  max-width: 100%;
+  max-height: 60vh;
+  overflow: auto;
+  background: white;
+}
+.book-image-viewer img {
+  display: block;
+}
