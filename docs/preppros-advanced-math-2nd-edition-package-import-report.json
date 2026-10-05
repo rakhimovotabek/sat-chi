@@ -1,0 +1,46 @@
+{
+  "title": "PrepPros Advanced Math — 2nd Edition",
+  "slug": "preppros-advanced-math-2nd-edition",
+  "fingerprint": "5f40b924cd5282c1fe74ebe52956506c2ae13f87342de08c292e2566ccde04e5",
+  "expected": {
+    "chapters": 1,
+    "topics": 1,
+    "questions": 150,
+    "questionsWithExplanations": 0,
+    "questionsWithoutExplanations": 150,
+    "questionsWithImages": 150,
+    "imageOptionQuestions": 0,
+    "multipleChoiceQuestions": 63,
+    "openResponseQuestions": 87,
+    "needsReview": 2,
+    "missingDifficulty": 0,
+    "assets": 150
+  },
+  "imported": {
+    "chapters": 1,
+    "topics": 1,
+    "topicRows": 2,
+    "redundantLevelsCollapsed": 0,
+    "questions": 150,
+    "missingDifficultyFallbacks": 0,
+    "withExplanations": 0,
+    "withoutExplanations": 150,
+    "imageQuestions": 150,
+    "imageOptionQuestions": 0,
+    "openResponseQuestions": 87,
+    "passages": 0
+  },
+  "skipped": [],
+  "sourceCountNotes": {
+    "reviewUnresolvedNotes": 0
+  },
+  "database": {
+    "chapters": 1,
+    "id": "5b2eb05c-0cfe-5aea-afd6-f065bc3bbf1e",
+    "published": true,
+    "questions": 150,
+    "title": "PrepPros Advanced Math — 2nd Edition",
+    "topics": 1
+  },
+  "assetsVerified": 150
+}

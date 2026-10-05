@@ -320,7 +320,7 @@ export async function contentFixture(
       );
     if (table === "book_practice_items") return json(store.items);
     if (table === "question_check_attempts") return json(store.checks || []);
-    if (table === "check_bank_answer") {
+    if (["check_bank_answer", "check_book_practice_answer"].includes(table)) {
       store.checks ||= [];
       const item = store.items.find((i) => i.id === body.p_item);
       const answer = store.questions.find((q) => q.id === item.question.id)

@@ -1,0 +1,76 @@
+{
+  "title": "SATakror — 101 Most Repetitive Questions",
+  "slug": "satakror-101-most-repetitive-questions",
+  "fingerprint": "a17f2e1b524cf015e49068bbd59435f51beba55b4213bb2d129011aa244d692d",
+  "expected": {
+    "chapters": 1,
+    "topics": 31,
+    "questions": 101,
+    "questionsWithExplanations": 0,
+    "questionsWithoutExplanations": 101,
+    "questionsWithImages": 101,
+    "imageOptionQuestions": 0,
+    "multipleChoiceQuestions": 101,
+    "openResponseQuestions": 0,
+    "needsReview": 0,
+    "missingDifficulty": 101,
+    "assets": 101
+  },
+  "imported": {
+    "chapters": 1,
+    "topics": 31,
+    "topicRows": 32,
+    "redundantLevelsCollapsed": 0,
+    "questions": 101,
+    "missingDifficultyFallbacks": 101,
+    "withExplanations": 0,
+    "withoutExplanations": 101,
+    "imageQuestions": 101,
+    "imageOptionQuestions": 0,
+    "openResponseQuestions": 0,
+    "passages": 100
+  },
+  "skipped": [],
+  "sourceCountNotes": {
+    "unresolvedExtractionIssues": 0
+  },
+  "database": {
+    "chapters": 1,
+    "id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+    "published": true,
+    "questions": 101,
+    "title": "SATakror — 101 Most Repetitive Questions",
+    "topics": 31
+  },
+  "assetsVerified": 101,
+  "packageType": "Reading book / SAT reading practice",
+  "validation": {
+    "packageType": "Reading book / SAT reading practice",
+    "title": "SATakror — 101 Most Repetitive Questions",
+    "chapters": 1,
+    "topics": 31,
+    "questionsExpected": 101,
+    "questionsImported": 101,
+    "passagesImported": 100,
+    "sharedPassageGroups": 1,
+    "passageQuestionLinksVerified": true,
+    "studentBookVisible": true,
+    "allQuestionsAndPassagesVisible": true,
+    "gradingVerified": true,
+    "explanationsSupplied": 0,
+    "missingExplanationBehaviorVerified": true,
+    "assets": 101,
+    "allAssetImagesLoaded": true,
+    "optionImagesSupplied": 0,
+    "unresolvedQuestionIdsSkipped": [],
+    "duplicateBookCreated": false,
+    "protectedBooksAndVocabularyUntouched": true,
+    "practiceValidationSessionsRolledBack": true,
+    "browserSampleTopics": [
+      "Lunar Intensity"
+    ],
+    "mobileOverflow": false
+  },
+  "frontendChanged": false,
+  "frontendDeployed": false
+}

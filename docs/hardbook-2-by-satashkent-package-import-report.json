@@ -1,0 +1,64 @@
+{
+  "title": "HardBook 2.0 — All SAT Hard Math Questions Collection",
+  "slug": "hardbook-2-by-satashkent",
+  "fingerprint": "14c20e01664c0d03e63292953333aac5002ddb09885f508730ffc370984ecffa",
+  "expected": {
+    "chapters": 4,
+    "topics": 4,
+    "questions": 487,
+    "questionsWithExplanations": 0,
+    "questionsWithoutExplanations": 487,
+    "questionsWithImages": 487,
+    "imageOptionQuestions": 0,
+    "multipleChoiceQuestions": 307,
+    "openResponseQuestions": 180,
+    "needsReview": 1,
+    "missingDifficulty": 0,
+    "assets": 487
+  },
+  "imported": {
+    "chapters": 4,
+    "topics": 4,
+    "topicRows": 4,
+    "redundantLevelsCollapsed": 4,
+    "questions": 487,
+    "missingDifficultyFallbacks": 0,
+    "withExplanations": 0,
+    "withoutExplanations": 487,
+    "imageQuestions": 487,
+    "imageOptionQuestions": 0,
+    "openResponseQuestions": 180,
+    "passages": 0
+  },
+  "skipped": [],
+  "sourceCountNotes": {
+    "reviewUnresolvedNotes": 0
+  },
+  "database": {
+    "chapters": 4,
+    "id": "b7486094-9d19-5554-ad1d-ccd168e58309",
+    "published": true,
+    "questions": 487,
+    "title": "HardBook 2.0 — All SAT Hard Math Questions Collection",
+    "topics": 4
+  },
+  "assetsVerified": 487,
+  "validation": {
+    "bookAppearsPublished": true,
+    "flatTopics": [
+      "Algebra",
+      "Advanced Math",
+      "Geometry",
+      "Problem Solving and Data Analysis"
+    ],
+    "questionAnswerKeysVerified": true,
+    "openResponseGradingVerified": true,
+    "openResponseTestSessionRolledBack": true,
+    "assetsLoadedInBrowser": 487,
+    "allImagesDecoded": true,
+    "duplicateBookCreated": false,
+    "existingBooksAndVocabularyUntouched": true,
+    "explanationsAvailable": false,
+    "frontendDeploymentRequired": false
+  }
+}

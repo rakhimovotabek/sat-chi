@@ -10,6 +10,11 @@ with zipfile.ZipFile(archive) as source:
     if len(books) != 1:
         raise ValueError('ZIP must contain exactly one book.json')
     prefix = books[0][:-len('book.json')]
+    provenance_name = prefix + 'asset-provenance.json'
+    if provenance_name not in names:
+        raise ValueError('ZIP is missing asset provenance')
+    provenance = json.loads(source.read(provenance_name))
+    referenced_assets = {item['asset'] for item in provenance}
     index = []
     for name in names:
         if not name.startswith(prefix):
@@ -19,6 +24,9 @@ with zipfile.ZipFile(archive) as source:
             raise ValueError('Unsafe ZIP path')
         raw = source.read(name)  # ZIP CRC is verified too.
         if relative.parts[0] == 'assets':
+            if str(relative) not in referenced_assets:
+                # Ignore package leftovers such as .tmp files and unused crops.
+                continue
             if relative.suffix != '.png' or raw[:8] != b'\x89PNG\r\n\x1a\n':
                 raise ValueError('Unsupported package asset: ' + name)
             pos, compressed, dimensions = 8, bytearray(), None

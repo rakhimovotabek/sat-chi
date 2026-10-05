@@ -9,6 +9,8 @@ import {
   finishPractice,
   checkBankAnswer,
   checkBankResponse,
+  checkBookAnswer,
+  checkBookResponse,
 } from "../books/api.js";
 import useStudyTimer from "./useStudyTimer.js";
 import MathTools from "./MathTools.jsx";
@@ -147,11 +149,15 @@ export default function Player() {
     try {
       await queue.current;
       await study.flush();
-      const attempt = await (
-        item.question.question_type === "open"
-          ? checkBankResponse
-          : checkBankAnswer
-      )(
+      const checkAnswer =
+        state.data.session.kind === "book"
+          ? item.question.question_type === "open"
+            ? checkBookResponse
+            : checkBookAnswer
+          : item.question.question_type === "open"
+            ? checkBankResponse
+            : checkBankAnswer;
+      const attempt = await checkAnswer(
         sessionId,
         item.id,
         item.question.question_type === "open"
@@ -243,7 +249,7 @@ export default function Player() {
     return <Navigate to={`/admin/sessions/${sessionId}`} replace />;
   const { session, review } = state.data;
   const submitted = Boolean(session.submitted_at);
-  const practice = session.kind === "bank";
+  const practice = ["bank", "book"].includes(session.kind);
   const current = items[index];
   const q = current.question;
   const isBook = session.kind === "book";
@@ -547,7 +553,10 @@ export default function Player() {
                       : "Incorrect"}{" "}
                   · Correct answer:{" "}
                   {openResponse
-                    ? answer.accepted_answers?.join(" or ")
+                    ? answer.correct_answer ||
+                      (answer.accepted_range
+                        ? `${answer.accepted_range.min} to ${answer.accepted_range.max}`
+                        : answer.accepted_answers?.join(" or "))
                     : String.fromCharCode(65 + answer.correct_answer)}
                 </h3>
                 {isBook ? null : (

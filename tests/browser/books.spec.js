@@ -204,7 +204,15 @@ test("student topic practice saves choices and marks, resumes, grades and review
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  await page.getByRole("button", { name: "Submit practice" }).click();
+  await page.getByRole("button", { name: "Check", exact: true }).click();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByRole("button", { name: "Check", exact: true }).click();
+  await expect(page.locator(".answer-choice.incorrect-choice")).toHaveCount(1);
+  await page.getByRole("radio", { name: "B 4", exact: true }).check();
+  await page.getByRole("button", { name: "Check", exact: true }).click();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByRole("radio", { name: "B 4", exact: true }).check();
+  await page.getByRole("button", { name: "Check", exact: true }).click();
   await expect(
     page.getByRole("region", { name: "Practice results" }),
   ).toBeVisible();
@@ -215,7 +223,8 @@ test("student topic practice saves choices and marks, resumes, grades and review
   await expect(
     page.getByRole("radio", { name: "B 4", exact: true }),
   ).toBeDisabled();
-  expect(store.items.map((i) => i.correct)).toEqual([true, false, false]);
+  expect(store.items.map((i) => i.correct)).toEqual([true, true, true]);
+  expect(store.checks.filter((attempt) => attempt.item_id === store.items[1].id)).toHaveLength(2);
   await page.reload();
   await expect(
     page.getByRole("region", { name: "Practice results" }),

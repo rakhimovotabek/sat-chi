@@ -1,0 +1,83 @@
+{
+  "title": "SAToplam 2.0 Writing",
+  "slug": "satoplam-2-writing",
+  "fingerprint": "1e5500f5e094ea41a86eb62860cba014f51624e3c2ae440a5f4cd3228f74853f",
+  "expected": {
+    "chapters": 2,
+    "topics": 4,
+    "questions": 846,
+    "questionsWithExplanations": 0,
+    "questionsWithoutExplanations": 846,
+    "questionsWithImages": 0,
+    "imageOptionQuestions": 0,
+    "multipleChoiceQuestions": 846,
+    "openResponseQuestions": 0,
+    "needsReview": 0,
+    "missingDifficulty": 846,
+    "assets": 0
+  },
+  "imported": {
+    "chapters": 2,
+    "topics": 4,
+    "topicRows": 6,
+    "redundantLevelsCollapsed": 0,
+    "questions": 846,
+    "missingDifficultyFallbacks": 846,
+    "withExplanations": 0,
+    "withoutExplanations": 846,
+    "imageQuestions": 0,
+    "imageOptionQuestions": 0,
+    "openResponseQuestions": 0,
+    "passages": 824
+  },
+  "skipped": [],
+  "sourceCountNotes": {
+    "coverAdvertised": 973,
+    "topicHeadingTotal": 844,
+    "answerKeyTotal": 846
+  },
+  "database": {
+    "chapters": 2,
+    "id": "339eaeab-0dee-55a0-ae7b-341d02e70b96",
+    "published": true,
+    "questions": 846,
+    "title": "SAToplam 2.0 Writing",
+    "topics": 4
+  },
+  "assetsVerified": 0,
+  "validation": {
+    "title": "SAToplam 2.0 Writing",
+    "questionsVerified": 846,
+    "passagesVerified": 824,
+    "sharedPassageGroups": 22,
+    "chapters": 2,
+    "topics": 4,
+    "sourceAndReviewPreserved": true,
+    "studentBookVisible": true,
+    "studentQuestionsVisible": 846,
+    "privateAnswersHidden": true,
+    "assetsSupplied": 0,
+    "optionImagesSupplied": 0,
+    "explanationsSupplied": 0,
+    "existingMissingExplanationBehaviorVerified": true,
+    "duplicateBookCreated": false,
+    "practiceBackendValidation": {
+      "topics": 4,
+      "questions": 846,
+      "gradingVerified": true,
+      "validationSessionsRolledBack": true
+    },
+    "browserPracticeSnapshotSamples": [
+      "Boundaries",
+      "Form, Structure, and Sense",
+      "Transitions",
+      "Rhetorical Synthesis"
+    ],
+    "browserUsesRolledBackDatabaseSnapshots": true,
+    "mobileOverflow": false,
+    "protectedContentHashesMatch": true,
+    "existingBooksIncludingReadingAndVocabookUntouched": true
+  },
+  "frontendChanged": false,
+  "frontendDeployed": false
+}

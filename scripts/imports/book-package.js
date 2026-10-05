@@ -13,6 +13,15 @@ export const stableId = (value) => {
 };
 const sqlJson = (v) => `'${JSON.stringify(v).replaceAll("'", "''")}'::jsonb`;
 
+function packageDifficulty(value) {
+  if (value == null || value === "") return "unclassified";
+  const normalized = String(value).trim().toLowerCase();
+  if (normalized === "1" || normalized === "easy") return "easy";
+  if (normalized === "2" || normalized === "medium") return "medium";
+  if (["3", "4", "hard", "extra hard", "800-level"].includes(normalized)) return "hard";
+  throw new Error(`Unsupported source difficulty: ${value}`);
+}
+
 export function preparePackage(book, manifest, review, assets, fingerprint) {
   const chapters = book.chapters;
   const questions = chapters.flatMap((c) =>
@@ -33,6 +42,7 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
     multipleChoiceQuestions: questions.filter((q) => q.type === "mcq").length,
     openResponseQuestions: questions.filter((q) => q.type === "open").length,
     needsReview: questions.filter((q) => q.needsReview).length,
+    missingDifficulty: questions.filter((q) => q.difficulty == null || q.difficulty === "").length,
     assets: assets.length,
   };
   for (const [key, value] of Object.entries(counts))
@@ -65,6 +75,7 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
   // Check every reference, including questions that must be skipped.
   for (const q of questions) {
     asset(q.questionImage);
+    asset(q.answerImage);
     q.options.forEach((o) => asset(o.image));
     (q.explanationImages || []).forEach(asset);
     for (const match of (q.explanation || "").matchAll(
@@ -110,14 +121,20 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
           q.type === "open" &&
           (q.options.length ||
             typeof q.correctAnswer !== "string" ||
-            !q.acceptedAnswers?.length ||
-            q.acceptedAnswers.some((a) => typeof a !== "string") ||
-            !q.acceptedAnswers.includes(q.correctAnswer))
+            (!q.acceptedAnswers?.length && !q.acceptedRange) ||
+            (q.acceptedAnswers || []).some((a) => typeof a !== "string") ||
+            (q.acceptedAnswers?.length && !q.acceptedAnswers.includes(q.correctAnswer)) ||
+            (q.acceptedRange && (!Number.isFinite(q.acceptedRange.min) || !Number.isFinite(q.acceptedRange.max) || q.acceptedRange.min > q.acceptedRange.max)))
         )
           throw new Error(`Missing supplied open answer: ${q.id}`);
         const {
           correctAnswer,
           acceptedAnswers,
+          acceptedRange,
+          answerFormat,
+          answerType,
+          answerImage,
+          answerSource,
           explanation,
           explanationImages,
           ...metadata
@@ -135,8 +152,14 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
               : [null, null, null, null],
           table: q.table,
           correctAnswer:
-            q.type === "mcq" ? "ABCD".indexOf(correctAnswer) : null,
+            q.type === "mcq" ? "ABCD".indexOf(correctAnswer) : correctAnswer,
           acceptedAnswers,
+          acceptedRange,
+          answerFormat: answerFormat ?? (
+            q.type === "open" && book.book.slug === "800-challenge-hard-math-150-part-1-sat-math-club"
+              ? "numeric"
+              : undefined
+          ),
           explanation:
             explanation == null
               ? null
@@ -144,7 +167,7 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
                   /(!\[[^\]]*\]\()([^)]+)(\))/g,
                   (_, start, path, end) => start + asset(path) + end,
                 ),
-          difficulty: q.difficulty.toLowerCase(),
+          difficulty: packageDifficulty(q.difficulty),
           position: qi,
           page: q.page,
           metadata: {
@@ -187,6 +210,7 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
         (c) => c.children.length === 1 && c.children[0].title === c.title,
       ).length,
       questions: imported.length,
+      missingDifficultyFallbacks: imported.filter((q) => q.difficulty === "unclassified").length,
       withExplanations: imported.filter((q) => q.explanation != null).length,
       withoutExplanations: imported.filter((q) => q.explanation == null).length,
       imageQuestions: imported.filter((q) => q.image).length,
@@ -280,9 +304,9 @@ for c in select value from jsonb_array_elements(d->'topics')loop
  end if;
  for q in select value from jsonb_array_elements(t->'questions')loop
  insert into public.questions(id,topic_id,question_text,options,option_image_urls,image_url,stimulus_table,difficulty,position,domain,skill,source,source_page,import_metadata,question_type)
- values((q->>'id')::uuid,(t->>'id')::uuid,q->>'text',q->'options',q->'optionImages',q->>'image',nullif(q->'table','null'::jsonb),q->>'difficulty',(q->>'position')::int,'Algebra',t->>'title',d->'book'->'book'->>'sourceFile',(q->>'page')::int,q->'metadata',q->>'type');
- insert into public.question_answers values((q->>'id')::uuid,(q->>'correctAnswer')::int,q->>'explanation');
- if q->>'type'='open' then insert into public.book_open_answers values((q->>'id')::uuid,q->'acceptedAnswers');end if;
+ values((q->>'id')::uuid,(t->>'id')::uuid,q->>'text',q->'options',q->'optionImages',q->>'image',nullif(q->'table','null'::jsonb),q->>'difficulty',(q->>'position')::int,coalesce(c->'metadata'->'chapter'->>'title',c->>'title'),t->>'title',d->'book'->'book'->>'sourceFile',(q->>'page')::int,q->'metadata',q->>'type');
+ insert into public.question_answers values((q->>'id')::uuid,case when q->>'type'='mcq' then (q->>'correctAnswer')::int else null end,q->>'explanation');
+ if q->>'type'='open' then insert into public.book_open_answers(question_id,accepted_answers,correct_answer,answer_format,accepted_range) values((q->>'id')::uuid,coalesce(q->'acceptedAnswers','[]'::jsonb),q->>'correctAnswer',q->>'answerFormat',q->'acceptedRange');end if;
  update public.content_review_items set status='approved',note='Imported from supplied structured package; unflagged question with source answer key and lossless crops.',extraction_method='source_image_package',reviewed_at=now() where entity_id=(q->>'id')::uuid;
  end loop;end loop;end loop;
 for a in select value from jsonb_array_elements(d->'assets')loop
@@ -350,11 +374,13 @@ async function main() {
   const indexHash = createHash("sha256")
     .update(JSON.stringify(assets))
     .digest("hex");
-  const resume =
-    process.argv.includes("--resume-assets") &&
-    verified?.fingerprint === fingerprint &&
-    verified?.indexHash === indexHash &&
-    verified?.count === assets.length;
+  const verifiedSources = verified?.sources ||
+    (verified?.count === assets.length ? assets.map((a) => a.source) : []);
+  const resume = process.argv.includes("--resume-assets") &&
+    verified?.fingerprint === fingerprint && verified?.indexHash === indexHash &&
+    Number.isInteger(verified?.count) && verified.count >= 0 &&
+    verified.count <= assets.length && verifiedSources.length === verified.count &&
+    assets.slice(0, verified.count).every((a, i) => verifiedSources[i] === a.source);
   if (process.argv.includes("--resume-assets") && !resume)
     throw new Error("No matching fully verified asset checkpoint");
   if (resume) {
@@ -367,41 +393,62 @@ async function main() {
       data.forEach((a) => names.add(a.name));
       if (data.length < 1000) break;
     }
-    if (assets.some((a) => !names.has(`${a.storageHash}.png`)))
+    if (assets.slice(0, verified.count).some((a) => !names.has(`${a.storageHash}.png`)))
       throw new Error("Previously verified asset is missing");
-    complete = assets.length;
+    complete = verified.count;
     console.log(
-      `Resumed ${complete} previously hash-verified assets; all objects still present.`,
+      `Resumed ${complete} previously hash-verified assets; all checkpointed objects still present.`,
     );
   }
-  for (let offset = 0; !resume && offset < assets.length; offset += 12) {
+  const batchSize = 16;
+  for (let offset = complete; offset < assets.length; offset += batchSize) {
     await Promise.all(
-      assets.slice(offset, offset + 12).map(async (a) => {
+      assets.slice(offset, offset + batchSize).map(async (a) => {
         const path = `${fingerprint}/${a.storageHash}.png`,
           raw = await readFile(join(folder, a.source));
-        const { error } = await client.storage
-          .from("book-package-assets")
-          .upload(path, raw, { contentType: "image/png", upsert: true });
-        if (error)
-          throw new Error(`Asset upload failed: ${a.source}: ${error.message}`);
-        if (process.argv.includes("--verify-assets")) {
-          const { data, error: downloadError } = await client.storage
+        let upload;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          upload = await client.storage
             .from("book-package-assets")
-            .download(path);
-          if (
-            downloadError ||
-            createHash("sha256")
-              .update(Buffer.from(await data.arrayBuffer()))
-              .digest("hex") !== a.sha256
-          )
+            .upload(path, raw, { contentType: "image/png", upsert: true });
+          if (!upload.error) break;
+          if (!/HTTP (408|429|500|502|503|504)/i.test(upload.error.message) || attempt === 4)
+            throw new Error(`Asset upload failed: ${a.source}: ${upload.error.message}`);
+          await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** attempt));
+        }
+        if (process.argv.includes("--verify-assets")) {
+          let download;
+          for (let attempt = 0; attempt < 5; attempt++) {
+            download = await client.storage
+              .from("book-package-assets")
+              .download(path);
+            if (!download.error) break;
+            if (!/HTTP (408|429|500|502|503|504)/i.test(download.error.message) || attempt === 4)
+              throw new Error(`Asset download failed: ${a.source}: ${download.error.message}`);
+            await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** attempt));
+          }
+          if (createHash("sha256")
+            .update(Buffer.from(await download.data.arrayBuffer()))
+            .digest("hex") !== a.sha256)
             throw new Error(`Stored asset verification failed: ${a.source}`);
         }
         complete++;
       }),
     );
-    if (offset % 120 === 0)
+    if (complete % 120 < batchSize || complete === assets.length)
       console.log(
         `Assets stored${process.argv.includes("--verify-assets") ? " and verified" : ""}: ${complete}/${assets.length}`,
+      );
+    if (process.argv.includes("--verify-assets"))
+      await writeFile(
+        verificationFile,
+        JSON.stringify({
+          fingerprint,
+          indexHash,
+          count: complete,
+          sources: assets.slice(0, complete).map((a) => a.source),
+        }) + "\n",
+        { mode: 0o600 },
       );
   }
   if (process.argv.includes("--verify-assets") || resume)
@@ -470,7 +517,9 @@ async function main() {
     JSON.stringify(prepared.report, null, 2) + "\n",
   );
   await writeFile(
-    "docs/algebra-package-import-report.json",
+    prepared.report.slug === "algebra-official-sat-question-bank"
+      ? "docs/algebra-package-import-report.json"
+      : `docs/${prepared.report.slug}-package-import-report.json`,
     JSON.stringify(prepared.report, null, 2) + "\n",
   );
   console.log(JSON.stringify(outcome));

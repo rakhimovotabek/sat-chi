@@ -1,0 +1,127 @@
+{
+  "title": "PROBLEM-SOLVING AND DATA ANALYSIS - Official SAT Question Bank",
+  "slug": "problem-solving-and-data-analysis-official-sat-question-bank",
+  "fingerprint": "55db3ca82742b550bf58ba655b61efcdd6ebae413f79be5aadc0b255bdf0143c",
+  "expected": {
+    "chapters": 7,
+    "topics": 7,
+    "questions": 421,
+    "questionsWithExplanations": 421,
+    "questionsWithoutExplanations": 0,
+    "questionsWithImages": 421,
+    "imageOptionQuestions": 320,
+    "multipleChoiceQuestions": 320,
+    "openResponseQuestions": 101,
+    "needsReview": 21,
+    "missingDifficulty": 0,
+    "assets": 2152
+  },
+  "imported": {
+    "chapters": 7,
+    "topics": 7,
+    "topicRows": 7,
+    "redundantLevelsCollapsed": 7,
+    "questions": 400,
+    "missingDifficultyFallbacks": 0,
+    "withExplanations": 400,
+    "withoutExplanations": 0,
+    "imageQuestions": 400,
+    "imageOptionQuestions": 299,
+    "openResponseQuestions": 101
+  },
+  "skipped": [
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0181",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 186. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0191",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 199. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0195",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 203. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0204",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 213. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0213",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 224. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0224",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 236. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0230",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 243. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0241",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 256. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0249",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 265. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0261",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 278. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0269",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 291. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0271",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 294. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0272",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 296. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0273",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 298. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0287",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 316. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0289",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 318. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0294",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 324. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0308",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 341. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0310",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 344. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0315",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 351. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "problem-solving-and-data-analysis-official-sat-question-bank_q_0366",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 407. Original pixels are preserved; inspect legibility."
+    }
+  ],
+  "database": {
+    "chapters": 7,
+    "id": "f5493c07-6723-5f39-abfc-9b50f9eb0a1d",
+    "published": true,
+    "questions": 400,
+    "title": "PROBLEM-SOLVING AND DATA ANALYSIS - Official SAT Question Bank",
+    "topics": 7
+  },
+  "assetsVerified": 2152
+}

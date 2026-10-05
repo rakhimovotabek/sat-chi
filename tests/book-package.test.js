@@ -44,6 +44,8 @@ const open = {
   options: [],
   correctAnswer: "8.6",
   acceptedAnswers: ["8.6", "43/5"],
+  answerFormat: "numeric",
+  acceptedRange: null,
   explanation: null,
   explanationImages: [],
 };
@@ -96,11 +98,28 @@ test("package validation rejects mismatched counts and missing assets, and prese
   assert.equal(p.imported[0].correctAnswer, 1);
   assert.equal(p.imported[1].explanation, null);
   assert.deepEqual(p.imported[1].acceptedAnswers, ["8.6", "43/5"]);
+  assert.equal(p.imported[1].correctAnswer, "8.6");
+  assert.equal(p.imported[1].answerFormat, "numeric");
+  assert.equal(p.imported[1].acceptedRange, null);
   assert.equal(p.skipped, undefined);
   assert.equal(p.report.skipped[0].id, "package_q_review");
   assert.equal(p.imported[0].metadata.questionNumber, null);
   assert.equal(p.imported[0].metadata.sourceQuestionId, "source-key");
   assert.ok(!("correctAnswer" in p.imported[0].metadata));
+  assert.ok(!("answerSource" in p.imported[1].metadata));
+  assert.ok(!("answerImage" in p.imported[1].metadata));
+  assert.ok(!("acceptedRange" in p.imported[1].metadata));
+  const missingDifficulty = structuredClone(book);
+  missingDifficulty.chapters[0].topics[0].questions[1].difficulty = null;
+  const fallback = preparePackage(
+    missingDifficulty,
+    manifest,
+    review,
+    assets,
+    fingerprint,
+  );
+  assert.equal(fallback.imported[1].difficulty, "unclassified");
+  assert.equal(fallback.report.imported.missingDifficultyFallbacks, 1);
   assert.throws(
     () =>
       preparePackage(
@@ -123,6 +142,22 @@ test("package validation rejects mismatched counts and missing assets, and prese
       ),
     /Missing package asset/,
   );
+});
+
+test("800 Challenge retains source difficulty labels and imports numeric response keys", () => {
+  const source = structuredClone(book);
+  source.book.slug = "800-challenge-hard-math-150-part-1-sat-math-club";
+  const questions = source.chapters[0].topics[0].questions;
+  questions[0].difficulty = "EXTRA HARD";
+  questions[1].difficulty = "800-LEVEL";
+  delete questions[1].answerFormat;
+  const prepared = preparePackage(source, manifest, review, assets, fingerprint);
+  assert.equal(prepared.imported[0].difficulty, "hard");
+  assert.equal(prepared.imported[0].metadata.difficulty, "EXTRA HARD");
+  assert.equal(prepared.imported[1].difficulty, "hard");
+  assert.equal(prepared.imported[1].metadata.difficulty, "800-LEVEL");
+  assert.equal(prepared.imported[1].answerFormat, "numeric");
+  assert.deepEqual(prepared.imported[1].acceptedAnswers, open.acceptedAnswers);
 });
 
 test("package import is atomic and idempotent; book practice securely gates explanations and grades supplied open answers", async () => {
@@ -260,7 +295,7 @@ test("package import is atomic and idempotent; book practice securely gates expl
       /Select an answer/,
     );
     await save(items[0], 1);
-    await save(items[1], null, "43/5");
+    await save(items[1], null, "8.60");
     assert.equal(
       (
         await call(
@@ -415,6 +450,71 @@ test("package import is atomic and idempotent; book practice securely gates expl
         )
       ).rows[0].correct,
       false,
+    );
+    await db.exec("reset role");
+    await db.query(
+      "update public.book_open_answers set accepted_answers='[]',correct_answer='3.0 to 3.3',answer_format='numeric-range',accepted_range=$2::jsonb where question_id=$1",
+      [p.imported[1].id, JSON.stringify({ min: 3, max: 3.3, inclusive: true })],
+    );
+    await role(student);
+    const rangeSid = await call(
+      "start_book_practice",
+      [stableId("package-fixture/c1/t1")],
+      ["uuid"],
+    );
+    const rangeItem = (
+      await db.query(
+        "select id from public.book_practice_items where session_id=$1 and position=1",
+        [rangeSid],
+      )
+    ).rows[0];
+    await call(
+      "save_book_practice",
+      [rangeSid, JSON.stringify([{ id: rangeItem.id, selected_response: "3.15" }])],
+      ["uuid", "jsonb"],
+    );
+    await call("finish_book_practice", [rangeSid], ["uuid"]);
+    assert.equal(
+      (await db.query("select correct from public.book_practice_items where id=$1", [rangeItem.id])).rows[0].correct,
+      true,
+    );
+    const rangeReview = await call(
+      "book_practice_open_review",
+      [rangeSid],
+      ["uuid"],
+    );
+    assert.deepEqual(
+      rangeReview.find((item) => item.item_id === rangeItem.id).accepted_answers,
+      ["3.0 to 3.3"],
+      "range review falls back to the source answer string for older clients",
+    );
+
+    await db.exec("reset role");
+    await db.query(
+      "update public.book_open_answers set accepted_answers=$2::jsonb,correct_answer='x^2',answer_format='math-expression',accepted_range=null where question_id=$1",
+      [p.imported[1].id, JSON.stringify(["x^2"])],
+    );
+    await role(student);
+    const expressionSid = await call(
+      "start_book_practice",
+      [stableId("package-fixture/c1/t1")],
+      ["uuid"],
+    );
+    const expressionItem = (
+      await db.query(
+        "select id from public.book_practice_items where session_id=$1 and position=1",
+        [expressionSid],
+      )
+    ).rows[0];
+    await call(
+      "save_book_practice",
+      [expressionSid, JSON.stringify([{ id: expressionItem.id, selected_response: " x ^ 2 " }])],
+      ["uuid", "jsonb"],
+    );
+    await call("finish_book_practice", [expressionSid], ["uuid"]);
+    assert.equal(
+      (await db.query("select correct from public.book_practice_items where id=$1", [expressionItem.id])).rows[0].correct,
+      true,
     );
   } finally {
     await db.close();
@@ -598,13 +698,13 @@ test("canonical package questions appear in Bank and image/open checks preserve 
       ).correct,
       false,
     );
-    await save(response, "43/5");
+    await save(response, "8.6");
     const event = crypto.randomUUID();
     assert.equal(
       (
         await call(
           "check_bank_response",
-          [sid, response.id, "43/5", event],
+          [sid, response.id, "8.60", event],
           ["uuid", "uuid", "text", "uuid"],
         )
       ).correct,
@@ -614,7 +714,7 @@ test("canonical package questions appear in Bank and image/open checks preserve 
       (
         await call(
           "check_bank_response",
-          [sid, response.id, "43/5", event],
+          [sid, response.id, "8.60", event],
           ["uuid", "uuid", "text", "uuid"],
         )
       ).correct,

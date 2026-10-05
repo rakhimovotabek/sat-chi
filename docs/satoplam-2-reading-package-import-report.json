@@ -1,0 +1,82 @@
+{
+  "title": "SAToplam 2.0 Reading",
+  "slug": "satoplam-2-reading",
+  "fingerprint": "38e4150f79a90414e7071aadce992d544c07ede61ed6f33392b20ee91d2e9af1",
+  "expected": {
+    "chapters": 2,
+    "topics": 13,
+    "questions": 971,
+    "questionsWithExplanations": 0,
+    "questionsWithoutExplanations": 971,
+    "questionsWithImages": 108,
+    "imageOptionQuestions": 0,
+    "multipleChoiceQuestions": 971,
+    "openResponseQuestions": 0,
+    "needsReview": 0,
+    "missingDifficulty": 971,
+    "assets": 96
+  },
+  "imported": {
+    "chapters": 2,
+    "topics": 13,
+    "topicRows": 15,
+    "redundantLevelsCollapsed": 0,
+    "questions": 971,
+    "missingDifficultyFallbacks": 971,
+    "withExplanations": 0,
+    "withoutExplanations": 971,
+    "imageQuestions": 108,
+    "imageOptionQuestions": 0,
+    "openResponseQuestions": 0,
+    "passages": 940
+  },
+  "skipped": [],
+  "sourceCountNotes": {
+    "manifestQuestionsWithImages": 96,
+    "actualImageQuestions": 108,
+    "distinctSourcePageImages": 96,
+    "coverAdvertised": 846
+  },
+  "database": {
+    "chapters": 2,
+    "id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+    "published": true,
+    "questions": 971,
+    "title": "SAToplam 2.0 Reading",
+    "topics": 13
+  },
+  "assetsVerified": 96,
+  "validation": {
+    "title": "SAToplam 2.0 Reading",
+    "questionsVerified": 971,
+    "passagesVerified": 940,
+    "sharedPassageGroups": 29,
+    "chapters": 2,
+    "topics": 13,
+    "sourceAndReviewPreserved": true,
+    "studentBookVisible": true,
+    "studentQuestionsVisible": 971,
+    "privateAnswersHidden": true,
+    "sourceImageLoadsVerified": 96,
+    "optionImages": "none supplied",
+    "explanations": "none supplied; existing unavailable behavior verified",
+    "duplicateBookCreated": false,
+    "practiceBackendValidation": {
+      "topics": 13,
+      "questions": 971,
+      "gradingVerified": true,
+      "validationSessionsRolledBack": true
+    },
+    "browserPracticeSnapshotSamples": [
+      "Main Ideas",
+      "Command of Evidence - Graphs",
+      "Cross-Text Connections"
+    ],
+    "browserUsesRolledBackDatabaseSnapshots": true,
+    "mobileOverflow": false,
+    "existingBooksAndVocabookUntouched": true,
+    "protectedContentHashesMatch": true
+  },
+  "frontendChanged": false,
+  "frontendDeployed": false
+}

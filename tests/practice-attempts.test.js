@@ -135,3 +135,76 @@ test("bank checks keep every attempt, private keys, accurate question time and o
     await db.close();
   }
 });
+
+test("book practice checks save wrong and correct answers without revealing the key", async () => {
+  const { db, role, call, book } = await learningDatabase();
+  try {
+    const topic = (
+      await db.query(
+        "select id from public.book_topics where book_id=$1 limit 1",
+        [book],
+      )
+    ).rows[0].id;
+    const sid = await call("start_book_practice", [topic], ["uuid"]);
+    const item = (
+      await db.query(
+        "select * from public.book_practice_items where session_id=$1 order by position limit 1",
+        [sid],
+      )
+    ).rows[0];
+    await role(student);
+    const wrong = await call(
+      "check_book_practice_answer",
+      [sid, item.id, 0, "f2000000-0000-0000-0000-000000000011"],
+      ["uuid", "uuid", "integer", "uuid"],
+    );
+    assert.equal(wrong.correct, false);
+    assert.ok(!("correct_answer" in wrong));
+    assert.ok(!("explanation" in wrong));
+    assert.equal(
+      (
+        await db.query(
+          "select submitted_at from public.book_practice_sessions where id=$1",
+          [sid],
+        )
+      ).rows[0].submitted_at,
+      null,
+    );
+    const saved = (
+      await db.query(
+        "select selected_answer,correct,solved_at,has_answered from public.book_practice_items where id=$1",
+        [item.id],
+      )
+    ).rows[0];
+    assert.equal(saved.selected_answer, 0);
+    assert.equal(saved.correct, false);
+    assert.equal(saved.solved_at, null);
+    assert.equal(saved.has_answered, true);
+    const correct = await call(
+      "check_book_practice_answer",
+      [sid, item.id, 1, "f2000000-0000-0000-0000-000000000012"],
+      ["uuid", "uuid", "integer", "uuid"],
+    );
+    assert.equal(correct.correct, true);
+    const persisted = (
+      await db.query(
+        "select selected_answer,correct,solved_at from public.book_practice_items where id=$1",
+        [item.id],
+      )
+    ).rows[0];
+    assert.equal(persisted.selected_answer, 1);
+    assert.equal(persisted.correct, true);
+    assert.ok(persisted.solved_at);
+    assert.equal(
+      (
+        await db.query(
+          "select count(*)::int count from public.question_check_attempts where item_id=$1",
+          [item.id],
+        )
+      ).rows[0].count,
+      2,
+    );
+  } finally {
+    await db.close();
+  }
+});

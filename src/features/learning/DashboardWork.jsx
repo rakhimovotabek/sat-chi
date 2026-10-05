@@ -14,9 +14,9 @@ export default function DashboardWork() {
         checked(
           supabase
             .from("book_practice_sessions")
-            .select("id,title,kind,started_at,current_position")
+            .select("id,title,kind,started_at,current_position,submitted_at")
             .eq("student_id", session.user.id)
-            .is("submitted_at", null)
+            .in("kind", ["book", "bank"])
             .order("started_at", { ascending: false })
             .limit(10),
         ),
@@ -103,8 +103,9 @@ export default function DashboardWork() {
                     >
                       <strong>{s.title}</strong>
                       <small>
-                        {s.kind} · Resume at question{" "}
-                        {(s.current_position || 0) + 1}
+                        {s.submitted_at
+                          ? `${s.kind} · Completed`
+                          : `${s.kind} · Resume at question ${(s.current_position || 0) + 1}`}
                       </small>
                     </Link>
                   ))}

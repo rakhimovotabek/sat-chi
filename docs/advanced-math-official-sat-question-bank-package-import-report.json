@@ -1,0 +1,131 @@
+{
+  "title": "ADVANCED MATH - Official SAT Question Bank",
+  "slug": "advanced-math-official-sat-question-bank",
+  "fingerprint": "5f4dcabdf074147ac1a033db5d6081181c46845f516ed836811230b029e4ab00",
+  "expected": {
+    "chapters": 3,
+    "topics": 3,
+    "questions": 540,
+    "questionsWithExplanations": 540,
+    "questionsWithoutExplanations": 0,
+    "questionsWithImages": 540,
+    "imageOptionQuestions": 420,
+    "multipleChoiceQuestions": 420,
+    "openResponseQuestions": 120,
+    "needsReview": 22,
+    "missingDifficulty": 0,
+    "assets": 2771
+  },
+  "imported": {
+    "chapters": 3,
+    "topics": 3,
+    "topicRows": 3,
+    "redundantLevelsCollapsed": 3,
+    "questions": 518,
+    "missingDifficultyFallbacks": 0,
+    "withExplanations": 518,
+    "withoutExplanations": 0,
+    "imageQuestions": 518,
+    "imageOptionQuestions": 399,
+    "openResponseQuestions": 119
+  },
+  "skipped": [
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0036",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 39. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0202",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 208. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0251",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 258. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0263",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 271. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0294",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 305. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0327",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 340. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0333",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 348. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0339",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 354. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0369",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 385. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0370",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 387. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0374",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 391. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0375",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 393. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0380",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 398. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0413",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 434. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0419",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 441. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0430",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 452. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0454",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 477. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0456",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 480. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0477",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 501. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0501",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 526. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0518",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 546. Original pixels are preserved; inspect legibility."
+    },
+    {
+      "id": "advanced-math-official-sat-question-bank_q_0534",
+      "reason": "Source content overlaps the publication footer on PDF page(s) 563. Original pixels are preserved; inspect legibility."
+    }
+  ],
+  "database": {
+    "chapters": 3,
+    "id": "b8173713-19fe-58e9-a9af-62616f035627",
+    "published": true,
+    "questions": 518,
+    "title": "ADVANCED MATH - Official SAT Question Bank",
+    "topics": 3
+  },
+  "assetsVerified": 2771
+}

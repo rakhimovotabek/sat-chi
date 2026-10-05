@@ -170,19 +170,18 @@ export async function getPractice(id) {
       ...openReview.find((o) => o.item_id === r.item_id),
     }));
   }
-  const attempts =
-    session.kind === "bank"
-      ? await checked(
-          supabase
-            .from("question_check_attempts")
-            .select("*")
-            .in(
-              "item_id",
-              items.map((i) => i.id),
-            )
-            .order("attempt_order"),
-        )
-      : [];
+  const attempts = ["bank", "book"].includes(session.kind)
+    ? await checked(
+        supabase
+          .from("question_check_attempts")
+          .select("*")
+          .in(
+            "item_id",
+            items.map((i) => i.id),
+          )
+          .order("attempt_order"),
+      )
+    : [];
   return {
     session,
     items: items.map((i) => ({
@@ -246,6 +245,28 @@ export const getBookExplanation = (session, item) =>
 export const checkBankResponse = (session, item, response, event) =>
   checked(
     supabase.rpc("check_bank_response", {
+      p_session: session,
+      p_item: item,
+      p_response: response,
+      p_event: event,
+    }),
+    "Could not check your answer. Retry to save this attempt.",
+  );
+
+export const checkBookAnswer = (session, item, choice, event) =>
+  checked(
+    supabase.rpc("check_book_practice_answer", {
+      p_session: session,
+      p_item: item,
+      p_choice: choice,
+      p_event: event,
+    }),
+    "Could not check your answer. Retry to save this attempt.",
+  );
+
+export const checkBookResponse = (session, item, response, event) =>
+  checked(
+    supabase.rpc("check_book_practice_response", {
       p_session: session,
       p_item: item,
       p_response: response,

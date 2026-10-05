@@ -1,0 +1,42 @@
+{
+  "title": "PrepPros Presents: The Complete Guide to Digital SAT Math",
+  "slug": "preppros-complete-guide-to-digital-sat-math",
+  "fingerprint": "4392803d2be93f3e9867e942726b5774e58ccf3bef7c284672fbf3a14f8199e2",
+  "expected": {
+    "chapters": 36,
+    "topics": 41,
+    "questions": 1263,
+    "questionsWithExplanations": 0,
+    "questionsWithoutExplanations": 1263,
+    "questionsWithImages": 1263,
+    "imageOptionQuestions": 797,
+    "multipleChoiceQuestions": 797,
+    "openResponseQuestions": 466,
+    "needsReview": 0,
+    "missingDifficulty": 208,
+    "assets": 5714
+  },
+  "imported": {
+    "chapters": 36,
+    "topics": 41,
+    "topicRows": 77,
+    "redundantLevelsCollapsed": 0,
+    "questions": 1263,
+    "missingDifficultyFallbacks": 208,
+    "withExplanations": 0,
+    "withoutExplanations": 1263,
+    "imageQuestions": 1263,
+    "imageOptionQuestions": 797,
+    "openResponseQuestions": 466
+  },
+  "skipped": [],
+  "database": {
+    "chapters": 36,
+    "id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+    "published": true,
+    "questions": 1263,
+    "title": "PrepPros Presents: The Complete Guide to Digital SAT Math",
+    "topics": 41
+  },
+  "assetsVerified": 5714
+}

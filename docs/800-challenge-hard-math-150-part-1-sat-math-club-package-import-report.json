@@ -1,0 +1,42 @@
+{
+  "title": "800 Challenge: Hard Math 150 — Part 1",
+  "slug": "800-challenge-hard-math-150-part-1-sat-math-club",
+  "fingerprint": "9489d375f3b629131e209b902c57c361c2b36007bb4336312e574405f761b20a",
+  "expected": {
+    "chapters": 1,
+    "topics": 128,
+    "questions": 150,
+    "questionsWithExplanations": 150,
+    "questionsWithoutExplanations": 0,
+    "questionsWithImages": 150,
+    "imageOptionQuestions": 75,
+    "multipleChoiceQuestions": 75,
+    "openResponseQuestions": 75,
+    "needsReview": 0,
+    "missingDifficulty": 0,
+    "assets": 600
+  },
+  "imported": {
+    "chapters": 1,
+    "topics": 128,
+    "topicRows": 129,
+    "redundantLevelsCollapsed": 0,
+    "questions": 150,
+    "missingDifficultyFallbacks": 0,
+    "withExplanations": 150,
+    "withoutExplanations": 0,
+    "imageQuestions": 150,
+    "imageOptionQuestions": 75,
+    "openResponseQuestions": 75
+  },
+  "skipped": [],
+  "database": {
+    "chapters": 1,
+    "id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+    "published": true,
+    "questions": 150,
+    "title": "800 Challenge: Hard Math 150 — Part 1",
+    "topics": 128
+  },
+  "assetsVerified": 600
+}

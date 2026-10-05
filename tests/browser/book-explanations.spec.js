@@ -52,6 +52,70 @@ test("book explanations unlock on any choice, survive answer changes and navigat
   ).toBe(false);
 });
 
+test("Book Practice checks text answers, marks wrong and correct choices, and restores progress after reload", async ({
+  page,
+}) => {
+  const store = await contentFixture(page);
+  await page.route("**/rpc/check_book_practice_answer", (route) => {
+    const body = route.request().postDataJSON();
+    const item = store.items.find((i) => i.id === body.p_item);
+    const attempt = {
+      id: body.p_event,
+      item_id: item.id,
+      attempt_order:
+        (store.checks || []).filter((a) => a.item_id === item.id).length + 1,
+      selected_answer: body.p_choice,
+      correct: body.p_choice === 1,
+      created_at: new Date().toISOString(),
+      active_seconds: 0,
+    };
+    store.checks ||= [];
+    store.checks.push(attempt);
+    Object.assign(item, {
+      selected_answer: body.p_choice,
+      correct: attempt.correct,
+      has_answered: true,
+      solved_at: attempt.correct ? attempt.created_at : null,
+    });
+    return route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify(attempt),
+    });
+  });
+  await page.goto(`/books/${bookId}/topics/${topicId}`);
+  await page.getByRole("button", { name: "Start topic practice" }).click();
+  const check = page.getByRole("button", { name: "Check", exact: true });
+  const explanation = page.getByRole("button", {
+    name: "Explanation",
+    exact: true,
+  });
+  await expect(check).toBeDisabled();
+  await expect(explanation).toHaveCount(0);
+  await page.getByRole("radio").nth(0).check();
+  await expect(check).toBeEnabled();
+  await expect(explanation).toBeVisible();
+  await check.click();
+  await expect(page.locator(".answer-choice").nth(0)).toHaveClass(
+    /incorrect-choice/,
+  );
+  await expect(page.locator(".answer-choice.correct-choice")).toHaveCount(0);
+  await page.getByRole("radio").nth(1).check();
+  await check.click();
+  await expect(page.locator(".answer-choice").nth(1)).toHaveClass(
+    /correct-choice/,
+  );
+  await expect(
+    page.getByText("Solved. Continue to the next question."),
+  ).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("radio").nth(1)).toBeChecked();
+  await expect(page.locator(".answer-choice").nth(1)).toHaveClass(
+    /correct-choice/,
+  );
+  await expect(explanation).toBeVisible();
+  expect(store.checks).toHaveLength(2);
+});
+
 for (const width of [1280, 390]) {
   test(`package stem, image options, and multi-page explanation render at ${width}px`, async ({
     page,
@@ -69,6 +133,26 @@ for (const width of [1280, 390]) {
       options: ["", "", "", ""],
       option_image_urls: [1, 2, 3, 4].map(image),
       import_metadata: { option_labels_in_images: true },
+    });
+    await page.route("**/rpc/check_book_practice_answer", (route) => {
+      const body = route.request().postDataJSON();
+      const item = store.items.find((i) => i.id === body.p_item);
+      const attempt = {
+        id: body.p_event,
+        item_id: item.id,
+        attempt_order: 1,
+        selected_answer: body.p_choice,
+        correct: false,
+        created_at: new Date().toISOString(),
+        active_seconds: 0,
+      };
+      store.checks = [attempt];
+      item.selected_answer = body.p_choice;
+      item.has_answered = true;
+      return route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify(attempt),
+      });
     });
     await page.route("**/rpc/book_practice_explanation", (route) =>
       route.fulfill({
@@ -102,6 +186,11 @@ for (const width of [1280, 390]) {
     await page.getByRole("button", { name: "Start topic practice" }).click();
     await expect(page.locator(".answer-choices img")).toHaveCount(4);
     await page.getByRole("radio").first().check();
+    await page.getByRole("button", { name: "Check", exact: true }).click();
+    await expect(page.locator(".answer-choice").first()).toHaveClass(
+      /incorrect-choice/,
+    );
+    await expect(page.locator(".answer-choice.correct-choice")).toHaveCount(0);
     await page
       .getByRole("button", { name: "Explanation", exact: true })
       .click();
