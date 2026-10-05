@@ -12,6 +12,10 @@ test("bank Check shows only attempted choices, retries and preserves overview/re
   await page.getByRole("radio", { name: "A 2", exact: true }).check();
   await page.getByRole("button", { name: "Check", exact: true }).click();
   await expect(page.locator(".incorrect-choice")).toHaveCount(1);
+  await expect(page.locator(".incorrect-choice")).toHaveCSS(
+    "background-color",
+    "rgb(153, 27, 27)",
+  );
   await expect(page.locator(".correct-choice")).toHaveCount(0);
   await page
     .getByRole("button", { name: "Mark for review", exact: true })
@@ -41,6 +45,17 @@ test("bank Check shows only attempted choices, retries and preserves overview/re
   await page.reload();
   await expect(page.locator(".correct-choice")).toHaveCount(1);
   await expect(page.getByText(/Attempt 1: A/)).toBeVisible();
+  await expect(page.locator(".correct-choice")).toHaveCSS(
+    "background-color",
+    "rgb(22, 101, 52)",
+  );
+  await page
+    .getByRole("button", { name: "Question 1 of 3", exact: true })
+    .click();
+  await expect(page.locator(".question-number.is-mixed")).toHaveCount(1);
+  await expect(
+    page.getByText("Solved after mistake", { exact: true }),
+  ).toBeVisible();
 });
 test("Progress and admin student detail render server summaries and bounded question lists", async ({
   page,
@@ -207,4 +222,37 @@ test("bank timing, eliminated choices and marks persist through resume and check
   await expect(
     page.getByRole("tab", { name: "Difficulty", exact: true }),
   ).toHaveCount(0);
+});
+
+test("difficulty buttons select a union, toggle off and persist after reload", async ({
+  page,
+}) => {
+  const store = await learningFixture(page);
+  store.questions.forEach((q, i) => {
+    q.difficulty = ["easy", "medium", "hard"][i];
+  });
+  await page.goto("/question-bank");
+  await page.getByRole("button", { name: "Easy", exact: true }).click();
+  await page.getByRole("button", { name: "Medium", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "2 questions match", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Easy", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("button", { name: "Medium", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "2 questions match", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Easy", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "1 questions match", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Medium", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "3 questions match", exact: true }),
+  ).toBeVisible();
 });

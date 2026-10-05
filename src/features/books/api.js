@@ -58,15 +58,23 @@ export async function getBook(id) {
   );
   return (await resolveCovers([book], supabase))[0];
 }
-export const getTopics = (book) =>
-  checked(
-    supabase
-      .from("book_topics")
-      .select("*,questions(count)")
-      .eq("book_id", book)
-      .order("position")
-      .order("id"),
-  );
+export async function getTopics(book) {
+  const [topics, progress] = await Promise.all([
+    checked(
+      supabase
+        .from("book_topics")
+        .select("*,questions(count)")
+        .eq("book_id", book)
+        .order("position")
+        .order("id"),
+    ),
+    checked(supabase.rpc("book_practice_progress", { p_book: book })),
+  ]);
+  return topics.map((t) => ({
+    ...t,
+    progress: progress.find((p) => p.topic_id === t.id),
+  }));
+}
 export async function saveBook(values, id) {
   const payload = bookSavePayload(values);
   const { data, error } = await (id

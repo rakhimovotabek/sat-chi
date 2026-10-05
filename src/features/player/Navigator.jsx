@@ -42,7 +42,8 @@ export default function Navigator({
         <div className="navigator-legend">
           {[
             ["unanswered", "Unanswered"],
-            ["correct", "Solved"],
+            ["correct", "Solved first try"],
+            ["mixed", "Solved after mistake"],
             ["incorrect", "Needs another attempt"],
             ["marked", "Marked"],
             ["current", "Current"],

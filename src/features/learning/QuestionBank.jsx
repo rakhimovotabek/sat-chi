@@ -8,7 +8,11 @@ import ContentState from "../books/ContentState.jsx";
 import BookSelect from "../books/BookSelect.jsx";
 import useAuth from "../../hooks/useAuth.js";
 import { DOMAINS } from "./Filters.jsx";
-import { toggleDomain, toggleSkill } from "./bank-selection.js";
+import {
+  toggleDomain,
+  toggleSkill,
+  toggleDifficulty,
+} from "./bank-selection.js";
 import useAction from "./useAction.js";
 import { bank, bankFacets, startBank } from "./api.js";
 function readConfiguration(key) {
@@ -223,21 +227,44 @@ export default function QuestionBank({ admin = false }) {
                 Reset filters
               </button>
             </div>
-            <label>
-              Difficulty
-              <select
-                aria-label="Difficulty"
-                value={filters.difficulty || ""}
-                onChange={(e) => field("difficulty", e.target.value)}
+            <div className="difficulty-filter">
+              <span id="difficulty-label">Difficulty</span>
+              <div
+                className="difficulty-options"
+                role="group"
+                aria-labelledby="difficulty-label"
               >
-                <option value="">Any difficulty</option>
+                <button
+                  type="button"
+                  className="button button-secondary button-compact"
+                  aria-pressed={
+                    !(
+                      filters.difficulties ??
+                      (filters.difficulty ? [filters.difficulty] : [])
+                    ).length
+                  }
+                  onClick={() =>
+                    change({ ...filters, difficulty: "", difficulties: [] })
+                  }
+                >
+                  Any difficulty
+                </button>
                 {["easy", "medium", "hard", "unclassified"].map((v) => (
-                  <option value={v} key={v}>
+                  <button
+                    type="button"
+                    key={v}
+                    className="button button-secondary button-compact"
+                    aria-pressed={(
+                      filters.difficulties ??
+                      (filters.difficulty ? [filters.difficulty] : [])
+                    ).includes(v)}
+                    onClick={() => change(toggleDifficulty(filters, v))}
+                  >
                     {v[0].toUpperCase() + v.slice(1)}
-                  </option>
+                  </button>
                 ))}
-              </select>
-            </label>
+              </div>
+            </div>
             <BookSelect
               label="Book / source"
               emptyLabel="All books"

@@ -157,6 +157,7 @@ export async function learningFixture(page, role = "student") {
           (!f.domain || q.domain === f.domain) &&
           (!f.book || f.book === bookId) &&
           (!f.difficulty || q.difficulty === f.difficulty) &&
+          (!f.difficulties?.length || f.difficulties.includes(q.difficulty)) &&
           (table === "question_bank_facets" ||
             !(f.domains?.length || f.skills?.length) ||
             f.domains?.includes(q.domain) ||

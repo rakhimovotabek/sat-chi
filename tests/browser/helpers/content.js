@@ -285,7 +285,29 @@ export async function contentFixture(
       topics(body.p_payload.topics);
       return json({ book_id: b.id, question_count: n });
     }
+    if (table === "book_practice_progress") {
+      return json(
+        store.topics
+          .filter((t) => t.book_id === body.p_book)
+          .map((t) => {
+            const items = store.items.filter(
+              (i) => i.question.topic_id === t.id,
+            );
+            return {
+              topic_id: t.id,
+              total: store.questions.filter((q) => q.topic_id === t.id).length,
+              solved: items.filter((i) => i.correct === true).length,
+              checked: items.filter((i) => i.correct != null).length,
+            };
+          }),
+      );
+    }
     if (table === "start_book_practice") {
+      if (
+        store.session?.kind === "book" &&
+        store.session.source_id === body.p_topic_id
+      )
+        return json(sessionId);
       store.session = {
         id: sessionId,
         student_id: id,
@@ -293,6 +315,7 @@ export async function contentFixture(
         submitted_at: null,
         started_at: new Date().toISOString(),
         kind: "book",
+        source_id: body.p_topic_id,
         current_position: 0,
         elapsed_seconds: 0,
       };

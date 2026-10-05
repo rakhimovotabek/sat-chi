@@ -287,12 +287,14 @@
   flex-shrink: 0;
 }
 .correct-choice {
-  border-color: #4c9364 !important;
-  background: #eff8f0 !important;
+  border-color: #166534 !important;
+  background: #166534 !important;
+  color: #fff;
 }
 .incorrect-choice {
-  border-color: #bf5555 !important;
-  background: #fff3f3 !important;
+  border-color: #991b1b !important;
+  background: #991b1b !important;
+  color: #fff;
 }
 .marked-control {
   background: #fff8df;
@@ -550,3 +552,5 @@
 .book-image-viewer img {
   display: block;
 }
+
+.correct-choice .choice-letter, .incorrect-choice .choice-letter { color: inherit; }

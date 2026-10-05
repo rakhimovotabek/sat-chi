@@ -44,6 +44,12 @@ function TopicTree({
                   )}
                 </strong>
                 <small>{t.questions?.[0]?.count || 0} direct questions</small>
+                {!admin && t.progress && (
+                  <small>
+                    {t.progress.solved} / {t.progress.total} solved ·{" "}
+                    {t.progress.checked} checked
+                  </small>
+                )}
               </div>
               <div className="inline-actions">
                 {admin ? (
@@ -152,6 +158,16 @@ export default function BookDetail({ admin = false }) {
     return (
       <ContentState error="This topic is unavailable." onRetry={state.reload} />
     );
+  const progressTopics = focused
+    ? [focused]
+    : topics.filter((t) => !t.parent_id);
+  const progress = progressTopics.reduce(
+    (sum, t) => ({
+      solved: sum.solved + (t.progress?.solved || 0),
+      total: sum.total + (t.progress?.total || 0),
+    }),
+    { solved: 0, total: 0 },
+  );
   return (
     <>
       <Link className="card-link" to={admin ? "/admin/books" : "/books"}>
@@ -165,6 +181,11 @@ export default function BookDetail({ admin = false }) {
           description={book.description || "Choose a topic to begin."}
         />
       </div>
+      {!admin && (
+        <p>
+          {progress.solved} / {progress.total} questions solved
+        </p>
+      )}
       {admin && (
         <div className="button-row">
           <span className="subtle-badge">

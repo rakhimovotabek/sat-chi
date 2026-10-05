@@ -28,14 +28,15 @@ test("bank domain/skill union filters update immediately, preserve choices, and 
   await expect(
     page.getByRole("heading", { name: "2 questions match" }),
   ).toBeVisible();
-  await page.getByLabel("Difficulty", { exact: true }).selectOption("easy");
+  await page.getByRole("button", { name: "Easy", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Start Practice Session" }),
   ).toBeDisabled();
   await expect(
     page.getByRole("heading", { name: "No matching questions" }),
   ).toBeVisible();
-  await page.getByLabel("Difficulty", { exact: true }).selectOption("hard");
+  await page.getByRole("button", { name: "Easy", exact: true }).click();
+  await page.getByRole("button", { name: "Hard", exact: true }).click();
   await page
     .getByRole("button", { name: "All questions", exact: true })
     .click();

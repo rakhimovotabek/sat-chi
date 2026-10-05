@@ -621,3 +621,23 @@
 .bank-question-preview { min-width: 200px; max-width: 440px; }
 .bank-question-preview figure { margin: 0; }
 .bank-question-preview img { width: 100%; height: auto; max-width: 440px; }
+
+.question-overview .question-number.is-mixed, .legend-dot.is-mixed {
+  background: linear-gradient(135deg, #991b1b 50%, #166534 50%);
+  color: #fff;
+  border-color: #166534;
+  border-radius: 4px;
+}
+.question-overview .question-number.is-current.is-mixed {
+  outline: 2px solid #1261d8;
+  outline-offset: 2px;
+  box-shadow: none;
+}
+.difficulty-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.difficulty-filter { display: grid; gap: 8px; }
+
+.difficulty-options button[aria-pressed="true"] {
+  background: #1261d8;
+  color: #fff;
+  border-color: #1261d8;
+}

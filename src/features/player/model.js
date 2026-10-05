@@ -21,5 +21,11 @@ export function questionState(item, current, submitted, practice = false) {
     item.selected_answer != null
   )
     states.push(item.correct ? "correct" : "incorrect");
+  if (
+    practice &&
+    item.correct === true &&
+    item.attempts?.some((a) => a.correct === false)
+  )
+    states.push("mixed");
   return states.filter(Boolean);
 }

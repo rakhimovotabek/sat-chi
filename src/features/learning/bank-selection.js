@@ -35,3 +35,16 @@ export function shortSetTitle(title, bookTitle) {
     "",
   );
 }
+
+export function toggleDifficulty(filters, value) {
+  const selected =
+    filters.difficulties ?? (filters.difficulty ? [filters.difficulty] : []);
+  const rest = { ...filters };
+  delete rest.difficulty;
+  return {
+    ...rest,
+    difficulties: selected.includes(value)
+      ? selected.filter((d) => d !== value)
+      : [...selected, value],
+  };
+}
