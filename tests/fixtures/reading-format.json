@@ -1,0 +1,57 @@
+[
+  {
+    "id": "00b0ca28-46e3-50ba-ad35-4ed2061d412b",
+    "source_id": "satoplam-reading_q_0101",
+    "passage": "The Study on Global Ageing and Adult Health (SAGE) seeks to discover long-term trends related to aging by compiling and analyzing evidence from approximately 66,000 participants in multiple countries. As with most longitudinal studies, extensive funding support is needed for SAGE to collect the relevant data over timescales and at intervals that will support robust conclusions. But the quality of a more constrained investigation, such as a sociology study seeking only to yield the average age at which people in a given city first become parents, is much less dependent on high levels of funding because _____ ",
+    "prompt": "Which choice most logically completes the text?",
+    "options": [
+      "such studies are likely to be a lower priority for funding than SAGE.",
+      "the sociology study is unlikely to be able to recruit 66,000 participants.",
+      "expanding the scope of such studies is unlikely to be feasible.",
+      "such studies are not trying to identify trends over time. 63"
+    ],
+    "underlined": null
+  },
+  {
+    "id": "0059466f-16d1-570e-a068-265d8d758c2f",
+    "source_id": "satoplam-writing_q_0629",
+    "passage": "While studying joro¯ spiders, a large species originally from East Asia, University of Georgia researchers wondered if the spiders’ rapid spread throughout the southeastern US was a result of aggressive behavior. _____  they discovered that jorõ spiders are gentle giants who react to even minor disturbances by \"freezing\" in place for an hour or more.",
+    "prompt": "Which choice completes the text with the most logical transition?",
+    "options": ["Instead,", "Therefore,", "For example,", "In other words,"],
+    "underlined": null
+  },
+  {
+    "id": "0bfd123a-5e10-5c8b-ad1f-ff50663f4318",
+    "source_id": "satoplam-reading_q_0953",
+    "passage": "The following text is adapted from Willa Cather’s 1912 novel Alexander’s Bridge. For the next few days Alexander was very busy. He took a desk in the office of a [Scottish] engineering firm on Henrietta Street, and was at work almost <u>constantly.</u> He avoided the clubs and usually dined alone at his hotel.",
+    "prompt": "As used in the text, what does the word \"constantly\" most nearly mean?",
+    "options": ["Hastily", "Carefully", "Nonstop", "Enough 545"],
+    "underlined": "constantly."
+  },
+  {
+    "id": "042b2f73-6569-58be-a3d8-d10886060aeb",
+    "source_id": "satoplam-reading_q_0657",
+    "passage": "Several sociologists have observed that the word \"culture,\" though commonly used in academic literature, is an ultimately hazy concept-for example, Victoria Bonnell and Lynn Hunt have noted that \"many critics have pointed to the vagueness of the concept of culture.\" <u>Does the concept of culture encompass knowledge, or laws, or both these things and others?</u> For casual usage, such haziness is permissible-we know culture when we see it-but for researchers, a standardization of the term is called for if sociology is to truly progress.",
+    "prompt": "Which choice best describes the function of the underlined portion in the text as a whole?",
+    "options": [
+      "It lists two essential components of what is referred to by Bonnell and Hunt as \"culture.\"",
+      "It presents a point regarding the definition of \"culture\" on which nonspecialists and specialists tend to disagree.",
+      "It describes the questions first raised by Bonnell and Hunt’s inquiry into the meaning of the word \"culture.\"",
+      "It illustrates a difficulty associated with the meaning of \"culture\" that the author believes holds back an academic field."
+    ],
+    "underlined": "Does the concept of culture encompass knowledge, or laws, or both these things and others?"
+  },
+  {
+    "id": "01b74c3d-5c17-595c-a125-ec6b33cdb298",
+    "source_id": "satoplam-reading_q_0624",
+    "passage": "Known for the albums Someday My Prince Will Come and Milestones, jazz trumpeter Miles Davis collaborated several times with pianist Gil Evans. Their 1958 adaptation of George Gershwin’s opera Porgy and Bess bears little resemblance to the 1935 original. Davis and Evans felt no desire to please listeners expecting an exact duplication of the opera. <u>They omitted parts, such as the aria “I Got Plenty of Nothin’,” and sometimes made only brief gestures toward Gershwin’s melodies.</u> But Davis and Evans’s willingness to recompose Gershwin’s work led to one of the most enduring albums in Davis’s catalog.",
+    "prompt": "Which choice best describes the function of the underlined portion in the text as a whole?",
+    "options": [
+      "It presents examples to support a claim made earlier in the text.",
+      "It shows how two artists benefited from ignoring certain conventions.",
+      "It proposes a reason why one work of art is widely thought to be more successful than another.",
+      "It undermines an assertion made later in the text. 421"
+    ],
+    "underlined": "They omitted parts, such as the aria “I Got Plenty of Nothin’,” and sometimes made only brief gestures toward Gershwin’s melodies."
+  }
+]

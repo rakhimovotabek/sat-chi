@@ -76,8 +76,23 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
     );
   const toggle = (set, value, id) =>
     set(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
+  const incompleteSection = (daily ? sections.slice(0, 1) : sections).find(
+    (s) =>
+      s.mode === "specific" &&
+      (!s.questionIds.length ||
+        (daily && s.questionIds.length < Number(s.count))),
+  );
+  const saveBlocked =
+    !all && !chosenGroups.length && !chosenStudents.length
+      ? "Choose at least one student or group, or select All active students."
+      : incompleteSection
+        ? daily
+          ? `Select at least ${Number(incompleteSection.count)} questions for the daily pool (${incompleteSection.questionIds.length} selected), lower Questions per day, or choose Random by filters.`
+          : "Select at least one question in each specific-question section."
+        : "";
   async function submit(e) {
     e.preventDefault();
+    if (action.busy || saveBlocked) return;
     await action.run(async () => {
       const common = {
         title,
@@ -98,12 +113,11 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
             active,
             allowLate,
             allowRepeat,
-            count:
-              section.mode === "specific"
-                ? section.questionIds.length
-                : Number(section.count),
+            count: Number(section.count),
             selection: initial.selection || "new",
-            filters: section.filters,
+            // In specific mode filters browse the picker; selected IDs define
+            // the saved pool, including selections on other pages/filters.
+            filters: section.mode === "specific" ? {} : section.filters,
             questionIds: section.mode === "specific" ? section.questionIds : [],
           },
           template?.id,
@@ -123,7 +137,7 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
             title: s.title,
             count:
               s.mode === "specific" ? s.questionIds.length : Number(s.count),
-            filters: s.filters,
+            filters: s.mode === "specific" ? {} : s.filters,
             ...(s.mode === "specific" ? { questionIds: s.questionIds } : {}),
           })),
         };
@@ -358,7 +372,7 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
           <Filters
             status={false}
             value={s.filters}
-            onChange={(filters) => change(s.key, { filters, questionIds: [] })}
+            onChange={(filters) => change(s.key, { filters })}
           />
           {s.mode === "specific" && (
             <QuestionPicker
@@ -410,6 +424,11 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
           {action.error}
         </p>
       )}
+      {saveBlocked && (
+        <p className="form-error" id="homework-save-validation" role="status">
+          {saveBlocked}
+        </p>
+      )}
       <div className="button-row">
         {!daily && (
           <button
@@ -423,15 +442,10 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
         )}
         <button
           className="button"
-          disabled={
-            action.busy ||
-            (!all && !chosenGroups.length && !chosenStudents.length) ||
-            (daily ? sections.slice(0, 1) : sections).some(
-              (s) =>
-                s.mode === "specific" &&
-                (!s.questionIds.length ||
-                  (daily && s.questionIds.length < Number(s.count))),
-            )
+          type="submit"
+          disabled={action.busy || !!saveBlocked}
+          aria-describedby={
+            saveBlocked ? "homework-save-validation" : undefined
           }
         >
           {action.busy

@@ -101,7 +101,6 @@ test("package validation rejects mismatched counts and missing assets, and prese
   assert.equal(p.imported[1].correctAnswer, "8.6");
   assert.equal(p.imported[1].answerFormat, "numeric");
   assert.equal(p.imported[1].acceptedRange, null);
-  assert.equal(p.skipped, undefined);
   assert.equal(p.report.skipped[0].id, "package_q_review");
   assert.equal(p.imported[0].metadata.questionNumber, null);
   assert.equal(p.imported[0].metadata.sourceQuestionId, "source-key");
@@ -788,4 +787,76 @@ test("canonical package questions appear in Bank and image/open checks preserve 
   } finally {
     await db.close();
   }
+});
+
+test("MathBook JPEG package accepts object review data and preserves explicit numeric answer alternatives", () => {
+  const source = structuredClone(book);
+  source.book.slug = "mathbook-2-by-satashkent";
+  source.chapters[0].topics[0].questions[1].correctAnswer = "1 or 5 or 10";
+  source.chapters[0].topics[0].questions[1].acceptedAnswers = ["1 or 5 or 10"];
+  source.chapters[0].topics[0].questions[0].sourceAnswer = "B";
+  const jpegAssets = assets.map((a) => ({
+    ...a,
+    extension: ".jpg",
+    contentType: "image/jpeg",
+  }));
+  const p = preparePackage(
+    source,
+    manifest,
+    { items: review, unresolvedExtractionIssues: [] },
+    jpegAssets,
+    fingerprint,
+  );
+  assert.equal(p.imported[0].image.endsWith(".jpg"), true);
+  assert.equal("sourceAnswer" in p.imported[0].metadata, false);
+  assert.deepEqual(p.imported[1].acceptedAnswers, [
+    "1 or 5 or 10",
+    "1",
+    "5",
+    "10",
+  ]);
+  assert.equal(p.imported[1].answerFormat, "numeric");
+  assert.deepEqual(
+    p.report.skipped.map((q) => q.id),
+    ["package_q_review"],
+  );
+  assert.equal(
+    source.chapters[0].topics[0].questions[1].acceptedAnswers.length,
+    1,
+  );
+  assert.equal(
+    packageData(
+      source,
+      manifest,
+      [],
+      [],
+      jpegAssets,
+      p,
+    ).assets[0].path.endsWith(".jpg"),
+    true,
+  );
+});
+
+test("structured package keeps supplied prompt, passage markup, literal blanks and option emphasis", () => {
+  const supplied = structuredClone(book);
+  Object.assign(supplied.chapters[0].topics[0].questions[0], {
+    questionText: "Combined source",
+    prompt: "Which word?",
+    passageText: "The <u>researcher</u> found _____ results.",
+    stimulus: "<em>Supplied note</em>",
+  });
+  supplied.chapters[0].topics[0].questions[0].options[0].text =
+    "<u>however</u>";
+  const prepared = preparePackage(supplied, {}, [], assets, fingerprint);
+  assert.equal(prepared.imported[0].text, "Which word?");
+  assert.equal(
+    prepared.imported[0].passage,
+    "The researcher found _____ results.",
+  );
+  assert.equal(prepared.imported[0].stimulus, "<em>Supplied note</em>");
+  assert.equal(prepared.imported[0].options[0], "<u>however</u>");
+  assert.match(
+    packageSql(supplied, {}, [], [], assets, prepared),
+    /question_text,passage,stimulus,passage_markup,options/,
+  );
 });

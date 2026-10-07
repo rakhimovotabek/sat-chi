@@ -29,7 +29,7 @@ export default function QuestionImage({ src, alt, allowZoom = true }) {
         if (
           !(
             packageAsset
-              ? /^[a-f0-9]{64}\/[a-f0-9]{64}\.png$/
+              ? /^[a-f0-9]{64}\/[a-f0-9]{64}\.(?:png|jpe?g)$/
               : /^[a-f0-9]{64}\/[a-f0-9]{64}\.webp$/
           ).test(path)
         )

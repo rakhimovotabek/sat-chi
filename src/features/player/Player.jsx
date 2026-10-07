@@ -1,3 +1,6 @@
+import DrawingLayer from "./DrawingLayer.jsx";
+import AnnotationToolbar from "./AnnotationToolbar.jsx";
+import FormattedText from "../../components/FormattedText.jsx";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Navigate } from "react-router";
 import useAuth from "../../hooks/useAuth.js";
@@ -31,6 +34,10 @@ export default function Player() {
   const [overviewOpen, setOverviewOpen] = useState(false);
   const [toolsTarget, setToolsTarget] = useState(null);
   const [workspace, setWorkspace] = useState(null);
+  const [drawing, setDrawing] = useState(false),
+    [drawingTool, setDrawingTool] = useState("pen"),
+    [clearDrawings, setClearDrawings] = useState(0),
+    [drawingError, setDrawingError] = useState("");
   const checkEvent = useRef(null);
   const [checking, setChecking] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -379,6 +386,18 @@ export default function Player() {
           q.section === "Math" && <MathTools />
         )}
 
+        {calculatorWorkspace && (
+          <AnnotationToolbar
+            active={drawing}
+            setActive={setDrawing}
+            tool={drawingTool}
+            setTool={setDrawingTool}
+            onClear={() => {
+              setDrawingError("");
+              setClearDrawings((v) => v + 1);
+            }}
+          />
+        )}
         <span role="status">
           {submitted
             ? "Submitted"
@@ -396,6 +415,11 @@ export default function Player() {
           {current.marked ? "Marked for review" : "Mark for review"}
         </button>
       </div>
+      {drawingError && (
+        <p className="annotation-storage-error" role="alert">
+          {drawingError}
+        </p>
+      )}
       <div className="practice-workspace" ref={setWorkspace}>
         {calculatorWorkspace && workspace && (
           <MathTools
@@ -407,9 +431,23 @@ export default function Player() {
           />
         )}
         <div className="question-player">
-          <Stimulus question={q} />
+          <Stimulus question={q}>
+            {calculatorWorkspace && (
+              <DrawingLayer
+                key={`${sessionId}:${q.id || current.id}:passage`}
+                userId={auth.user.id}
+                sessionId={sessionId}
+                questionId={q.id || current.id}
+                surface="passage"
+                active={drawing}
+                tool={drawingTool}
+                clearVersion={clearDrawings}
+                onStorageError={setDrawingError}
+              />
+            )}
+          </Stimulus>
           <section
-            className="answer-panel"
+            className="answer-panel annotation-surface"
             aria-label="Question and answer choices"
           >
             <div className="question-meta">
@@ -425,7 +463,9 @@ export default function Player() {
                   ? "No answer selected"
                   : `Answer ${String.fromCharCode(65 + current.selected_answer)} selected`}
             </p>
-            <h2 className="question-text">{q.question_text}</h2>
+            <h2 className="question-text">
+              <FormattedText>{q.question_text}</FormattedText>
+            </h2>
             {openResponse ? (
               <label className="book-open-response">
                 Your answer
@@ -498,13 +538,19 @@ export default function Player() {
                                 allowZoom={false}
                                 alt={`Choice ${String.fromCharCode(65 + i)}`}
                               />
-                              {option && <span>{option}</span>}
+                              {option && (
+                                <span>
+                                  <FormattedText>{option}</FormattedText>
+                                </span>
+                              )}
                             </span>
                           ) : (
                             <span>
-                              {embeddedChoices && !option.trim()
-                                ? "Choice in the question image"
-                                : option}
+                              <FormattedText>
+                                {embeddedChoices && !option.trim()
+                                  ? "Choice in the question image"
+                                  : option}
+                              </FormattedText>
                             </span>
                           )}
                         </label>
@@ -587,6 +633,19 @@ export default function Player() {
                   </p>
                 )}
               </section>
+            )}
+            {calculatorWorkspace && (
+              <DrawingLayer
+                key={`${sessionId}:${q.id || current.id}:answers`}
+                userId={auth.user.id}
+                sessionId={sessionId}
+                questionId={q.id || current.id}
+                surface="answers"
+                active={drawing}
+                tool={drawingTool}
+                clearVersion={clearDrawings}
+                onStorageError={setDrawingError}
+              />
             )}
           </section>
         </div>

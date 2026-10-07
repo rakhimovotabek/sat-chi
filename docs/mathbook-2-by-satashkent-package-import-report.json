@@ -1,0 +1,101 @@
+{
+  "title": "MathBook 2.0 by SATashkent",
+  "slug": "mathbook-2-by-satashkent",
+  "fingerprint": "c218d0cad9670032caf5b7b2e0a16b7a8e6ca6d6581097f7e2978df6eab57927",
+  "expected": {
+    "chapters": 4,
+    "topics": 21,
+    "questions": 1462,
+    "questionsWithExplanations": 0,
+    "questionsWithoutExplanations": 1462,
+    "questionsWithImages": 1462,
+    "imageOptionQuestions": 0,
+    "multipleChoiceQuestions": 1062,
+    "openResponseQuestions": 400,
+    "needsReview": 0,
+    "missingDifficulty": 1462,
+    "assets": 1462
+  },
+  "imported": {
+    "chapters": 4,
+    "topics": 21,
+    "topicRows": 25,
+    "redundantLevelsCollapsed": 0,
+    "questions": 1462,
+    "missingDifficultyFallbacks": 1462,
+    "withExplanations": 0,
+    "withoutExplanations": 1462,
+    "imageQuestions": 1462,
+    "imageOptionQuestions": 0,
+    "openResponseQuestions": 400
+  },
+  "skipped": [],
+  "database": {
+    "chapters": 4,
+    "id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+    "published": true,
+    "questions": 1462,
+    "title": "MathBook 2.0 by SATashkent",
+    "topics": 21
+  },
+  "assetsVerified": 1462,
+  "validation": {
+    "browser": {
+      "bookId": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+      "unfilteredCatalog": {
+        "code": "57014",
+        "message": "canceling statement due to statement timeout"
+      },
+      "studentQuestions": 1462,
+      "imageSamples": [
+        {
+          "chapter": "Algebra",
+          "question": "0019b968-d785-51b8-a111-67355515bde7",
+          "width": 472,
+          "height": 393
+        },
+        {
+          "chapter": "Advanced Math",
+          "question": "0079d31f-6a9c-574d-a1f3-7f32a78fda28",
+          "width": 458,
+          "height": 278
+        },
+        {
+          "chapter": "Problem Solving and Data Analysis",
+          "question": "0179a438-5104-5709-a0d5-f80d782c0838",
+          "width": 458,
+          "height": 328
+        },
+        {
+          "chapter": "Geometry",
+          "question": "001f4f09-a6bd-5e28-ac89-9e9ca9fbe7d7",
+          "width": 458,
+          "height": 328
+        }
+      ],
+      "booksUI": "passed",
+      "topicHierarchy": "4 chapters, 21 child topics; no redundant same-title nesting"
+    },
+    "practice": {
+      "mcqChecks": 1,
+      "openChecks": 0,
+      "questions": 13,
+      "sampleTopicOpenAcceptedAnswersVerified": true,
+      "topics": 1,
+      "transaction": "rolled back"
+    },
+    "openResponses": {
+      "allSuppliedAcceptedFormsVerified": true,
+      "openQuestionsChecked": 400,
+      "transaction": "rolled back"
+    },
+    "duplicateCreated": false,
+    "existingBooksUnchanged": true,
+    "existingQuestionsUnchanged": true,
+    "vocabularyUnchanged": true,
+    "targetedPackageTestsPassed": 7,
+    "lint": "passed",
+    "frontendFilesChanged": false,
+    "deploymentPerformed": false
+  }
+}

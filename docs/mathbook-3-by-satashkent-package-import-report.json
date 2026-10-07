@@ -1,0 +1,93 @@
+{
+  "title": "MathBook 3.0 by SATashkent",
+  "slug": "mathbook-3-by-satashkent",
+  "fingerprint": "8875cac973534d127f6152c15d477293d94c56085086f7659179b97f68b3aeb6",
+  "expected": {
+    "chapters": 4,
+    "topics": 21,
+    "questions": 418,
+    "questionsWithExplanations": 0,
+    "questionsWithoutExplanations": 418,
+    "questionsWithImages": 418,
+    "imageOptionQuestions": 0,
+    "multipleChoiceQuestions": 308,
+    "openResponseQuestions": 110,
+    "needsReview": 4,
+    "missingDifficulty": 418,
+    "assets": 418
+  },
+  "imported": {
+    "chapters": 4,
+    "topics": 21,
+    "topicRows": 25,
+    "redundantLevelsCollapsed": 0,
+    "questions": 414,
+    "missingDifficultyFallbacks": 414,
+    "withExplanations": 0,
+    "withoutExplanations": 414,
+    "imageQuestions": 414,
+    "imageOptionQuestions": 0,
+    "openResponseQuestions": 110
+  },
+  "skipped": [
+    {
+      "id": "mathbook-3-by-satashkent_geometry_triangles_q_0012",
+      "reason": "No answer for this question appears in the source section key."
+    },
+    {
+      "id": "mathbook-3-by-satashkent_geometry_trigonometry_q_0010",
+      "reason": "No answer for this question appears in the source section key."
+    },
+    {
+      "id": "mathbook-3-by-satashkent_geometry_circle_q_0016",
+      "reason": "No answer for this question appears in the source section key."
+    },
+    {
+      "id": "mathbook-3-by-satashkent_geometry_area-and-volume_q_0023",
+      "reason": "No answer for this question appears in the source section key."
+    }
+  ],
+  "database": {
+    "chapters": 4,
+    "id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+    "published": true,
+    "questions": 414,
+    "title": "MathBook 3.0 by SATashkent",
+    "topics": 21
+  },
+  "assetsVerified": 418,
+  "validation": {
+    "existingBooksUnchanged": true,
+    "existingVocabularyUnchanged": true,
+    "existingBooksCompared": 12,
+    "structure": {
+      "assets": 418,
+      "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+      "chapters": 4,
+      "open_questions": 110,
+      "packages": 1,
+      "published": true,
+      "questions": 414,
+      "repeated_topic_levels": 0,
+      "title": "MathBook 3.0 by SATashkent",
+      "topics": 21
+    },
+    "databasePracticeChecks": {
+      "all_open_keys_present": true,
+      "explanation_absent": true,
+      "fraction_key_correct": true,
+      "mcq_correct": true,
+      "mcq_saved": true,
+      "open_correct": true,
+      "open_saved": true,
+      "snapshot_image": true
+    },
+    "studentRlsChecks": {
+      "student_book_visible": true,
+      "student_images_authorized": true,
+      "student_questions_visible": true
+    },
+    "sourceJpegBrowserCheck": true,
+    "explanationsAbsentInSource": true
+  }
+}

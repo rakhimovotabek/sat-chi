@@ -1,3 +1,4 @@
+import { formattedTextPlain } from "../../src/components/formatted-text.js";
 import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { execFile } from "node:child_process";
@@ -24,6 +25,9 @@ function packageDifficulty(value) {
 }
 
 export function preparePackage(book, manifest, review, assets, fingerprint) {
+  review = Array.isArray(review)
+    ? review
+    : [...(review.items || []), ...(review.unresolvedExtractionIssues || [])];
   const chapters = book.chapters;
   const questions = chapters.flatMap((c) =>
     c.topics.flatMap((t) => t.questions),
@@ -32,10 +36,12 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
     chapters: chapters.length,
     topics: chapters.reduce((n, c) => n + c.topics.length, 0),
     questions: questions.length,
-    questionsWithExplanations: questions.filter((q) => q.explanation != null)
-      .length,
-    questionsWithoutExplanations: questions.filter((q) => q.explanation == null)
-      .length,
+    questionsWithExplanations: questions.filter((q) =>
+      Boolean(q.explanation?.trim()),
+    ).length,
+    questionsWithoutExplanations: questions.filter(
+      (q) => !q.explanation?.trim(),
+    ).length,
     questionsWithImages: questions.filter((q) => q.questionImage).length,
     imageOptionQuestions: questions.filter((q) =>
       q.options.some((o) => o.image),
@@ -67,7 +73,7 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
   const urls = new Map(
     assets.map((a) => [
       a.source,
-      `https://${project}.supabase.co/storage/v1/object/authenticated/book-package-assets/${fingerprint}/${a.storageHash}.png`,
+      `https://${project}.supabase.co/storage/v1/object/authenticated/book-package-assets/${fingerprint}/${a.storageHash}${a.extension || ".png"}`,
     ]),
   );
   const asset = (path) => {
@@ -148,6 +154,7 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
           answerType,
           answerImage,
           answerSource,
+          sourceAnswer,
           explanation,
           explanationImages,
           ...metadata
@@ -156,7 +163,10 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
           id: stableId(q.id),
           sourceId: q.id,
           type: q.type,
-          text: q.questionText,
+          text: q.prompt ?? q.questionText,
+          passage: formattedTextPlain(q.passageText ?? q.passage ?? ""),
+          passageMarkup: q.passageText ?? q.passage ?? "",
+          stimulus: q.stimulus ?? null,
           image: asset(q.questionImage),
           options: q.options.map((o) => o.text ?? ""),
           optionImages:
@@ -166,13 +176,36 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
           table: q.table,
           correctAnswer:
             q.type === "mcq" ? "ABCD".indexOf(correctAnswer) : correctAnswer,
-          acceptedAnswers,
+          acceptedAnswers:
+            q.type === "open" &&
+            ["mathbook-2-by-satashkent", "mathbook-3-by-satashkent"].includes(
+              book.book.slug,
+            )
+              ? [
+                  ...new Set(
+                    (acceptedAnswers || []).flatMap((value) => {
+                      const parts = value.split(/\s+or\s+/);
+                      return parts.length > 1 &&
+                        parts.every((part) =>
+                          /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:\/[+-]?\d+(?:\.\d*)?)?$/.test(
+                            part,
+                          ),
+                        )
+                        ? [value, ...parts]
+                        : [value];
+                    }),
+                  ),
+                ]
+              : acceptedAnswers,
           acceptedRange,
           answerFormat:
             answerFormat ??
             (q.type === "open" &&
-            book.book.slug ===
-              "800-challenge-hard-math-150-part-1-sat-math-club"
+            [
+              "800-challenge-hard-math-150-part-1-sat-math-club",
+              "mathbook-2-by-satashkent",
+              "mathbook-3-by-satashkent",
+            ].includes(book.book.slug)
               ? "numeric"
               : undefined),
           explanation:
@@ -228,8 +261,10 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
       missingDifficultyFallbacks: imported.filter(
         (q) => q.difficulty === "unclassified",
       ).length,
-      withExplanations: imported.filter((q) => q.explanation != null).length,
-      withoutExplanations: imported.filter((q) => q.explanation == null).length,
+      withExplanations: imported.filter((q) => Boolean(q.explanation?.trim()))
+        .length,
+      withoutExplanations: imported.filter((q) => !q.explanation?.trim())
+        .length,
       imageQuestions: imported.filter((q) => q.image).length,
       imageOptionQuestions: imported.filter((q) => q.optionImages.some(Boolean))
         .length,
@@ -265,7 +300,7 @@ export function packageData(
       );
       return {
         ...a,
-        path: `${prepared.report.fingerprint}/${a.storageHash}.png`,
+        path: `${prepared.report.fingerprint}/${a.storageHash}${a.extension || ".png"}`,
         questionId: ref?.id || explanationRef?.id || null,
         kind: ref
           ? ref.metadata.questionImage === a.source
@@ -320,8 +355,8 @@ for c in select value from jsonb_array_elements(d->'topics')loop
  insert into public.book_topics(id,book_id,parent_id,title,position)values((t->>'id')::uuid,'${bid}',(c->>'id')::uuid,t->>'title',(t->>'position')::int);
  end if;
  for q in select value from jsonb_array_elements(t->'questions')loop
- insert into public.questions(id,topic_id,question_text,options,option_image_urls,image_url,stimulus_table,difficulty,position,domain,skill,source,source_page,import_metadata,question_type)
- values((q->>'id')::uuid,(t->>'id')::uuid,q->>'text',q->'options',q->'optionImages',q->>'image',nullif(q->'table','null'::jsonb),q->>'difficulty',(q->>'position')::int,coalesce(c->'metadata'->'chapter'->>'title',c->>'title'),t->>'title',d->'book'->'book'->>'sourceFile',(q->>'page')::int,q->'metadata',q->>'type');
+ insert into public.questions(id,topic_id,question_text,passage,stimulus,passage_markup,options,option_image_urls,image_url,stimulus_table,difficulty,position,domain,skill,source,source_page,import_metadata,question_type)
+ values((q->>'id')::uuid,(t->>'id')::uuid,q->>'text',coalesce(q->>'passage',''),coalesce(q->>'stimulus',''),coalesce(q->>'passageMarkup',''),q->'options',q->'optionImages',q->>'image',nullif(q->'table','null'::jsonb),q->>'difficulty',(q->>'position')::int,coalesce(c->'metadata'->'chapter'->>'title',c->>'title'),t->>'title',d->'book'->'book'->>'sourceFile',(q->>'page')::int,q->'metadata',q->>'type');
  insert into public.question_answers values((q->>'id')::uuid,case when q->>'type'='mcq' then (q->>'correctAnswer')::int else null end,q->>'explanation');
  if q->>'type'='open' then insert into public.book_open_answers(question_id,accepted_answers,correct_answer,answer_format,accepted_range) values((q->>'id')::uuid,coalesce(q->'acceptedAnswers','[]'::jsonb),q->>'correctAnswer',q->>'answerFormat',q->'acceptedRange');end if;
  update public.content_review_items set status='approved',note='Imported from supplied structured package; unflagged question with source answer key and lossless crops.',extraction_method='source_image_package',reviewed_at=now() where entity_id=(q->>'id')::uuid;
@@ -420,7 +455,7 @@ async function main() {
     if (
       assets
         .slice(0, verified.count)
-        .some((a) => !names.has(`${a.storageHash}.png`))
+        .some((a) => !names.has(`${a.storageHash}${a.extension || ".png"}`))
     )
       throw new Error("Previously verified asset is missing");
     complete = verified.count;
@@ -432,16 +467,21 @@ async function main() {
   for (let offset = complete; offset < assets.length; offset += batchSize) {
     await Promise.all(
       assets.slice(offset, offset + batchSize).map(async (a) => {
-        const path = `${fingerprint}/${a.storageHash}.png`,
+        const path = `${fingerprint}/${a.storageHash}${a.extension || ".png"}`,
           raw = await readFile(join(folder, a.source));
         let upload;
         for (let attempt = 0; attempt < 5; attempt++) {
           upload = await client.storage
             .from("book-package-assets")
-            .upload(path, raw, { contentType: "image/png", upsert: true });
+            .upload(path, raw, {
+              contentType: a.contentType || "image/png",
+              upsert: true,
+            });
           if (!upload.error) break;
           if (
-            !/HTTP (408|429|500|502|503|504)/i.test(upload.error.message) ||
+            !/fetch failed|HTTP (408|429|500|502|503|504)/i.test(
+              upload.error.message,
+            ) ||
             attempt === 4
           )
             throw new Error(
@@ -459,7 +499,9 @@ async function main() {
               .download(path);
             if (!download.error) break;
             if (
-              !/HTTP (408|429|500|502|503|504)/i.test(download.error.message) ||
+              !/fetch failed|HTTP (408|429|500|502|503|504)/i.test(
+                download.error.message,
+              ) ||
               attempt === 4
             )
               throw new Error(

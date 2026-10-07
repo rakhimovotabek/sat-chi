@@ -446,7 +446,7 @@ test("recurring status edits persist and Bank facets match counts across section
     await role(admin);
     const day = (
       await db.query(
-          "select (now() at time zone 'Asia/Tashkent')::date::text as local_day",
+        "select (now() at time zone 'Asia/Tashkent')::date::text as local_day",
       )
     ).rows[0].local_day;
     const data = {
@@ -514,6 +514,74 @@ test("recurring status edits persist and Bank facets match counts across section
     await assert.rejects(
       call("homework_snapshot_open_key", ["{}"], ["jsonb"]),
       /permission denied/,
+    );
+  } finally {
+    await db.close();
+  }
+});
+
+test("recurring save uses maintained student eligibility instead of rescanning legacy approvals", async () => {
+  const { db, role, call, book } = await learningDatabase();
+  try {
+    await role(admin);
+    await db.exec("reset role");
+    await db.exec(
+      `create or replace function public.question_approved_for_students(p_id uuid) returns boolean language plpgsql as $$begin raise exception 'Legacy approval scan must not run during Save';end;$$;`,
+    );
+    await role(admin);
+    const day = (
+      await db.query(
+        "select timezone('Asia/Tashkent',now())::date::text as local_day",
+      )
+    ).rows[0].local_day;
+    const config = {
+      title: "Before edit",
+      instructions: "Before",
+      students: [student],
+      groups: [],
+      timezone: "Asia/Tashkent",
+      startDate: day,
+      count: 2,
+      selection: "new",
+      filters: { book },
+    };
+    const id = await call(
+      "save_daily_homework",
+      [JSON.stringify(config)],
+      ["jsonb"],
+    );
+    const edited = {
+      ...config,
+      title: "Saved edit",
+      instructions: "After",
+      students: [other],
+      timeLimit: 120,
+      allowLate: false,
+      allowRepeat: true,
+    };
+    await call(
+      "save_daily_homework",
+      [JSON.stringify(edited), id],
+      ["jsonb", "uuid"],
+    );
+    const row = (
+      await db.query(
+        "select data,jsonb_array_length(pool) size from public.daily_homework_versions where template_id=$1 order by revision desc limit 1",
+        [id],
+      )
+    ).rows[0];
+    assert.equal(row.data.title, edited.title);
+    assert.deepEqual(row.data.students, [other]);
+    assert.equal(row.data.timeLimit, 120);
+    assert.equal(row.size, 12);
+    await db.exec("reset role");
+    await db.query("update public.books set published=false where id=$1", [
+      book,
+    ]);
+    await role(admin);
+    await assert.rejects(
+      call("save_daily_homework", [JSON.stringify(config)], ["jsonb"]),
+      /Not enough usable published/,
     );
   } finally {
     await db.close();
