@@ -11,12 +11,12 @@ test("bank Check shows only attempted choices, retries and preserves overview/re
   ).toHaveCount(0);
   await page.getByRole("radio", { name: "A 2", exact: true }).check();
   await page.getByRole("button", { name: "Check", exact: true }).click();
-  await expect(page.locator(".incorrect-choice")).toHaveCount(1);
-  await expect(page.locator(".incorrect-choice")).toHaveCSS(
+  await expect(page.locator(".answer-choice.incorrect-choice")).toHaveCount(1);
+  await expect(page.locator(".answer-choice.incorrect-choice")).toHaveCSS(
     "background-color",
-    "rgb(153, 27, 27)",
+    "rgb(255, 245, 245)",
   );
-  await expect(page.locator(".correct-choice")).toHaveCount(0);
+  await expect(page.locator(".answer-choice.correct-choice")).toHaveCount(0);
   await page
     .getByRole("button", { name: "Mark for review", exact: true })
     .click();
@@ -39,15 +39,15 @@ test("bank Check shows only attempted choices, retries and preserves overview/re
   await page.getByRole("button", { name: /Question 1,/ }).click();
   await page.getByRole("radio", { name: "B 4", exact: true }).check();
   await page.getByRole("button", { name: "Check", exact: true }).click();
-  await expect(page.locator(".correct-choice")).toHaveCount(1);
-  await expect(page.locator(".incorrect-choice")).toHaveCount(1);
+  await expect(page.locator(".answer-choice.correct-choice")).toHaveCount(1);
+  await expect(page.locator(".answer-choice.incorrect-choice")).toHaveCount(1);
   expect(store.checks).toHaveLength(2);
   await page.reload();
-  await expect(page.locator(".correct-choice")).toHaveCount(1);
+  await expect(page.locator(".answer-choice.correct-choice")).toHaveCount(1);
   await expect(page.getByText(/Attempt 1: A/)).toBeVisible();
-  await expect(page.locator(".correct-choice")).toHaveCSS(
+  await expect(page.locator(".answer-choice.correct-choice")).toHaveCSS(
     "background-color",
-    "rgb(22, 101, 52)",
+    "rgb(240, 253, 244)",
   );
   await page
     .getByRole("button", { name: "Question 1 of 3", exact: true })
@@ -204,12 +204,12 @@ test("bank timing, eliminated choices and marks persist through resume and check
   await expect.poll(() => store.session.elapsed_seconds).toBeGreaterThan(0);
   await page.getByRole("radio", { name: "A 2", exact: true }).check();
   await page.getByRole("button", { name: "Check", exact: true }).click();
-  await expect(page.locator(".incorrect-choice")).toHaveCount(1);
+  await expect(page.locator(".answer-choice.incorrect-choice")).toHaveCount(1);
   expect(store.checks).toHaveLength(1);
   expect(store.items[0].active_seconds).toBeGreaterThan(0);
   const seconds = store.items[0].active_seconds;
   await page.reload();
-  await expect(page.locator(".incorrect-choice")).toHaveCount(1);
+  await expect(page.locator(".answer-choice.incorrect-choice")).toHaveCount(1);
   expect(store.items[0].eliminated).toContain(2);
   expect(store.items[0].marked).toBe(true);
   expect(store.items[0].active_seconds).toBeGreaterThanOrEqual(seconds);

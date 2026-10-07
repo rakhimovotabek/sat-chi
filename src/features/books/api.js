@@ -51,6 +51,27 @@ export async function getBookCatalog(page = 0, search = "") {
     total: count ?? data.length,
   };
 }
+// Select controls need book labels, not nested question counts or signed covers.
+export async function getBookOptions(page = 0, search = "") {
+  const { data, count, error } = await supabase
+    .from("books")
+    .select("id,title", { count: "exact" })
+    .ilike("title", `%${search.replace(/[%_\\]/g, "").trim()}%`)
+    .order("created_at", { ascending: false })
+    .order("id")
+    .range(page * 50, page * 50 + 49);
+  if (error) throw new Error(`Could not load books: ${error.message}`);
+  return { books: data || [], total: count || 0 };
+}
+export async function getBookOption(id) {
+  const { data, error } = await supabase
+    .from("books")
+    .select("id,title")
+    .eq("id", id)
+    .single();
+  if (error) throw new Error(`Could not load book: ${error.message}`);
+  return data;
+}
 export async function getBook(id) {
   const book = await checked(
     supabase.from("books").select("*").eq("id", id).single(),
@@ -166,7 +187,7 @@ export async function getPractice(id) {
       supabase.rpc("review_book_practice", { p_session_id: id }),
     );
   if (
-    ["book", "bank"].includes(session.kind) &&
+    ["book", "bank", "homework"].includes(session.kind) &&
     session.submitted_at &&
     items.some((i) => i.question.question_type === "open")
   ) {

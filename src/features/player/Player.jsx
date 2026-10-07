@@ -19,7 +19,7 @@ import Stimulus from "./Stimulus.jsx";
 import QuestionImage from "../../components/QuestionImage.jsx";
 import BookExplanation from "./BookExplanation.jsx";
 import Navigator from "./Navigator.jsx";
-import { practiceSummary } from "./model.js";
+import { practiceSummary, questionAnswerIssue } from "./model.js";
 export default function Player() {
   const { session: auth, profile } = useAuth();
   const { sessionId } = useParams();
@@ -92,7 +92,9 @@ export default function Player() {
     if (study.now >= new Date(s.started_at).getTime() + s.time_limit * 1000) {
       autoSubmitted.current = true;
       queue.current
-        .catch(() => {})
+        .then(() => {
+          if (unsaved.current) throw new Error("Answers still need saving.");
+        })
         .then(() => study.flush())
         .then(() => finishPractice(sessionId))
         .then(() => state.reload())
@@ -135,10 +137,13 @@ export default function Player() {
         updated.has_answered ||
         updated.selected_answer != null ||
         Boolean(updated.selected_response?.trim());
-    setItems((previous) =>
-      previous.map((item) => (item.id === updated.id ? updated : item)),
+    const snapshot = items.map((item) =>
+      item.id === updated.id ? updated : item,
     );
-    persist([updated]);
+    setItems(snapshot);
+    // Include earlier dirty questions: a later successful save must not hide a
+    // failed save on another question.
+    persist(snapshot);
   }
   async function check() {
     const item = items[index];
@@ -203,6 +208,11 @@ export default function Player() {
     setError("");
     try {
       const s = state.data.session;
+      await queue.current;
+      if (unsaved.current)
+        throw new Error(
+          "Could not save your answers. Retry saving before submitting.",
+        );
       if (
         !s.timed ||
         !s.time_limit ||
@@ -253,14 +263,13 @@ export default function Player() {
   const current = items[index];
   const q = current.question;
   const isBook = session.kind === "book";
+  const calculatorWorkspace = ["book", "bank", "homework"].includes(
+    session.kind,
+  );
   const openResponse = q.question_type === "open";
-  const usableChoices =
-    q.options?.length === 4 &&
-    q.options.every(
-      (option, i) =>
-        (option.trim() || q.option_image_urls?.[i]) &&
-        !/^Choice [A-D] in the source image$/i.test(option),
-    );
+  const usableChoices = !questionAnswerIssue(q);
+  const embeddedChoices =
+    q.image_url && q.import_metadata?.questionImageIncludesOptions === true;
   const answer = review.find((v) => v.item_id === current.id);
   const result = practiceSummary(items);
   return (
@@ -360,7 +369,7 @@ export default function Player() {
           )}
           {session.time_limit ? ` / ${formatTime(session.time_limit)}` : ""}
         </span>
-        {practice || isBook ? (
+        {calculatorWorkspace ? (
           <span
             className="player-math-tools"
             ref={setToolsTarget}
@@ -388,7 +397,7 @@ export default function Player() {
         </button>
       </div>
       <div className="practice-workspace" ref={setWorkspace}>
-        {(practice || isBook) && workspace && (
+        {calculatorWorkspace && workspace && (
           <MathTools
             key={sessionId}
             workspace={workspace}
@@ -451,6 +460,9 @@ export default function Player() {
                 }
               >
                 <legend className="visually-hidden">Choose your answer</legend>
+                {embeddedChoices && (
+                  <p>Select the matching choice from the question image.</p>
+                )}
                 {!usableChoices && (
                   <p role="alert">
                     This question’s answer choices need recovery. It is excluded
@@ -489,7 +501,11 @@ export default function Player() {
                               {option && <span>{option}</span>}
                             </span>
                           ) : (
-                            <span>{option}</span>
+                            <span>
+                              {embeddedChoices && !option.trim()
+                                ? "Choice in the question image"
+                                : option}
+                            </span>
                           )}
                         </label>
                         {!submitted && !current.solved_at && (
@@ -524,7 +540,10 @@ export default function Player() {
               />
             )}
             {practice && current.attempts?.length > 0 && (
-              <div className="attempt-feedback" aria-live="polite">
+              <div
+                className={`attempt-feedback answer-result ${current.solved_at ? "correct-choice" : "incorrect-choice"}`}
+                aria-live="polite"
+              >
                 <p>
                   {current.solved_at
                     ? "Solved. Continue to the next question."
@@ -544,7 +563,9 @@ export default function Player() {
               </div>
             )}
             {submitted && answer && (
-              <section className="question-explanation">
+              <section
+                className={`question-explanation answer-result ${current.correct ? "correct-choice" : "incorrect-choice"}`}
+              >
                 <h3>
                   {current.selected_answer == null
                     ? "Unanswered"

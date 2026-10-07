@@ -1,19 +1,21 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import PageHeader from "../../components/PageHeader.jsx";
+import Modal from "../../components/Modal.jsx";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import DailyHomeworkStudent from "./DailyHomeworkStudent.jsx";
 import DailyHomeworkAdmin from "./DailyHomeworkAdmin.jsx";
 import HomeworkForm from "./HomeworkForm.jsx";
 import useAction from "./useAction.js";
-import { homework, startHomework } from "./api.js";
+import { homework, startHomework, editHomework } from "./api.js";
 import { homeworkStatus, formatTime } from "./homework-model.js";
 export default function Homework({ admin = false }) {
   const state = useContent(homework),
     action = useAction(),
     navigate = useNavigate(),
     [creating, setCreating] = useState(false),
+    [editing, setEditing] = useState(null),
     [revision, setRevision] = useState(0);
   return (
     <>
@@ -41,6 +43,17 @@ export default function Homework({ admin = false }) {
         />
       )}
       {admin && <DailyHomeworkAdmin key={revision} />}
+      {admin && editing && (
+        <Modal title="Edit one-time homework" onClose={() => setEditing(null)}>
+          <HomeworkForm
+            assignment={editing}
+            onCreated={() => {
+              setEditing(null);
+              state.reload();
+            }}
+          />
+        </Modal>
+      )}
       {admin && <h2>One-time homework</h2>}
       {!admin && (
         <>
@@ -76,6 +89,7 @@ export default function Homework({ admin = false }) {
                   <th>Status</th>
                   <th>Time</th>
                   <th>Result</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,6 +123,19 @@ export default function Homework({ admin = false }) {
                       ) : (
                         "—"
                       )}
+                    </td>
+                    <td>
+                      <button
+                        className="button button-secondary button-compact"
+                        disabled={action.busy}
+                        onClick={() =>
+                          action.run(async () =>
+                            setEditing(await editHomework(row.id)),
+                          )
+                        }
+                      >
+                        Edit
+                      </button>
                     </td>
                   </tr>
                 ))}

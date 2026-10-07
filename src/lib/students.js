@@ -7,7 +7,7 @@ export async function listStudents(page = 0) {
   const start = page * STUDENTS_PAGE_SIZE;
   const { data, count, error } = await supabase.from('profiles')
     .select('id,display_name,username,active,created_at', { count: 'exact' })
-    .eq('role', 'student').order('created_at', { ascending: false }).order('id')
+    .eq('role', 'student').eq('active', true).order('created_at', { ascending: false }).order('id')
     .range(start, start + STUDENTS_PAGE_SIZE - 1);
   if (error) throw new Error('Could not load students. Check your connection and database setup.');
   return { students: data || [], count: count || 0 };
@@ -15,6 +15,17 @@ export async function listStudents(page = 0) {
 
 export async function manageStudent(body) {
   if (!supabase) throw new Error('Supabase is not configured.');
+  if (body.action === 'delete') {
+    // Existing RLS and the profile guard allow only active admins to deactivate
+    // students. Preserve Auth, homework history and progress instead of cascading.
+    const { data, error } = await supabase.from('profiles')
+      .update({ active: false }).eq('id', body.student_id).eq('role', 'student')
+      .select('id,active').single();
+    if (error || !data || data.active !== false) {
+      throw new Error(error?.message || 'Could not deactivate the student account.');
+    }
+    return { deleted_id: data.id, deactivated: true };
+  }
   // functions.invoke sends the current session JWT. No service-role key is used.
   const { data, error } = await supabase.functions.invoke('manage-student', { body });
   if (error) {

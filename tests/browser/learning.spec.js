@@ -276,7 +276,7 @@ test("timed bank practice remains open for Check after the suggested time", asyn
   expect(store.session.submitted_at).toBeNull();
   await page.getByRole("radio", { name: "B 4", exact: true }).check();
   await page.getByRole("button", { name: "Check", exact: true }).click();
-  await expect(page.locator(".correct-choice")).toHaveCount(1);
+  await expect(page.locator(".answer-choice.correct-choice")).toHaveCount(1);
 });
 test("admin practice keeps the admin layout and student attempts open read-only", async ({
   page,

@@ -4,6 +4,7 @@ import ContentState from "./ContentState.jsx";
 import { getQuestions, deleteQuestion } from "./api.js";
 import QuestionForm from "./QuestionForm.jsx";
 import ImportPanel from "./ImportPanel.jsx";
+import { questionAnswerIssue } from "../player/model.js";
 export default function TopicQuestions({ topic, onChanged = () => {} }) {
   const [page, setPage] = useState(0);
   const state = useContent(
@@ -88,7 +89,15 @@ export default function TopicQuestions({ topic, onChanged = () => {} }) {
                 {state.data.rows.map((q, i) => (
                   <tr key={q.id}>
                     <td>{page * 50 + i + 1}</td>
-                    <td className="question-table-text">{q.question_text}</td>
+                    <td className="question-table-text">
+                      {q.question_text}
+                      {questionAnswerIssue(q) && (
+                        <p role="alert">
+                          {questionAnswerIssue(q)} · Question {q.id}. Excluded
+                          from student practice until repaired.
+                        </p>
+                      )}
+                    </td>
                     <td>{q.difficulty}</td>
                     <td>
                       <div className="inline-actions">

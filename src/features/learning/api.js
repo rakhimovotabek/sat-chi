@@ -11,15 +11,23 @@ export async function checked(
     );
   return data;
 }
-export const rpc = (name, args = {}) => checked(supabase.rpc(name, args));
+export const rpc = async (name, args = {}) => {
+  const { data, error } = await supabase.rpc(name, args);
+  if (error)
+    throw new Error(
+      error.message || "Could not load learning data. Try again.",
+    );
+  return data;
+};
 export const groups = () =>
   checked(supabase.from("groups").select("*").order("name"));
 export const members = (id) =>
   checked(
     supabase
       .from("group_members")
-      .select("id,student_id,profiles(display_name,username,active)")
+      .select("id,student_id,profiles!inner(display_name,username,active)")
       .eq("group_id", id)
+      .eq("profiles.active", true)
       .limit(100),
   );
 export const searchStudents = (search = "") =>
@@ -58,6 +66,10 @@ export const startBank = (filters, count, timed) =>
 export const homework = () => rpc("homework_directory");
 export const createHomework = (data) =>
   rpc("create_homework", { p_data: data });
+export const editHomework = (id) =>
+  rpc("homework_edit_data", { p_homework: id });
+export const updateHomework = (id, data) =>
+  rpc("update_homework", { p_homework: id, p_data: data });
 export const startHomework = (id) =>
   rpc("start_homework", { p_assignment: id });
 export const metrics = (student) =>

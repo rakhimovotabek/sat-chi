@@ -104,10 +104,12 @@ export function createManageStudentHandler({ createClient, getEnv, logError = co
         if (targetError) return respond(500, { error: 'Could not check the student account.' });
         if (!target) return respond(404, { error: 'Student account not found.' });
         if (target.role !== 'student') return respond(403, { error: 'Only student accounts can be deleted here.' });
-        // Hard-delete Auth first; FK cascades remove the profile and memberships.
-        const { error: deleteError } = await server.auth.admin.deleteUser(target.id, false);
-        if (deleteError) return respond(500, { error: 'Could not delete the student account.' });
-        return respond(200, { deleted_id: target.id });
+        // Daily homework retains profile references. Deactivate without destroying history.
+        const { data: deactivated, error: deleteError } = await server.from('profiles')
+          .update({ active: false }).eq('id', target.id).eq('role', 'student')
+          .select('id,active').single();
+        if (deleteError || !deactivated || deactivated.active !== false) return respond(500, { error: 'Could not deactivate the student account.' });
+        return respond(200, { deleted_id: target.id, deactivated: true });
       }
       return respond(400, { error: 'Action must be create or delete.' });
     } catch {

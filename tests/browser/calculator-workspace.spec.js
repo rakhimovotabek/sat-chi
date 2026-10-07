@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { learningFixture } from "./helpers/learning.js";
 async function openCalculator(
   page,
-  { sdk = false, width = 1440, height = 1000 } = {},
+  { sdk = false, width = 1440, height = 1000, kind = "bank" } = {},
 ) {
   await page.setViewportSize({ width, height });
   const store = await learningFixture(page);
@@ -41,6 +41,13 @@ async function openCalculator(
   await expect(
     page.getByRole("button", { name: "Question 1 of 3", exact: true }),
   ).toBeVisible();
+  if (kind !== "bank") {
+    store.session.kind = kind;
+    await page.reload();
+    await expect(
+      page.getByRole("radio", { name: "B 4", exact: true }),
+    ).toBeVisible();
+  }
   await page.getByRole("radio", { name: "B 4", exact: true }).check();
   await expect(page.getByRole("status")).toHaveText("All changes saved");
   await page.getByRole("button", { name: "Calculator", exact: true }).click();
@@ -66,6 +73,44 @@ async function drag(page, locator, dx, dy) {
   await page.mouse.up();
 }
 const bounds = (locator) => locator.boundingBox();
+test("homework uses the dockable, floating and resizable calculator without losing answers", async ({
+  page,
+}) => {
+  const { panel, expression, store } = await openCalculator(page, {
+    kind: "homework",
+  });
+  await expect(panel).toHaveAttribute("data-mode", "docked");
+  await expression.fill("y=x+3");
+  const separator = page.getByRole("separator", { name: "Calculator width" });
+  const before = await bounds(panel);
+  await drag(page, separator, 50, 0);
+  expect((await bounds(panel)).width).toBeGreaterThan(before.width);
+  await page
+    .getByRole("button", { name: "Float calculator", exact: true })
+    .click();
+  await expect(panel).toHaveAttribute("data-mode", "floating");
+  const floating = await bounds(panel);
+  await drag(
+    page,
+    page.getByRole("button", {
+      name: "Resize calculator bottom-right",
+      exact: true,
+    }),
+    40,
+    30,
+  );
+  expect((await bounds(panel)).width).toBeGreaterThan(floating.width);
+  await expect(expression).toHaveValue("y=x+3");
+  await page
+    .getByRole("button", { name: "Dock calculator", exact: true })
+    .click();
+  await expect(panel).toHaveAttribute("data-mode", "docked");
+  expect(store.items[0].selected_answer).toBe(1);
+  await page.reload();
+  await expect(
+    page.getByRole("radio", { name: "B 4", exact: true }),
+  ).toBeChecked();
+});
 test("desktop docks into layout, divider resizes, toggles without iframe reload, and close restores question width", async ({
   page,
 }) => {

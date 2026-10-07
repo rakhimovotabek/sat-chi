@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import HomeworkForm from "./HomeworkForm.jsx";
+import Modal from "../../components/Modal.jsx";
 import useAction from "./useAction.js";
 import {
   dailyTemplates,
@@ -469,13 +470,10 @@ export default function DailyHomeworkAdmin() {
         )}
       </section>
       {editing && (
-        <>
-          <button
-            className="button button-secondary"
-            onClick={() => setEditing(null)}
-          >
-            Cancel edit
-          </button>
+        <Modal
+          title="Edit recurring homework assignment"
+          onClose={() => setEditing(null)}
+        >
           <HomeworkForm
             key={editing.id}
             template={editing}
@@ -484,7 +482,7 @@ export default function DailyHomeworkAdmin() {
               state.reload();
             }}
           />
-        </>
+        </Modal>
       )}
       {selected && (
         <DailyDetail

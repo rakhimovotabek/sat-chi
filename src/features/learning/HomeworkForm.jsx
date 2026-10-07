@@ -12,8 +12,8 @@ const newSection = () => ({
   mode: "random",
   questionIds: [],
 });
-export default function HomeworkForm({ onCreated, template }) {
-  const initial = template?.data || {};
+export default function HomeworkForm({ onCreated, template, assignment }) {
+  const initial = template?.data || assignment?.data || {};
   const [type, setType] = useState(template ? "daily" : "once"),
     [startDate, setStartDate] = useState(
       initial.startDate ||
@@ -32,8 +32,17 @@ export default function HomeworkForm({ onCreated, template }) {
   const daily = type === "daily";
   const [title, setTitle] = useState(initial.title || ""),
     [instructions, setInstructions] = useState(initial.instructions || ""),
-    [due, setDue] = useState(""),
-    [timed, setTimed] = useState(!!initial.timeLimit),
+    [due, setDue] = useState(
+      initial.dueAt
+        ? new Date(
+            new Date(initial.dueAt).getTime() -
+              new Date(initial.dueAt).getTimezoneOffset() * 60000,
+          )
+            .toISOString()
+            .slice(0, 16)
+        : "",
+    ),
+    [timed, setTimed] = useState(initial.timed ?? !!initial.timeLimit),
     [minutes, setMinutes] = useState(
       initial.timeLimit ? initial.timeLimit / 60 : 60,
     ),
@@ -41,16 +50,23 @@ export default function HomeworkForm({ onCreated, template }) {
     [chosenGroups, setChosenGroups] = useState(initial.groups || []),
     [chosenStudents, setChosenStudents] = useState(initial.students || []),
     [search, setSearch] = useState(""),
-    [sections, setSections] = useState([
-      {
+    [sections, setSections] = useState(
+      initial.sections?.map((s) => ({
         ...newSection(),
-        title: template ? "Daily questions" : "",
-        count: initial.count || 5,
-        filters: initial.filters || {},
-        mode: initial.questionIds?.length ? "specific" : "random",
-        questionIds: initial.questionIds || [],
-      },
-    ]);
+        ...s,
+        key: s.id,
+        mode: "specific",
+      })) || [
+        {
+          ...newSection(),
+          title: template ? "Daily questions" : "",
+          count: initial.count || 5,
+          filters: initial.filters || {},
+          mode: initial.questionIds?.length ? "specific" : "random",
+          questionIds: initial.questionIds || [],
+        },
+      ],
+    );
   const groupState = useContent(api.groups),
     studentState = useContent(() => api.searchStudents(search), [search]),
     action = useAction();
@@ -82,15 +98,18 @@ export default function HomeworkForm({ onCreated, template }) {
             active,
             allowLate,
             allowRepeat,
-            count: Number(section.count),
-            selection: "new",
+            count:
+              section.mode === "specific"
+                ? section.questionIds.length
+                : Number(section.count),
+            selection: initial.selection || "new",
             filters: section.filters,
             questionIds: section.mode === "specific" ? section.questionIds : [],
           },
           template?.id,
         );
-      } else
-        await api.createHomework({
+      } else {
+        const data = {
           title,
           instructions,
           dueAt: new Date(due).toISOString(),
@@ -100,13 +119,17 @@ export default function HomeworkForm({ onCreated, template }) {
           groups: chosenGroups,
           students: chosenStudents,
           sections: sections.map((s) => ({
+            ...(s.id ? { id: s.id } : {}),
             title: s.title,
             count:
               s.mode === "specific" ? s.questionIds.length : Number(s.count),
             filters: s.filters,
             ...(s.mode === "specific" ? { questionIds: s.questionIds } : {}),
           })),
-        });
+        };
+        if (assignment) await api.updateHomework(assignment.id, data);
+        else await api.createHomework(data);
+      }
       setTitle("");
       setSections([newSection()]);
       onCreated();
@@ -114,11 +137,17 @@ export default function HomeworkForm({ onCreated, template }) {
   }
   return (
     <form className="card learning-panel learning-form" onSubmit={submit}>
-      <h2>{template ? "Edit recurring homework" : "Create homework"}</h2>
+      <h2>
+        {template
+          ? "Edit recurring homework"
+          : assignment
+            ? "Edit homework"
+            : "Create homework"}
+      </h2>
       <label>
         Homework type
         <select
-          disabled={!!template}
+          disabled={!!template || !!assignment}
           value={type}
           onChange={(e) => setType(e.target.value)}
         >
@@ -409,7 +438,9 @@ export default function HomeworkForm({ onCreated, template }) {
             ? "Saving…"
             : template
               ? "Save recurring homework"
-              : "Create and assign homework"}
+              : assignment
+                ? "Save homework"
+                : "Create and assign homework"}
         </button>
       </div>
       <p className="empty-copy">

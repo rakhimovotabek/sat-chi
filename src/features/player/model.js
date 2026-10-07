@@ -29,3 +29,23 @@ export function questionState(item, current, submitted, practice = false) {
     states.push("mixed");
   return states.filter(Boolean);
 }
+export function questionAnswerIssue(question) {
+  if (question.question_type === "open") return null;
+  if (question.question_type && question.question_type !== "mcq")
+    return "Unsupported question type";
+  if (!Array.isArray(question.options) || question.options.length !== 4)
+    return "Missing answer choices";
+  const embedded =
+    question.image_url &&
+    question.import_metadata?.questionImageIncludesOptions === true;
+  return question.options.every(
+    (option, i) =>
+      typeof option === "string" &&
+      (question.option_image_urls?.[i] ||
+        embedded ||
+        (option.trim() &&
+          !/^\s*Choice [A-D] in the source image\s*$/i.test(option))),
+  )
+    ? null
+    : "Missing answer choices";
+}

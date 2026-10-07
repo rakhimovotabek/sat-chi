@@ -140,14 +140,15 @@ test('returns 404 for missing student', async () => {
   assert.equal(f.calls.some(([kind]) => kind === 'delete'), false);
 });
 
-test('hard-deletes only a verified student Auth account', async () => {
+test('deactivates only a verified student without deleting Auth or history', async () => {
   const f = fixture();
   assert.equal((await f.handle(f.request({ action: 'delete', student_id: studentId }))).status, 200);
-  assert.deepEqual(f.calls.find(([kind]) => kind === 'delete'), ['delete', studentId, false]);
+  assert.deepEqual(f.calls.find(([kind]) => kind === 'update'), ['update', { active: false }]);
+  assert.equal(f.calls.some(([kind]) => kind === 'delete'), false);
 });
 
-test('does not claim deletion when Auth deletion fails', async () => {
-  const f = fixture({ deleteError: { message: 'unavailable' } });
+test('does not claim deletion when profile deactivation fails', async () => {
+  const f = fixture({ profileError: { message: 'unavailable' } });
   assert.equal((await f.handle(f.request({ action: 'delete', student_id: studentId }))).status, 500);
 });
 

@@ -18,7 +18,8 @@ function packageDifficulty(value) {
   const normalized = String(value).trim().toLowerCase();
   if (normalized === "1" || normalized === "easy") return "easy";
   if (normalized === "2" || normalized === "medium") return "medium";
-  if (["3", "4", "hard", "extra hard", "800-level"].includes(normalized)) return "hard";
+  if (["3", "4", "hard", "extra hard", "800-level"].includes(normalized))
+    return "hard";
   throw new Error(`Unsupported source difficulty: ${value}`);
 }
 
@@ -42,7 +43,9 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
     multipleChoiceQuestions: questions.filter((q) => q.type === "mcq").length,
     openResponseQuestions: questions.filter((q) => q.type === "open").length,
     needsReview: questions.filter((q) => q.needsReview).length,
-    missingDifficulty: questions.filter((q) => q.difficulty == null || q.difficulty === "").length,
+    missingDifficulty: questions.filter(
+      (q) => q.difficulty == null || q.difficulty === "",
+    ).length,
     assets: assets.length,
   };
   for (const [key, value] of Object.entries(counts))
@@ -111,7 +114,13 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
           q.type === "mcq" &&
           (q.options.length !== 4 ||
             q.options.some(
-              (o, i) => o.label !== "ABCD"[i] || (!o.text && !o.image),
+              (o, i) =>
+                o.label !== "ABCD"[i] ||
+                (!o.text &&
+                  !o.image &&
+                  !(
+                    q.questionImageIncludesOptions === true && q.questionImage
+                  )),
             ) ||
             !"ABCD".includes(q.correctAnswer) ||
             q.correctAnswer.length !== 1)
@@ -123,8 +132,12 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
             typeof q.correctAnswer !== "string" ||
             (!q.acceptedAnswers?.length && !q.acceptedRange) ||
             (q.acceptedAnswers || []).some((a) => typeof a !== "string") ||
-            (q.acceptedAnswers?.length && !q.acceptedAnswers.includes(q.correctAnswer)) ||
-            (q.acceptedRange && (!Number.isFinite(q.acceptedRange.min) || !Number.isFinite(q.acceptedRange.max) || q.acceptedRange.min > q.acceptedRange.max)))
+            (q.acceptedAnswers?.length &&
+              !q.acceptedAnswers.includes(q.correctAnswer)) ||
+            (q.acceptedRange &&
+              (!Number.isFinite(q.acceptedRange.min) ||
+                !Number.isFinite(q.acceptedRange.max) ||
+                q.acceptedRange.min > q.acceptedRange.max)))
         )
           throw new Error(`Missing supplied open answer: ${q.id}`);
         const {
@@ -155,11 +168,13 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
             q.type === "mcq" ? "ABCD".indexOf(correctAnswer) : correctAnswer,
           acceptedAnswers,
           acceptedRange,
-          answerFormat: answerFormat ?? (
-            q.type === "open" && book.book.slug === "800-challenge-hard-math-150-part-1-sat-math-club"
+          answerFormat:
+            answerFormat ??
+            (q.type === "open" &&
+            book.book.slug ===
+              "800-challenge-hard-math-150-part-1-sat-math-club"
               ? "numeric"
-              : undefined
-          ),
+              : undefined),
           explanation:
             explanation == null
               ? null
@@ -210,7 +225,9 @@ export function preparePackage(book, manifest, review, assets, fingerprint) {
         (c) => c.children.length === 1 && c.children[0].title === c.title,
       ).length,
       questions: imported.length,
-      missingDifficultyFallbacks: imported.filter((q) => q.difficulty === "unclassified").length,
+      missingDifficultyFallbacks: imported.filter(
+        (q) => q.difficulty === "unclassified",
+      ).length,
       withExplanations: imported.filter((q) => q.explanation != null).length,
       withoutExplanations: imported.filter((q) => q.explanation == null).length,
       imageQuestions: imported.filter((q) => q.image).length,
@@ -374,13 +391,20 @@ async function main() {
   const indexHash = createHash("sha256")
     .update(JSON.stringify(assets))
     .digest("hex");
-  const verifiedSources = verified?.sources ||
+  const verifiedSources =
+    verified?.sources ||
     (verified?.count === assets.length ? assets.map((a) => a.source) : []);
-  const resume = process.argv.includes("--resume-assets") &&
-    verified?.fingerprint === fingerprint && verified?.indexHash === indexHash &&
-    Number.isInteger(verified?.count) && verified.count >= 0 &&
-    verified.count <= assets.length && verifiedSources.length === verified.count &&
-    assets.slice(0, verified.count).every((a, i) => verifiedSources[i] === a.source);
+  const resume =
+    process.argv.includes("--resume-assets") &&
+    verified?.fingerprint === fingerprint &&
+    verified?.indexHash === indexHash &&
+    Number.isInteger(verified?.count) &&
+    verified.count >= 0 &&
+    verified.count <= assets.length &&
+    verifiedSources.length === verified.count &&
+    assets
+      .slice(0, verified.count)
+      .every((a, i) => verifiedSources[i] === a.source);
   if (process.argv.includes("--resume-assets") && !resume)
     throw new Error("No matching fully verified asset checkpoint");
   if (resume) {
@@ -393,7 +417,11 @@ async function main() {
       data.forEach((a) => names.add(a.name));
       if (data.length < 1000) break;
     }
-    if (assets.slice(0, verified.count).some((a) => !names.has(`${a.storageHash}.png`)))
+    if (
+      assets
+        .slice(0, verified.count)
+        .some((a) => !names.has(`${a.storageHash}.png`))
+    )
       throw new Error("Previously verified asset is missing");
     complete = verified.count;
     console.log(
@@ -412,9 +440,16 @@ async function main() {
             .from("book-package-assets")
             .upload(path, raw, { contentType: "image/png", upsert: true });
           if (!upload.error) break;
-          if (!/HTTP (408|429|500|502|503|504)/i.test(upload.error.message) || attempt === 4)
-            throw new Error(`Asset upload failed: ${a.source}: ${upload.error.message}`);
-          await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** attempt));
+          if (
+            !/HTTP (408|429|500|502|503|504)/i.test(upload.error.message) ||
+            attempt === 4
+          )
+            throw new Error(
+              `Asset upload failed: ${a.source}: ${upload.error.message}`,
+            );
+          await new Promise((resolve) =>
+            setTimeout(resolve, 500 * 2 ** attempt),
+          );
         }
         if (process.argv.includes("--verify-assets")) {
           let download;
@@ -423,13 +458,22 @@ async function main() {
               .from("book-package-assets")
               .download(path);
             if (!download.error) break;
-            if (!/HTTP (408|429|500|502|503|504)/i.test(download.error.message) || attempt === 4)
-              throw new Error(`Asset download failed: ${a.source}: ${download.error.message}`);
-            await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** attempt));
+            if (
+              !/HTTP (408|429|500|502|503|504)/i.test(download.error.message) ||
+              attempt === 4
+            )
+              throw new Error(
+                `Asset download failed: ${a.source}: ${download.error.message}`,
+              );
+            await new Promise((resolve) =>
+              setTimeout(resolve, 500 * 2 ** attempt),
+            );
           }
-          if (createHash("sha256")
-            .update(Buffer.from(await download.data.arrayBuffer()))
-            .digest("hex") !== a.sha256)
+          if (
+            createHash("sha256")
+              .update(Buffer.from(await download.data.arrayBuffer()))
+              .digest("hex") !== a.sha256
+          )
             throw new Error(`Stored asset verification failed: ${a.source}`);
         }
         complete++;

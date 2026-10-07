@@ -151,7 +151,13 @@ test("800 Challenge retains source difficulty labels and imports numeric respons
   questions[0].difficulty = "EXTRA HARD";
   questions[1].difficulty = "800-LEVEL";
   delete questions[1].answerFormat;
-  const prepared = preparePackage(source, manifest, review, assets, fingerprint);
+  const prepared = preparePackage(
+    source,
+    manifest,
+    review,
+    assets,
+    fingerprint,
+  );
   assert.equal(prepared.imported[0].difficulty, "hard");
   assert.equal(prepared.imported[0].metadata.difficulty, "EXTRA HARD");
   assert.equal(prepared.imported[1].difficulty, "hard");
@@ -414,11 +420,22 @@ test("package import is atomic and idempotent; book practice securely gates expl
       true,
     );
     await role(student);
+    assert.equal(
+      await call(
+        "start_book_practice",
+        [stableId("package-fixture/c1/t1")],
+        ["uuid"],
+      ),
+      sid,
+    );
+    // Grade a separate snapshot while preserving the public resume contract.
+    await db.exec("reset role");
     const wrongSid = await call(
-      "start_book_practice",
+      "start_book_practice_new_snapshot",
       [stableId("package-fixture/c1/t1")],
       ["uuid"],
     );
+    await role(student);
     const wrongItem = (
       await db.query(
         "select id from public.book_practice_items where session_id=$1 and position=1",
@@ -456,12 +473,13 @@ test("package import is atomic and idempotent; book practice securely gates expl
       "update public.book_open_answers set accepted_answers='[]',correct_answer='3.0 to 3.3',answer_format='numeric-range',accepted_range=$2::jsonb where question_id=$1",
       [p.imported[1].id, JSON.stringify({ min: 3, max: 3.3, inclusive: true })],
     );
-    await role(student);
+    await db.exec("reset role");
     const rangeSid = await call(
-      "start_book_practice",
+      "start_book_practice_new_snapshot",
       [stableId("package-fixture/c1/t1")],
       ["uuid"],
     );
+    await role(student);
     const rangeItem = (
       await db.query(
         "select id from public.book_practice_items where session_id=$1 and position=1",
@@ -470,12 +488,20 @@ test("package import is atomic and idempotent; book practice securely gates expl
     ).rows[0];
     await call(
       "save_book_practice",
-      [rangeSid, JSON.stringify([{ id: rangeItem.id, selected_response: "3.15" }])],
+      [
+        rangeSid,
+        JSON.stringify([{ id: rangeItem.id, selected_response: "3.15" }]),
+      ],
       ["uuid", "jsonb"],
     );
     await call("finish_book_practice", [rangeSid], ["uuid"]);
     assert.equal(
-      (await db.query("select correct from public.book_practice_items where id=$1", [rangeItem.id])).rows[0].correct,
+      (
+        await db.query(
+          "select correct from public.book_practice_items where id=$1",
+          [rangeItem.id],
+        )
+      ).rows[0].correct,
       true,
     );
     const rangeReview = await call(
@@ -484,7 +510,8 @@ test("package import is atomic and idempotent; book practice securely gates expl
       ["uuid"],
     );
     assert.deepEqual(
-      rangeReview.find((item) => item.item_id === rangeItem.id).accepted_answers,
+      rangeReview.find((item) => item.item_id === rangeItem.id)
+        .accepted_answers,
       ["3.0 to 3.3"],
       "range review falls back to the source answer string for older clients",
     );
@@ -494,12 +521,13 @@ test("package import is atomic and idempotent; book practice securely gates expl
       "update public.book_open_answers set accepted_answers=$2::jsonb,correct_answer='x^2',answer_format='math-expression',accepted_range=null where question_id=$1",
       [p.imported[1].id, JSON.stringify(["x^2"])],
     );
-    await role(student);
+    await db.exec("reset role");
     const expressionSid = await call(
-      "start_book_practice",
+      "start_book_practice_new_snapshot",
       [stableId("package-fixture/c1/t1")],
       ["uuid"],
     );
+    await role(student);
     const expressionItem = (
       await db.query(
         "select id from public.book_practice_items where session_id=$1 and position=1",
@@ -508,12 +536,22 @@ test("package import is atomic and idempotent; book practice securely gates expl
     ).rows[0];
     await call(
       "save_book_practice",
-      [expressionSid, JSON.stringify([{ id: expressionItem.id, selected_response: " x ^ 2 " }])],
+      [
+        expressionSid,
+        JSON.stringify([
+          { id: expressionItem.id, selected_response: " x ^ 2 " },
+        ]),
+      ],
       ["uuid", "jsonb"],
     );
     await call("finish_book_practice", [expressionSid], ["uuid"]);
     assert.equal(
-      (await db.query("select correct from public.book_practice_items where id=$1", [expressionItem.id])).rows[0].correct,
+      (
+        await db.query(
+          "select correct from public.book_practice_items where id=$1",
+          [expressionItem.id],
+        )
+      ).rows[0].correct,
       true,
     );
   } finally {

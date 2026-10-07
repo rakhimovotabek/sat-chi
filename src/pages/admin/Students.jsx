@@ -47,7 +47,7 @@ export default function Students() {
     try {
       await manageStudent({ action: 'delete', student_id: pendingDelete.id });
       setPendingDelete(null);
-      setNotice('Student account and group memberships deleted.');
+      setNotice('Student account deactivated. Assignments and progress are preserved.');
       setRefresh((current) => current + 1);
     } catch (failure) { setError(failure.message); }
     finally { setBusy(false); }
@@ -62,7 +62,7 @@ export default function Students() {
       {pendingDelete && (
         <section className="delete-confirmation" aria-labelledby="delete-title">
           <h2 id="delete-title">Delete {pendingDelete.display_name || pendingDelete.username || 'this student'}?</h2>
-          <p>The Auth account, profile, and group memberships will be permanently removed.</p>
+          <p>This deactivates the student account and removes it from active lists. Assignments and progress are preserved.</p>
           <div className="button-row">
             <button className="button button-secondary" disabled={busy} onClick={() => setPendingDelete(null)}>Cancel</button>
             <button className="button button-danger" disabled={busy} onClick={remove}>{busy ? 'Deleting…' : 'Confirm deletion'}</button>

@@ -1,0 +1,526 @@
+{
+  "restoredCount": 70,
+  "restoredQuestions": [
+    {
+      "id": "138efcc3-8055-5561-a42a-a77e6c4ab658",
+      "sourceId": "algebra-official-sat-question-bank_q_0148",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "3fd5f3c8-4ef5-5ec1-a08f-6c94cf82e29d",
+      "sourceId": "algebra-official-sat-question-bank_q_0159",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "886b7e8c-c3aa-58a2-ad38-6bf043523e2d",
+      "sourceId": "algebra-official-sat-question-bank_q_0163",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "596ac61e-267a-56a4-a7d0-68b3ecdf7c0a",
+      "sourceId": "algebra-official-sat-question-bank_q_0174",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "35437a5a-975b-5788-a259-5b9bcb3ca35a",
+      "sourceId": "algebra-official-sat-question-bank_q_0189",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "a055bbe3-0ebf-5840-a745-cf767d1501e8",
+      "sourceId": "algebra-official-sat-question-bank_q_0239",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "c9c0845e-5f84-5e97-a006-17bcde974ac9",
+      "sourceId": "algebra-official-sat-question-bank_q_0252",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "ca4e2567-94be-5921-a812-969401b7b0b2",
+      "sourceId": "algebra-official-sat-question-bank_q_0263",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "758e19e7-4a72-5601-a119-accb9d6242fc",
+      "sourceId": "algebra-official-sat-question-bank_q_0291",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "125a8d29-d8ac-5214-a77c-f9e760bb90c9",
+      "sourceId": "algebra-official-sat-question-bank_q_0294",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "e8ae364c-e4d1-57d0-a2be-0c4922d102d5",
+      "sourceId": "algebra-official-sat-question-bank_q_0317",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "853f1872-60df-5904-af8b-15bd0c3648f2",
+      "sourceId": "algebra-official-sat-question-bank_q_0329",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "c62e7332-6b5f-590e-ab47-4008d8d6a791",
+      "sourceId": "algebra-official-sat-question-bank_q_0332",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "faced8b7-6bc8-51c5-a155-51e3dfa0a1fe",
+      "sourceId": "algebra-official-sat-question-bank_q_0334",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "cc1a8d13-66dc-5b43-a65b-024fb6d981ef",
+      "sourceId": "algebra-official-sat-question-bank_q_0340",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "8939ea56-44da-55ea-a8bb-34f492bc187d",
+      "sourceId": "algebra-official-sat-question-bank_q_0402",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "0b1bef9c-113c-5bf7-a84c-32065a9b9162",
+      "sourceId": "algebra-official-sat-question-bank_q_0413",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "8642469f-994a-5d0d-a3b9-707166870cc2",
+      "sourceId": "algebra-official-sat-question-bank_q_0419",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "e46687f7-3345-50a7-a6c9-c15565996533",
+      "sourceId": "algebra-official-sat-question-bank_q_0516",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "3f1be5a6-14a4-532f-a007-efc0d1cf61e6",
+      "sourceId": "algebra-official-sat-question-bank_q_0531",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "39942137-e391-5da3-a6ee-49a0f41033ab",
+      "sourceId": "algebra-official-sat-question-bank_q_0535",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "6ee40bd5-7f22-5d58-a39a-f6ea1bfeb314",
+      "sourceId": "algebra-official-sat-question-bank_q_0544",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "52c52cc4-265f-5b51-ae33-c1b15b581c05",
+      "sourceId": "algebra-official-sat-question-bank_q_0575",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "24bd9d39-f661-5c60-a982-6ba5c8d7ef5e",
+      "sourceId": "algebra-official-sat-question-bank_q_0576",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "1fddd8be-d7cb-5875-a2e5-4a9f8254b2b4",
+      "sourceId": "algebra-official-sat-question-bank_q_0586",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "141acc30-5b7f-57d8-ac03-6728b57aa39b",
+      "sourceId": "algebra-official-sat-question-bank_q_0598",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "b899660b-ec67-5903-afa7-4598f48b9c58",
+      "sourceId": "algebra-official-sat-question-bank_q_0613",
+      "book": "algebra-official-sat-question-bank"
+    },
+    {
+      "id": "50d5ad48-6898-5994-af60-c5fca9fc1b81",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0036",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "c9cc5a23-e415-5226-ae69-f970bf5ed27b",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0202",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "66899e12-a8b4-5d42-a067-cdd368004ca8",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0251",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "9f19e2b6-b4f4-52bf-add4-a17aba5eee05",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0263",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "3ce298f9-f229-5beb-af7a-859c2eedc037",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0294",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "b40d85f7-0f78-5275-a345-41f3192d28b5",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0327",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "1d77e7a3-e03a-5d2b-a6ea-4722d2d73bbc",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0333",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "94186ded-7510-5af7-a4f8-b9c73cea82e2",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0339",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "2f6417e8-177b-5ca6-a20b-5a9522260c57",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0369",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "596ba0d4-a08f-5168-a2d3-31825d489628",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0370",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "2fe119c2-f22e-5cce-a5b1-aaf87c35ee70",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0374",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "201a2b28-02ff-5827-a8dc-bed58f8653eb",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0375",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "88800541-d54a-592f-a4bb-3395ba7cc234",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0380",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "339bc8df-fddd-5028-a17c-e1336b67d2c7",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0413",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "89dc0928-1ed7-5a79-a900-9a82b7c72532",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0419",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "b78f044f-a302-5ae2-a20a-f9d6e388daa8",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0430",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "18c85435-325f-50a7-a6ec-4ee4c711dda0",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0454",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "3f1ee705-6c4b-5c9f-a91a-2cc39c81ff69",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0456",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "53974ff2-37e3-5a4f-a3d7-f03c48edae59",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0477",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "d3c6724d-93dd-5476-a8b9-781cd05a7fef",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0501",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "2080f455-788d-5b23-a974-09cb60261afd",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0518",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "4000ee44-511b-56d3-a8d6-f0af2693d39a",
+      "sourceId": "advanced-math-official-sat-question-bank_q_0534",
+      "book": "advanced-math-official-sat-question-bank"
+    },
+    {
+      "id": "23d94555-0e73-5347-aecc-a18866489e87",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0181",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "f95f3525-3efa-5c6b-a551-2641f4eb7f8f",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0191",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "c9bdf54e-9aa6-538b-a30c-d6876c2799e8",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0195",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "87567ac6-53eb-59d8-a370-3df57e3acc2d",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0204",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "3e4bdf8a-df0a-53b9-a80e-2212ad6c2b6f",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0213",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "4a55b88a-38f9-55bc-a748-2203c33bccdc",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0224",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "f38a39de-4d95-518f-a488-26071c2f1065",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0230",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "abf6394e-aadf-593b-a8a7-399b8731041f",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0241",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "edec83f7-4c99-5754-acab-9003c42aa31f",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0249",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "05ae0206-8fcb-53e0-a875-77e5e1939870",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0261",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "61aff9c4-ebee-5178-afd3-1a8ef7d9535b",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0269",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "f51e958d-10d2-5ae8-a8a8-117d2fe347dd",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0271",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "ed4bdc55-d284-5651-af85-83d5cfb08db5",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0272",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "56d4ce6b-4716-5b2f-a2d0-8503ec009f2d",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0273",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "a529bd3e-7124-5db9-a066-5d7ea82505fd",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0287",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "4f04f575-ce8b-5794-a08d-3c5baaf6a12a",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0289",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "6f677215-ad5d-52af-a26e-569bbc7dca09",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0294",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "709972fa-e0ff-5232-af3a-e104767242ef",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0308",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "83ed3fcd-db96-5cc6-aa1a-292ca8888864",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0310",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "6da6eab3-fee7-5f79-ae84-aac5ab246c2c",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0315",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    },
+    {
+      "id": "698dc5cd-cf05-5085-ac7c-30c42d2c36f3",
+      "sourceId": "problem-solving-and-data-analysis-official-sat-question-bank_q_0366",
+      "book": "problem-solving-and-data-analysis-official-sat-question-bank"
+    }
+  ],
+  "alreadyValidReviewedQuestions": [
+    {
+      "id": "0449eb19-279b-5bad-afa8-4894de7149ea",
+      "sourceId": "preppros-advanced-math-2nd-edition_q_0001"
+    },
+    {
+      "id": "b449ece1-2e59-5a2b-aef7-f76c426ac239",
+      "sourceId": "preppros-advanced-math-2nd-edition_q_0110"
+    },
+    {
+      "id": "c516eaa6-d6bc-570b-a8c9-119fbe4637c2",
+      "sourceId": "hardbook-2-by-satashkent_q_0111"
+    }
+  ],
+  "textChoices": 428,
+  "textQuestionCount": 122,
+  "textQuestionSourceIds": [
+    "algebra-official-sat-question-bank_q_0003",
+    "algebra-official-sat-question-bank_q_0029",
+    "algebra-official-sat-question-bank_q_0032",
+    "algebra-official-sat-question-bank_q_0068",
+    "algebra-official-sat-question-bank_q_0074",
+    "algebra-official-sat-question-bank_q_0080",
+    "algebra-official-sat-question-bank_q_0099",
+    "algebra-official-sat-question-bank_q_0104",
+    "algebra-official-sat-question-bank_q_0110",
+    "algebra-official-sat-question-bank_q_0121",
+    "algebra-official-sat-question-bank_q_0128",
+    "algebra-official-sat-question-bank_q_0146",
+    "algebra-official-sat-question-bank_q_0192",
+    "algebra-official-sat-question-bank_q_0198",
+    "algebra-official-sat-question-bank_q_0221",
+    "algebra-official-sat-question-bank_q_0257",
+    "algebra-official-sat-question-bank_q_0285",
+    "algebra-official-sat-question-bank_q_0302",
+    "algebra-official-sat-question-bank_q_0314",
+    "algebra-official-sat-question-bank_q_0351",
+    "algebra-official-sat-question-bank_q_0354",
+    "algebra-official-sat-question-bank_q_0375",
+    "algebra-official-sat-question-bank_q_0417",
+    "algebra-official-sat-question-bank_q_0435",
+    "algebra-official-sat-question-bank_q_0453",
+    "algebra-official-sat-question-bank_q_0456",
+    "algebra-official-sat-question-bank_q_0458",
+    "algebra-official-sat-question-bank_q_0462",
+    "algebra-official-sat-question-bank_q_0497",
+    "algebra-official-sat-question-bank_q_0498",
+    "algebra-official-sat-question-bank_q_0509",
+    "algebra-official-sat-question-bank_q_0526",
+    "algebra-official-sat-question-bank_q_0536",
+    "algebra-official-sat-question-bank_q_0539",
+    "algebra-official-sat-question-bank_q_0555",
+    "algebra-official-sat-question-bank_q_0600",
+    "advanced-math-official-sat-question-bank_q_0010",
+    "advanced-math-official-sat-question-bank_q_0018",
+    "advanced-math-official-sat-question-bank_q_0029",
+    "advanced-math-official-sat-question-bank_q_0050",
+    "advanced-math-official-sat-question-bank_q_0052",
+    "advanced-math-official-sat-question-bank_q_0080",
+    "advanced-math-official-sat-question-bank_q_0118",
+    "advanced-math-official-sat-question-bank_q_0120",
+    "advanced-math-official-sat-question-bank_q_0138",
+    "advanced-math-official-sat-question-bank_q_0146",
+    "advanced-math-official-sat-question-bank_q_0147",
+    "advanced-math-official-sat-question-bank_q_0153",
+    "advanced-math-official-sat-question-bank_q_0165",
+    "advanced-math-official-sat-question-bank_q_0174",
+    "advanced-math-official-sat-question-bank_q_0205",
+    "advanced-math-official-sat-question-bank_q_0215",
+    "advanced-math-official-sat-question-bank_q_0229",
+    "advanced-math-official-sat-question-bank_q_0243",
+    "advanced-math-official-sat-question-bank_q_0251",
+    "advanced-math-official-sat-question-bank_q_0252",
+    "advanced-math-official-sat-question-bank_q_0274",
+    "advanced-math-official-sat-question-bank_q_0290",
+    "advanced-math-official-sat-question-bank_q_0315",
+    "advanced-math-official-sat-question-bank_q_0320",
+    "advanced-math-official-sat-question-bank_q_0388",
+    "advanced-math-official-sat-question-bank_q_0392",
+    "advanced-math-official-sat-question-bank_q_0402",
+    "advanced-math-official-sat-question-bank_q_0403",
+    "advanced-math-official-sat-question-bank_q_0420",
+    "advanced-math-official-sat-question-bank_q_0444",
+    "advanced-math-official-sat-question-bank_q_0451",
+    "advanced-math-official-sat-question-bank_q_0532",
+    "advanced-math-official-sat-question-bank_q_0534",
+    "advanced-math-official-sat-question-bank_q_0537",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0002",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0004",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0005",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0010",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0017",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0020",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0038",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0041",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0046",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0069",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0070",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0077",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0101",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0102",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0108",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0120",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0127",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0133",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0135",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0139",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0147",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0149",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0169",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0179",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0187",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0192",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0209",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0210",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0222",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0228",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0229",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0230",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0240",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0248",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0250",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0251",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0262",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0278",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0290",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0301",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0314",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0328",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0332",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0339",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0340",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0348",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0355",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0367",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0373",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0384",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0391",
+    "problem-solving-and-data-analysis-official-sat-question-bank_q_0402"
+  ],
+  "excludedForMissingAnswers": [],
+  "notes": [
+    "Original source assets and answer keys preserved.",
+    "Only source-labeled scalar numeric choices transcribed; formulas and graphs retain images.",
+    "Question images containing A–D choices have letter selection controls."
+  ],
+  "validation": {
+    "catalogQuestions": 5696,
+    "unsupportedCatalogQuestions": 0,
+    "missingFrozenOpenKeys": 0,
+    "unsupportedSavedSnapshots": 0,
+    "bank": {
+      "Math": {
+        "count": 3627,
+        "facetTotal": 3627,
+        "milliseconds": 3115
+      },
+      "domains": {
+        "Algebra": 972,
+        "Advanced Math": 1210,
+        "Problem-Solving and Data Analysis": 784,
+        "Geometry and Trigonometry": 410
+      },
+      "Reading & Writing": {
+        "count": 2069,
+        "facetTotal": 2069,
+        "milliseconds": 1282
+      },
+      "browser": "passed"
+    }
+  }
+}

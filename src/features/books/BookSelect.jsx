@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useContent from "./useContent.js";
-import { getBook, getBookCatalog } from "./api.js";
+import { getBookOption, getBookOptions } from "./api.js";
 export default function BookSelect({
   value,
   onChange,
@@ -17,9 +17,9 @@ export default function BookSelect({
     }, 250);
     return () => clearTimeout(timeout);
   }, [search]);
-  const books = useContent(() => getBookCatalog(page, query), [page, query]);
+  const books = useContent(() => getBookOptions(page, query), [page, query]);
   const selected = useContent(
-    () => (value ? getBook(value) : Promise.resolve(null)),
+    () => (value ? getBookOption(value) : Promise.resolve(null)),
     [value],
   );
   const rows = books.data?.books || [];
