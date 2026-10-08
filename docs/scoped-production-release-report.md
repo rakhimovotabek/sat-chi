@@ -1,3 +1,5 @@
+> Current status (2026-10-09): release COMPLETE; normal writes are reopened in compatible mode and signup is restored. See [production-release-completed.md](production-release-completed.md). The blocked execution state below is historical.
+
 # Scoped production release — verification blocked
 
 2026-10-08. The four database migrations and matching frontend were deployed. **The release is incomplete and normal application writes remain blocked.** Actual production Book loading and practice startup failed with PostgreSQL statement timeouts. Do not describe the site as fully verified or reopen writes yet.

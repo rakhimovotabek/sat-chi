@@ -1,3 +1,5 @@
+> Current status (2026-10-09): release COMPLETE; normal writes are reopened in compatible mode and signup is restored. See [production-release-completed.md](production-release-completed.md). The blocked execution state below is historical.
+
 > Current execution status (2026-10-08): the four migrations and matching frontend are published, but Book queries timed out during production verification. Writes remain in maintenance. See [scoped-production-release-report.md](scoped-production-release-report.md). Earlier pending/aborted status below is historical.
 
 # Production release execution — stopped before cutover
