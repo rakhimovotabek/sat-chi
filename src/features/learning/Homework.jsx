@@ -87,6 +87,7 @@ export default function Homework({ admin = false }) {
                   <th>Student</th>
                   <th>Due</th>
                   <th>Status</th>
+                  <th>Progress</th>
                   <th>Time</th>
                   <th>Result</th>
                   <th>Actions</th>
@@ -110,6 +111,15 @@ export default function Homework({ admin = false }) {
                           : new Date(row.due_at) < new Date()
                             ? "Overdue"
                             : "Not Started"}
+                    </td>
+                    <td>
+                      {row.answered || 0} /{" "}
+                      {row.question_count ??
+                        row.sections?.reduce(
+                          (sum, section) => sum + section.count,
+                          0,
+                        ) ??
+                        0}
                     </td>
                     <td>{formatTime(row.elapsed_seconds)}</td>
                     <td>

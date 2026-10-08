@@ -117,15 +117,10 @@ test("open homework response retries the failed save and survives reload", async
   store.session.kind = "homework";
   await page.reload();
   let failed = true;
-  await page.route("**/rpc/save_book_practice", (route) => {
+  await page.route("**/rpc/save_practice_changes", (route) => {
     if (failed)
       return json(route, { message: "Simulated transport failure" }, 500);
-    for (const answer of route.request().postDataJSON().p_answers)
-      Object.assign(
-        store.items.find((i) => i.id === answer.id),
-        answer,
-      );
-    return json(route, null);
+    return route.fallback();
   });
   await page.getByLabel("Your answer").fill("25");
   await expect(page.getByRole("status")).toHaveText("Save failed");
@@ -188,14 +183,9 @@ test("a later successful question save also persists the earlier dirty answer", 
   const store = await contentFixture(page);
   await openPractice(page);
   let fail = true;
-  await page.route("**/rpc/save_book_practice", (route) => {
+  await page.route("**/rpc/save_practice_changes", (route) => {
     if (fail) return json(route, { message: "Transport failure" }, 500);
-    for (const a of route.request().postDataJSON().p_answers)
-      Object.assign(
-        store.items.find((i) => i.id === a.id),
-        a,
-      );
-    return json(route, null);
+    return route.fallback();
   });
   await page.getByRole("radio").nth(1).check();
   await expect(page.getByRole("status")).toHaveText("Save failed");

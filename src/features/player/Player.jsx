@@ -8,7 +8,7 @@ import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import {
   getPractice,
-  savePractice,
+  savePracticeChanges,
   finishPractice,
   checkBankAnswer,
   checkBankResponse,
@@ -23,6 +23,7 @@ import QuestionImage from "../../components/QuestionImage.jsx";
 import BookExplanation from "./BookExplanation.jsx";
 import Navigator from "./Navigator.jsx";
 import { practiceSummary, questionAnswerIssue } from "./model.js";
+import { createPracticePersistence } from "./practice-persistence.js";
 export default function Player() {
   const { session: auth, profile } = useAuth();
   const { sessionId } = useParams();
@@ -43,10 +44,13 @@ export default function Player() {
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const queue = useRef(Promise.resolve());
-  const pending = useRef(0);
   const unsaved = useRef(false);
-  const alive = useRef(true);
-  const revision = useRef(0);
+  const persistence = useRef(null);
+  const [saveState, setSaveState] = useState({
+    unsaved: false,
+    conflicts: [],
+    durable: true,
+  });
   const ownsSession = state.data?.session.student_id === auth.user.id;
   const study = useStudyTimer(
     sessionId,
@@ -58,7 +62,6 @@ export default function Player() {
       !items[index]?.solved_at,
   );
   useEffect(() => {
-    alive.current = true;
     const warn = (e) => {
       if (unsaved.current) {
         e.preventDefault();
@@ -67,22 +70,63 @@ export default function Player() {
     };
     window.addEventListener("beforeunload", warn);
     return () => {
-      alive.current = false;
       window.removeEventListener("beforeunload", warn);
     };
   }, []);
   useEffect(() => {
-    if (state.data) {
-      setItems(state.data.items);
-      setIndex((i) =>
-        Math.min(
-          state.data.session.current_position ?? i,
-          Math.max(0, state.data.items.length - 1),
-        ),
-      );
-      unsaved.current = false;
+    if (!state.data || !ownsSession) return;
+    let storage;
+    try {
+      storage = window.localStorage;
+    } catch {
+      /* Visible recovery warning below. */
     }
-  }, [state.data]);
+    const controller = createPracticePersistence({
+      userId: auth.user.id,
+      sessionId,
+      items: state.data.items,
+      submitted: Boolean(state.data.session.submitted_at),
+      storage,
+      save: (changes) => savePracticeChanges(sessionId, changes),
+    });
+    persistence.current = controller;
+    const stop = controller.subscribe((next) => {
+      setItems(next.items);
+      unsaved.current = next.unsaved;
+      setSaving(next.pending > 0);
+      setSaveState(next);
+    });
+    setIndex(
+      Math.min(
+        state.data.session.current_position || 0,
+        Math.max(0, state.data.items.length - 1),
+      ),
+    );
+    if (controller.state().unsaved && !controller.state().conflicts.length) {
+      queue.current = controller.flush();
+      queue.current.catch(() => {});
+    }
+    return stop;
+  }, [state.data, sessionId, ownsSession, auth.user.id]);
+  // A browser storage failure must not permit a sidebar exit to silently discard
+  // the only unsaved copy. Normal navigation uses the durable recovery outbox.
+  useEffect(() => {
+    const protect = (event) => {
+      if (
+        unsaved.current &&
+        !persistence.current?.state().durable &&
+        event.target.closest?.("a[href]")
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        setError(
+          "Answer recovery storage is unavailable. Retry saving before leaving.",
+        );
+      }
+    };
+    document.addEventListener("click", protect, true);
+    return () => document.removeEventListener("click", protect, true);
+  }, []);
   const autoSubmitted = useRef(false);
   useEffect(() => {
     const s = state.data?.session;
@@ -111,46 +155,16 @@ export default function Player() {
         });
     }
   }, [study.now, items.length, state.data, sessionId]);
-  function persist(snapshot) {
-    const version = ++revision.current;
-    unsaved.current = true;
-    pending.current++;
-    setSaving(true);
-    const request = queue.current
-      .catch(() => {})
-      .then(() => savePractice(sessionId, snapshot));
+  function persist() {
+    const request = persistence.current?.flush() || Promise.resolve();
     queue.current = request;
-    request
-      .then(
-        () => {
-          if (version === revision.current) unsaved.current = false;
-          if (alive.current) setError("");
-        },
-        (e) => {
-          if (alive.current) setError(e.message);
-        },
-      )
-      .finally(() => {
-        pending.current--;
-        if (alive.current) setSaving(pending.current > 0);
-      });
+    request.catch(() => {});
     return request;
   }
   function change(patch) {
     checkEvent.current = null;
-    const updated = { ...items[index], ...patch };
-    if (state.data.session.kind === "book")
-      updated.has_answered =
-        updated.has_answered ||
-        updated.selected_answer != null ||
-        Boolean(updated.selected_response?.trim());
-    const snapshot = items.map((item) =>
-      item.id === updated.id ? updated : item,
-    );
-    setItems(snapshot);
-    // Include earlier dirty questions: a later successful save must not hide a
-    // failed save on another question.
-    persist(snapshot);
+    persistence.current.change(items[index].id, patch);
+    persist();
   }
   async function check() {
     const item = items[index];
@@ -193,12 +207,10 @@ export default function Player() {
         ),
       );
       checkEvent.current = null;
-      if (
-        attempt.correct &&
-        items.every((i) => i.id === item.id || i.solved_at)
-      )
-        state.reload();
+      // Refresh authoritative versions after Check changes/locks an answer.
+      state.reload();
     } catch (e) {
+      if (e.code === "40001") state.reload();
       setError(e.message);
     } finally {
       setChecking(false);
@@ -214,18 +226,11 @@ export default function Player() {
     setSubmitting(true);
     setError("");
     try {
-      const s = state.data.session;
-      await queue.current;
+      await persist();
       if (unsaved.current)
         throw new Error(
           "Could not save your answers. Retry saving before submitting.",
         );
-      if (
-        !s.timed ||
-        !s.time_limit ||
-        Date.now() < new Date(s.started_at).getTime() + s.time_limit * 1000
-      )
-        await persist(items);
       await study.flush();
       await finishPractice(sessionId);
       state.reload();
@@ -237,7 +242,7 @@ export default function Player() {
   }
   async function leave() {
     try {
-      if (!state.data.session.submitted_at) await persist(items);
+      if (!state.data.session.submitted_at) await persist();
       await study.flush();
       navigate(
         state.data.session.kind === "homework"
@@ -256,14 +261,14 @@ export default function Player() {
   }
   if (state.loading || state.error)
     return <ContentState {...state} onRetry={state.reload} />;
+  if (!ownsSession)
+    return <Navigate to={`/admin/sessions/${sessionId}`} replace />;
   if (!items.length)
     return (
       <p className="card" role="status">
         Preparing your questions…
       </p>
     );
-  if (!ownsSession)
-    return <Navigate to={`/admin/sessions/${sessionId}`} replace />;
   const { session, review } = state.data;
   const submitted = Boolean(session.submitted_at);
   const practice = ["bank", "book"].includes(session.kind);
@@ -346,18 +351,71 @@ export default function Player() {
           <p>Study time: {formatTime(state.data.session.elapsed_seconds)}</p>
         </section>
       )}
-      {error && (
+      {(error || saveState.error) && (
         <div className="form-error" role="alert">
-          {error}
+          {error || saveState.error}
           {!submitted && (
             <button
               className="button button-secondary button-compact"
-              onClick={() => persist(items)}
+              onClick={persist}
             >
               Retry saving
             </button>
           )}
         </div>
+      )}
+      {saveState.conflicts.length > 0 && (
+        <section className="card learning-panel" aria-label="Answer recovery">
+          <p>
+            Saved answers or homework questions changed. Pending answers remain
+            on this device until you review them.
+          </p>
+          <ul>
+            {saveState.recovered?.map((row) => {
+              const describe = (values) =>
+                values == null
+                  ? "Question removed"
+                  : (values.selected_response ??
+                    (values.selected_answer == null
+                      ? "Unanswered"
+                      : String.fromCharCode(65 + values.selected_answer)));
+              return (
+                <li key={row.id}>
+                  Question {(row.position ?? 0) + 1}: saved answer:{" "}
+                  {describe(row.saved)}; pending answer: {describe(row.pending)}
+                </li>
+              );
+            })}
+          </ul>
+          <button className="button button-secondary" onClick={state.reload}>
+            Reload saved answers
+          </button>
+          <button
+            className="button button-secondary"
+            onClick={() => {
+              persistence.current.resolve(false);
+              state.reload();
+            }}
+          >
+            Keep saved answers
+          </button>
+          <button
+            className="button"
+            disabled={!saveState.canUseDrafts}
+            onClick={() => {
+              persistence.current.resolve(true);
+              persist();
+            }}
+          >
+            Use recovered answers
+          </button>
+        </section>
+      )}
+      {!saveState.durable && saveState.unsaved && (
+        <p role="alert">
+          Answer recovery storage is unavailable. Keep this page open until
+          saving succeeds.
+        </p>
       )}
       <div className="player-toolbar">
         <span className="practice-clock">
@@ -403,8 +461,10 @@ export default function Player() {
             ? "Submitted"
             : saving
               ? "Saving answers…"
-              : error
-                ? "Save failed"
+              : saveState.unsaved
+                ? saveState.error
+                  ? "Save failed"
+                  : "Answers pending"
                 : "All changes saved"}
         </span>
         <button
@@ -582,7 +642,7 @@ export default function Player() {
                 key={`${sessionId}/${current.id}`}
                 sessionId={sessionId}
                 item={current}
-                waitForSave={() => queue.current}
+                waitForSave={persist}
               />
             )}
             {practice && current.attempts?.length > 0 && (
@@ -689,7 +749,11 @@ export default function Player() {
           )}
           {!practice && !submitted && (
             <button className="button" disabled={submitting} onClick={submit}>
-              {submitting ? "Submitting…" : "Submit practice"}
+              {submitting
+                ? "Submitting…"
+                : session.kind === "homework"
+                  ? "Submit homework"
+                  : "Submit practice"}
             </button>
           )}
         </div>

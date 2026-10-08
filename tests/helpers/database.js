@@ -1,3 +1,4 @@
+import { versionedFixtureArgs } from "./practice-save.js";
 import { readFile, readdir } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
 export const admin = "f1000000-0000-0000-0000-000000000001",
@@ -17,13 +18,15 @@ export async function learningDatabase() {
     db.exec(
       `reset role;set role authenticated;select set_config('request.jwt.claim.sub','${id}',false);`,
     );
-  const call = async (name, args = [], casts = []) =>
-    (
+  const call = async (name, args = [], casts = []) => {
+    args = await versionedFixtureArgs(db, name, args);
+    return (
       await db.query(
         `select public.${name}(${args.map((_, i) => `$${i + 1}::${casts[i]}`).join(",")}) result`,
         args,
       )
     ).rows[0].result;
+  };
   await role(admin);
   const imported = await call(
     "import_book_content",

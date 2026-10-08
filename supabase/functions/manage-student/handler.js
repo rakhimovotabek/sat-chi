@@ -11,7 +11,7 @@ export function createManageStudentHandler({ createClient, getEnv, logError = co
     const allowedOrigins = (getEnv('ALLOWED_ORIGINS') || '').split(',').map((value) => value.trim()).filter(Boolean);
     const cors = {
       'Vary': 'Origin',
-      'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',
+      'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info, x-satchi-client-version',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
     };
     if (origin && allowedOrigins.includes(origin)) cors['Access-Control-Allow-Origin'] = origin;
@@ -30,7 +30,10 @@ export function createManageStudentHandler({ createClient, getEnv, logError = co
 
     try {
       const options = { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } };
-      const callerClient = createClient(url, anonKey, options);
+      const callerClient = createClient(url, anonKey, { ...options, global: { headers: {
+        Authorization: `Bearer ${token}`,
+        'x-satchi-client-version': request.headers.get('x-satchi-client-version') || '',
+      } } });
       // The JWT is validated by Supabase Auth; decoding JWT claims is insufficient.
       const { data: authData, error: authError } = await callerClient.auth.getUser(token);
       if (authError || !authData?.user) return respond(401, { error: 'Invalid or expired session.' });
@@ -40,6 +43,13 @@ export function createManageStudentHandler({ createClient, getEnv, logError = co
         .select('id,role,active').eq('id', authData.user.id).single();
       if (callerError || caller?.role !== 'admin' || caller.active !== true) {
         return respond(403, { error: 'An active admin account is required.' });
+      }
+      if (getEnv('SATCHI_RELEASE_GATE_REQUIRED') === 'true') {
+        const { error: gateError } = await callerClient.rpc('satchi_assert_release_write_access');
+        if (gateError) return respond(gateError.code === 'PT426' ? 426 : 503, {
+          error: gateError.code === 'PT503' || gateError.code === 'PT426'
+            ? gateError.message : 'Account management is paused until release safeguards are available.',
+        });
       }
       if (!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) {
         return respond(415, { error: 'Use application/json.' });

@@ -1,3 +1,4 @@
+import { versionedFixtureArgs } from "./helpers/practice-save.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
@@ -72,11 +73,13 @@ test("PostgreSQL content permissions, imports, snapshot practice and grading res
     db.exec(
       `reset role; set role authenticated; select set_config('request.jwt.claim.sub','${id}',false);`,
     );
-  const rpc = async (name, args, casts) =>
-    db.query(
+  const rpc = async (name, args, casts) => {
+    args = await versionedFixtureArgs(db, name, args);
+    return db.query(
       `select public.${name}(${args.map((_, i) => `$${i + 1}::${casts[i]}`).join(",")}) as result`,
       args,
     );
+  };
   try {
     await db.exec(
       `create role anon nologin;create role authenticated nologin;create role service_role nologin bypassrls;create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to anon,authenticated,service_role;`,

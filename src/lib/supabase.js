@@ -16,6 +16,7 @@ export const isSupabaseConfigured = Boolean(url && anonKey && isHttpUrl(url));
 // A missing configuration leaves the login screen available with setup guidance.
 export const supabase = isSupabaseConfigured
   ? createClient(url, anonKey, {
+      global: { headers: { "x-satchi-client-version": "20261008" } },
       auth: {
         persistSession: true,
         autoRefreshToken: true,

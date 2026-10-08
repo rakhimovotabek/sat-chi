@@ -736,6 +736,23 @@ test("canonical package questions appear in Bank and image/open checks preserve 
       false,
     );
     await save(response, "8.6");
+    await assert.rejects(
+      db.query("select public.check_bank_response($1,$2,'wrong',$3)", [
+        sid,
+        response.id,
+        crypto.randomUUID(),
+      ]),
+      (e) => e.code === "40001",
+    );
+    assert.equal(
+      (
+        await db.query(
+          "select selected_response from public.book_practice_items where id=$1",
+          [response.id],
+        )
+      ).rows[0].selected_response,
+      "8.6",
+    );
     const event = crypto.randomUUID();
     assert.equal(
       (
@@ -759,7 +776,7 @@ test("canonical package questions appear in Bank and image/open checks preserve 
     );
     await assert.rejects(
       save(response, "wrong"),
-      /Solved answers cannot change/,
+      /Submitted answers cannot change/,
     );
     assert.deepEqual(
       (await call("book_practice_open_review", [sid], ["uuid"]))[0]

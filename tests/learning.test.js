@@ -1,3 +1,4 @@
+import { versionedFixtureArgs } from "./helpers/practice-save.js";
 import { buildImportSql } from "../scripts/imports/import-sql.js";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -72,13 +73,15 @@ test("real PostgreSQL learning workflows preserve ownership, private keys, froze
     db.exec(
       `reset role;set role authenticated;select set_config('request.jwt.claim.sub','${id}',false);`,
     );
-  const call = async (name, values = [], casts = []) =>
-    (
+  const call = async (name, values = [], casts = []) => {
+    values = await versionedFixtureArgs(db, name, values);
+    return (
       await db.query(
         `select public.${name}(${values.map((_, i) => `$${i + 1}::${casts[i]}`).join(",")}) result`,
         values,
       )
     ).rows[0].result;
+  };
   const q = {
     question: "Which number is four?",
     options: ["2", "4", "6", "8"],

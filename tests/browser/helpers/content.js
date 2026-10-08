@@ -384,6 +384,39 @@ export async function contentFixture(
           .question_answers.explanation,
       });
     }
+    if (table === "save_practice_changes") {
+      const rows = body.p_changes.map((a) =>
+        store.items.find((i) => i.id === a.id),
+      );
+      if (
+        rows.some(
+          (r, n) =>
+            !r ||
+            (r.answer_revision || 0) !== body.p_changes[n].expected_revision,
+        )
+      )
+        return json(
+          {
+            message:
+              "Answers changed in another tab. Reload and review your recovered answers.",
+            code: "40001",
+          },
+          409,
+        );
+      body.p_changes.forEach((a, n) => {
+        const item = rows[n];
+        Object.assign(item, a, {
+          answer_revision: (item.answer_revision || 0) + 1,
+          has_answered:
+            item.has_answered ||
+            a.selected_answer != null ||
+            Boolean(a.selected_response?.trim()),
+        });
+      });
+      return json(
+        rows.map((i) => ({ id: i.id, answer_revision: i.answer_revision })),
+      );
+    }
     if (table === "save_book_practice") {
       body.p_answers.forEach((a) =>
         Object.assign(

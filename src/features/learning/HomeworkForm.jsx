@@ -4,6 +4,7 @@ import Filters from "./Filters.jsx";
 import QuestionPicker from "./QuestionPicker.jsx";
 import useAction from "./useAction.js";
 import * as api from "./api.js";
+import { homeworkDueInput, homeworkDueInstant } from "./homework-model.js";
 const newSection = () => ({
   key: crypto.randomUUID(),
   title: "",
@@ -33,14 +34,7 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
   const [title, setTitle] = useState(initial.title || ""),
     [instructions, setInstructions] = useState(initial.instructions || ""),
     [due, setDue] = useState(
-      initial.dueAt
-        ? new Date(
-            new Date(initial.dueAt).getTime() -
-              new Date(initial.dueAt).getTimezoneOffset() * 60000,
-          )
-            .toISOString()
-            .slice(0, 16)
-        : "",
+      initial.dueAt ? homeworkDueInput(initial.dueAt) : "",
     ),
     [timed, setTimed] = useState(initial.timed ?? !!initial.timeLimit),
     [minutes, setMinutes] = useState(
@@ -126,7 +120,7 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
         const data = {
           title,
           instructions,
-          dueAt: new Date(due).toISOString(),
+          dueAt: homeworkDueInstant(due),
           timed,
           timeLimit: timed ? Number(minutes) * 60 : null,
           allStudents: all,
@@ -233,7 +227,7 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
         </label>
         {!daily && (
           <label>
-            Due date and time
+            Due date and time (Asia/Tashkent)
             <input
               type="datetime-local"
               required
@@ -458,8 +452,9 @@ export default function HomeworkForm({ onCreated, template, assignment }) {
         </button>
       </div>
       <p className="empty-copy">
-        Each section is validated and frozen together. If there are too few
-        questions, nothing is created.
+        {daily
+          ? "All changes save together. If saving fails, the previous template stays intact. Recurring edits take effect the next local day; today's work and completed history stay intact."
+          : "All changes save together. If saving fails, the previous homework stays intact. Unfinished attempts receive updated questions and keep answers to unchanged questions; completed attempts keep their original questions."}
       </p>
     </form>
   );

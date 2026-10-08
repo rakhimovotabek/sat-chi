@@ -7,10 +7,17 @@ async function checked(
 ) {
   const { data, error } = await request;
   if (error)
-    throw new Error(
-      error.code === "23505"
-        ? "This content has already been imported."
-        : message,
+    throw Object.assign(
+      new Error(
+        error.code === "PGRST202"
+          ? "Saving is unavailable on this server. Your answers have not been saved to the server. Ask an administrator to update it, then retry saving."
+          : error.code === "40001"
+            ? error.message
+            : error.code === "23505"
+              ? "This content has already been imported."
+              : message,
+      ),
+      { code: error.code },
     );
   return data;
 }
@@ -220,31 +227,25 @@ export async function getPractice(id) {
     review,
   };
 }
-export const savePractice = (id, items) =>
-  checked(
-    supabase.rpc("save_book_practice", {
-      p_session_id: id,
-      p_answers: items.map(
-        ({
-          id,
-          selected_answer,
-          selected_response,
-          marked,
-          eliminated,
-          question,
-        }) => ({
-          id,
-          selected_answer,
-          ...(question?.question_type === "open"
-            ? { selected_response: selected_response ?? null }
-            : {}),
-          marked,
-          eliminated,
-        }),
+// Versioned, dirty-item-only saves return explicit server acknowledgements.
+export async function savePracticeChanges(id, changes) {
+  const { data, error } = await supabase.rpc("save_practice_changes", {
+    p_session: id,
+    p_changes: changes,
+  });
+  if (error)
+    throw Object.assign(
+      new Error(
+        error.code === "PGRST202"
+          ? "Saving is unavailable on this server. Your pending answers are kept on this device. Ask an administrator to update the server before retrying."
+          : error.code === "40001"
+            ? error.message
+            : `Could not save your answers. ${error.message || "Retry saving."}`,
       ),
-    }),
-    "Could not save your answers. Try again before leaving.",
-  );
+      { code: error.code },
+    );
+  return data;
+}
 export const finishPractice = (id) =>
   checked(
     supabase.rpc("finish_book_practice", { p_session_id: id }),

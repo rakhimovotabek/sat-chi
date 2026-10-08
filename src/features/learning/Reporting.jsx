@@ -1,4 +1,5 @@
 import DailyHomeworkAnalytics from "./DailyHomeworkAnalytics.jsx";
+import OpenResponseReview from "./OpenResponseReview.jsx";
 import PracticeAnalytics from "./PracticeAnalytics.jsx";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
@@ -441,8 +442,8 @@ export function AdminSession() {
     <>
       <PageHeader
         title={state.data?.session.title || "Practice attempt"}
-        eyebrow="Read-only student attempt"
-        description="Saved answers and submission results. Administrators cannot answer or submit on a student's behalf."
+        eyebrow="Student attempt review"
+        description="Inspect saved answers and results. Review submitted open responses without changing the student's answer."
       />
       <ContentState {...state} onRetry={state.reload} />
       {state.data && (
@@ -491,8 +492,9 @@ export function AdminSession() {
                 {i.attempts?.map((a) => (
                   <p key={a.id}>
                     Attempt {a.attempt_order} ·{" "}
-                    {String.fromCharCode(65 + a.selected_answer)} ·{" "}
-                    {a.correct ? "Correct" : "Incorrect"} ·{" "}
+                    {a.selected_response ??
+                      String.fromCharCode(65 + a.selected_answer)}{" "}
+                    · {a.correct ? "Correct" : "Incorrect"} ·{" "}
                     {formatTime(a.between_seconds)} since prior check ·{" "}
                     {formatTime(a.active_seconds)} cumulative
                   </p>
@@ -502,7 +504,9 @@ export function AdminSession() {
                   Student answer:{" "}
                   {i.selected_answer == null
                     ? "Unanswered"
-                    : i.question.options[i.selected_answer]}
+                    : i.question.question_type === "open"
+                      ? i.selected_response
+                      : i.question.options[i.selected_answer]}
                 </p>
                 {state.data.review.find((r) => r.item_id === i.id) && (
                   <p className="page-description">
@@ -512,6 +516,16 @@ export function AdminSession() {
                     }
                   </p>
                 )}
+                {state.data.session.submitted_at &&
+                  i.question.question_type === "open" && (
+                    <OpenResponseReview
+                      sessionId={sessionId}
+                      item={i}
+                      review={state.data.review.find((r) => r.item_id === i.id)}
+                      disabled={state.loading}
+                      onSaved={state.reload}
+                    />
+                  )}
               </article>
             ))}
           </div>

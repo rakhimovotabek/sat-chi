@@ -1,11 +1,18 @@
 import { useState } from "react";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
-import { bank } from "./api.js";
+import { assignmentBank } from "./api.js";
 export default function QuestionPicker({ filters, value, onChange }) {
   const [page, setPage] = useState(0);
+  const [previousFilters, setPreviousFilters] = useState(
+    JSON.stringify(filters),
+  );
+  if (previousFilters !== JSON.stringify(filters)) {
+    setPreviousFilters(JSON.stringify(filters));
+    setPage(0);
+  }
   const state = useContent(
-    () => bank(filters, page),
+    () => assignmentBank(filters, page),
     [JSON.stringify(filters), page],
   );
   return (

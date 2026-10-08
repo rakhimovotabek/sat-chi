@@ -310,3 +310,23 @@ node scripts/imports/book-package.js /absolute/path/book-satchi-import.zip --app
 node --test tests/book-package.test.js
 npm run test:e2e -- tests/browser/book-explanations.spec.js
 ```
+
+### Homework lifecycle repair (local, October 8)
+
+The additive `20261008000100_homework_lifecycle.sql` migration supports open-response one-time homework, atomic editing, unfinished-attempt synchronization, recipient/group roster updates, and withdrawn access without deleting history. Admin Homework shows answered/total progress. One-time deadline inputs use Asia/Tashkent independently of browser timezone. Recurring edits still take effect the next local day.
+
+See [repair report and reproducible checks](docs/homework-repair-report.md) for the root-cause reproduction, changed functions, verification boundaries, and migration status. The migration and frontend changes have **not** been applied or deployed to the hosted application. Local SQL-backed browser tests execute PostgreSQL with RLS; their authentication is simulated.
+
+Phase 1 adds durable pending-answer recovery, acknowledged versioned saves, conflict protection and administrator open-response review in `20261008000200_practice_answer_integrity.sql`. Both October 8 migrations remain pending. See the [Phase 1 integrity report](docs/phase-1-integrity-repair-report.md) for snapshot/access policy, regression results and coordinated release requirements.
+
+### Native database and browser regression
+
+`tests/native-app-workflows.test.js` starts an isolated PostgreSQL cluster, PostgREST, and the actual Vite application. Application queries and RPCs go through PostgREST; Auth and Storage transport are local disposable fixtures, with Storage permissions checked using database RLS. It never connects to the linked Supabase project. Supply local PostgreSQL and PostgREST binaries and run:
+
+```sh
+SATCHI_TEST_POSTGRES_BIN=/path/to/postgresql/bin \
+SATCHI_TEST_POSTGREST=/path/to/postgrest \
+node --test tests/native-app-workflows.test.js
+```
+
+Use the Node version specified in `package.json`, install Playwright Chromium with the existing browser-test setup, and supply any library path needed by your PostgreSQL distribution. The test explicitly skips when binary paths are absent. It creates and removes its own temporary cluster and applies migrations only inside that cluster. Hosted verification requires separate authorized test credentials and approved schema updates.

@@ -36,7 +36,7 @@ function fixture(overrides = {}) {
       async deleteUser(id, softDelete) { calls.push(['delete', id, softDelete]); if (overrides.cleanupThrows) throw new Error('test cleanup transport failure'); return { error: failProfile ? overrides.cleanupError || null : overrides.deleteError || null }; },
     } },
   };
-  const callerClient = { auth: { async getUser(token) {
+  const callerClient = { async rpc(name) { assert.equal(name, 'satchi_assert_release_write_access'); calls.push(['gate']); return { error: overrides.gateError || null }; }, auth: { async getUser(token) {
     calls.push(['verify', token]);
     return overrides.authError ? { data: { user: null }, error: { message: 'invalid' } } : { data: { user: { id: adminId } }, error: null };
   } } };
@@ -171,3 +171,13 @@ test('reports thrown cleanup failures for manual inspection', async () => {
   assert.equal(response.status, 500);
   assert.match((await response.json()).error, /check Auth users/);
 });
+
+for (const code of ['PT503', 'PT426', 'PGRST202']) {
+  test(`release guard rejects ${code} before Auth or profile mutations`, async () => {
+    const f = fixture({ env: { SATCHI_RELEASE_GATE_REQUIRED: 'true' }, gateError: { code, message: 'Release gate rejected request' } });
+    const response = await f.handle(f.request(validCreate));
+    assert.equal(response.status, code === 'PT426' ? 426 : 503);
+    assert.ok(f.calls.some(([kind]) => kind === 'gate'));
+    assert.equal(f.calls.some(([kind]) => ['create', 'update', 'delete'].includes(kind)), false);
+  });
+}

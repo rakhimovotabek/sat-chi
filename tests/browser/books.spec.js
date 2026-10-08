@@ -224,7 +224,9 @@ test("student topic practice saves choices and marks, resumes, grades and review
     page.getByRole("radio", { name: "B 4", exact: true }),
   ).toBeDisabled();
   expect(store.items.map((i) => i.correct)).toEqual([true, true, true]);
-  expect(store.checks.filter((attempt) => attempt.item_id === store.items[1].id)).toHaveLength(2);
+  expect(
+    store.checks.filter((attempt) => attempt.item_id === store.items[1].id),
+  ).toHaveLength(2);
   await page.reload();
   await expect(
     page.getByRole("region", { name: "Practice results" }),
@@ -239,11 +241,13 @@ test("a failed practice save offers retry and does not claim saved answers", asy
   await expect(
     page.getByText("Question 1 of 3", { exact: true }),
   ).toBeVisible();
-  await page.route("**/rpc/save_book_practice", (route) =>
+  await page.route("**/rpc/save_practice_changes", (route) =>
     route.fulfill({
       status: 500,
       contentType: "application/json",
-      body: JSON.stringify({ message: "internal fixture failure" }),
+      body: JSON.stringify({
+        message: "Could not save: internal fixture failure",
+      }),
     }),
   );
   await page.getByRole("radio", { name: "B 4", exact: true }).check();

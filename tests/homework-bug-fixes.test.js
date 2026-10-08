@@ -99,6 +99,20 @@ test("one-time edit persists metadata, assignees and content without deleting st
     assert.deepEqual(
       (
         await db.query(
+          "select * from public.book_practice_items where session_id=$1",
+          [sid],
+        )
+      ).rows,
+      [],
+    );
+    await assert.rejects(
+      call("save_book_practice", [sid, "[]"], ["uuid", "jsonb"]),
+      /unavailable/,
+    );
+    await role(admin);
+    assert.deepEqual(
+      (
+        await db.query(
           "select * from public.book_practice_items where session_id=$1 order by position",
           [sid],
         )

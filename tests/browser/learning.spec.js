@@ -79,7 +79,7 @@ test("student starts, resumes and submits homework with section results and save
     page.getByText("Question 2 of 3", { exact: true }),
   ).toBeVisible();
   page.on("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "Submit practice" }).click();
+  await page.getByRole("button", { name: "Submit homework" }).click();
   await expect(
     page.getByRole("region", { name: "Practice results" }),
   ).toBeVisible();

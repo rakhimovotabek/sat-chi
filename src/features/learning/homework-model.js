@@ -27,3 +27,16 @@ export function sectionResults(items) {
 export function formatTime(seconds = 0) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
+
+// Homework deadlines are entered in Tashkent, independently of the browser zone.
+export function homeworkDueInput(instant) {
+  return new Date(new Date(instant).getTime() + 5 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 16);
+}
+export function homeworkDueInstant(input) {
+  const instant = new Date(`${input}:00+05:00`);
+  if (!Number.isFinite(instant.getTime()))
+    throw new Error("Choose a valid homework due date and time.");
+  return instant.toISOString();
+}

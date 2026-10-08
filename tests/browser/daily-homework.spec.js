@@ -153,7 +153,7 @@ test("student starts today, saves answers and review marks, resumes and complete
   await expect(page.getByRole("status")).toHaveText("All changes saved");
   page.on("dialog", (d) => d.accept());
   await page
-    .getByRole("button", { name: "Submit practice", exact: true })
+    .getByRole("button", { name: "Submit homework", exact: true })
     .click();
   await expect(
     page.getByRole("region", { name: "Practice results" }),
@@ -204,7 +204,7 @@ test("student missed day allows completed late and disabled late policy prevents
   }
   page.on("dialog", (d) => d.accept());
   await page
-    .getByRole("button", { name: "Submit practice", exact: true })
+    .getByRole("button", { name: "Submit homework", exact: true })
     .click();
   await expect(
     page.getByRole("region", { name: "Practice results" }),

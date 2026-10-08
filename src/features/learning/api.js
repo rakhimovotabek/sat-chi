@@ -57,6 +57,27 @@ export const removeMember = (id) =>
   checked(supabase.from("group_members").delete().eq("id", id));
 export const bank = (filters, page = 0) =>
   rpc("question_bank", { p_filters: filters, p_page: page });
+// Diagnose an older server without silently returning its broader admin pool.
+export async function assignmentBank(filters, page = 0) {
+  const { data, error } = await supabase.rpc("question_bank", {
+    p_filters: { ...filters, assignment: true },
+    p_page: page,
+  });
+  if (!error) return data;
+  if (error.message === "Invalid filters") {
+    const legacy = await supabase.rpc("question_bank", {
+      p_filters: filters,
+      p_page: page,
+    });
+    if (!legacy.error)
+      throw new Error(
+        "Homework question selection requires a server update. Existing selections are preserved. Ask an administrator to enable assignment filtering before adding questions.",
+      );
+  }
+  throw new Error(
+    error.message || "Could not load homework questions. Try again.",
+  );
+}
 export const startBank = (filters, count, timed) =>
   rpc("start_bank_practice", {
     p_filters: filters,
