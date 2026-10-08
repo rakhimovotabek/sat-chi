@@ -1,3 +1,5 @@
+> Current execution status (2026-10-08): the four migrations and matching frontend are published, but Book queries timed out during production verification. Writes remain in maintenance. See [scoped-production-release-report.md](scoped-production-release-report.md). Earlier pending/aborted status below is historical.
+
 # Storage freeze investigation and release status
 
 2026-10-08. **NOT DEPLOYED — NO-GO.** A real upload using a token issued before maintenance succeeded during maintenance, despite restrictive Storage policies. A service-role upload also succeeded. The ordinary authenticated upload and new signing requests were rejected. No four-migration cutover, GitHub push, or Netlify frontend deployment was attempted. All probe restrictions and files were removed, and normal pre-migration admission was restored.

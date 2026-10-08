@@ -116,7 +116,7 @@ test(
       { mode: 0o600 },
     );
     const historySql =
-      "select encode(sha256(convert_to(coalesce(string_agg(encode(sha256(convert_to(to_jsonb(i)::text,'UTF8')),'hex'),'' order by i.id),''),'UTF8')),'hex') from public.book_practice_items i";
+      "select encode(sha256(convert_to(coalesce(string_agg(encode(sha256(convert_to((to_jsonb(i)-'answer_revision')::text,'UTF8')),'hex'),'' order by i.id),''),'UTF8')),'hex') from public.book_practice_items i";
     const history = await query(historySql);
     const tables = JSON.parse(
       await query(
@@ -143,17 +143,25 @@ test(
             : "__unused__",
       );
     const storageBefore = await rowDigest("storage", "objects");
+    const applied = JSON.parse(
+      await query(
+        "select coalesce(jsonb_agg(version),'[]') from supabase_migrations.schema_migrations",
+      ),
+    );
+    let rehearsed = 0;
     for (const file of [
       "20261008000100_homework_lifecycle.sql",
       "20261008000200_practice_answer_integrity.sql",
       "20261008000300_admin_open_response_review.sql",
       "20261008000400_homework_snapshot_assets.sql",
-    ])
+      "20261009000100_book_approval_cache.sql",
+    ]) {
+      if (applied.includes(file.split("_")[0])) continue;
       await query(await readFile(join("supabase/migrations", file), "utf8"));
+      rehearsed++;
+    }
     assert.ok(
-      (await query(
-        historySql.replace("to_jsonb(i)", "(to_jsonb(i)-'answer_revision')"),
-      )) === history,
+      (await query(historySql)) === history,
       "Existing student answer and grading rows must remain unchanged",
     );
     for (const [table, before] of Object.entries(protectedRows))
@@ -175,6 +183,40 @@ test(
       storageBefore,
       "All existing Storage metadata must remain unchanged",
     );
+    assert.equal(
+      await query(
+        "select count(*) from public.question_bank_eligibility where book_student_ready is distinct from public.book_question_approved_uncached(question_id)",
+      ),
+      "0",
+      "Cached Book approval must match every original decision in the restored production data",
+    );
+    const student = await query(
+      "select id from public.profiles where role='student' and active order by id limit 1",
+    );
+    const topic = await query(
+      "select q.topic_id from public.questions q join public.book_topics t on t.id=q.topic_id join public.books b on b.id=t.book_id join public.question_bank_eligibility e on e.question_id=q.id where b.published and e.book_student_ready group by q.topic_id having count(*) between 1 and 5 order by count(*),q.topic_id limit 1",
+    );
+    assert.ok(
+      student && topic,
+      "Restored fixture must include a student and a small published topic",
+    );
+    for (const statement of [
+      "select count(*) from public.questions",
+      `select public.start_book_practice('${topic}')`,
+    ]) {
+      // Apply actual student RLS and retain the deployed 8s limit. The mutation
+      // is rolled back, leaving all restored answers/history untouched.
+      const output = await query(
+        `begin;set local statement_timeout='8s';set local role authenticated;select set_config('request.jwt.claim.sub','${student}',true);explain(analyze,buffers,format json) ${statement};rollback;`,
+      );
+      const plan = JSON.parse(
+        output.slice(output.indexOf("[\n"), output.lastIndexOf("]") + 1),
+      )[0];
+      assert.ok(
+        plan["Execution Time"] < 3000,
+        "Book RLS/catalog and practice startup must stay well below the deployed timeout on the full restored dataset",
+      );
+    }
     await writeFile(
       join(folder, "application-integrity-baseline.private.json"),
       JSON.stringify(protectedRows, null, 2),
@@ -187,7 +229,9 @@ test(
           postgresMajor: 17,
           restored: true,
           ...result,
-          pendingMigrationsRehearsed: 4,
+          pendingMigrationsRehearsed: rehearsed,
+          bookApprovalMatchesOriginal: true,
+          fullDatasetStudentBookQueriesUnderThreeSeconds: true,
           existingAnswerRowsUnchanged: true,
           allExistingPublicRowsPreserved: true,
           existingPublicTablesVerified: Object.keys(protectedRows).length,

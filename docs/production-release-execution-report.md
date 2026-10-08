@@ -1,3 +1,5 @@
+> Current execution status (2026-10-08): the four migrations and matching frontend are published, but Book queries timed out during production verification. Writes remain in maintenance. See [scoped-production-release-report.md](scoped-production-release-report.md). Earlier pending/aborted status below is historical.
+
 # Production release execution — stopped before cutover
 
 Follow-up investigation and current release status are in [storage-freeze-and-release-report.md](storage-freeze-and-release-report.md). Actual pre-issued-token and service-role uploads both succeeded during maintenance despite disposable-path restrictive policies. All temporary policies and files were cleaned up, mode was restored to `off`, and Phase2 remains blocked.

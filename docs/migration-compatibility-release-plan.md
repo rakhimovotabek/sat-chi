@@ -1,3 +1,5 @@
+> Current execution status (2026-10-08): the four migrations and matching frontend are published, but Book queries timed out during production verification. Writes remain in maintenance. See [scoped-production-release-report.md](scoped-production-release-report.md). Earlier pending/aborted status below is historical.
+
 # Practice answer integrity: compatibility decision and release plan
 
 Reviewed and tested on 2026-10-08. No production migrations, deployment, push, or student-data writes were performed. Existing uncommitted work was preserved.
