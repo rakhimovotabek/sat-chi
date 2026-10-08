@@ -742,7 +742,7 @@ test("canonical package questions appear in Bank and image/open checks preserve 
         response.id,
         crypto.randomUUID(),
       ]),
-      (e) => e.code === "40001",
+      (e) => e.code === "PT409",
     );
     assert.equal(
       (

@@ -165,14 +165,21 @@ test("removed questions and completed sessions keep drafts for review and cannot
   }
 });
 test("server conflicts require reload before an explicit overwrite and missing acknowledgements remain pending", async () => {
-  const p = setup(memory(), [row()], async () => {
-    throw Object.assign(Error("Changed elsewhere"), { code: "40001" });
-  });
-  p.change("one", { selected_answer: 1 });
-  await assert.rejects(p.flush());
-  assert.equal(p.state().canUseDrafts, false);
-  p.resolve(true);
-  assert.equal(p.state().conflicts.length, 1);
+  for (const code of ["PT409", "40001"]) {
+    let requests = 0;
+    const p = setup(memory(), [row()], async () => {
+      requests++;
+      throw Object.assign(Error("Changed elsewhere"), { code });
+    });
+    p.change("one", { selected_answer: 1 });
+    await assert.rejects(p.flush());
+    assert.equal(p.state().canUseDrafts, false);
+    assert.equal(p.state().unsaved, true);
+    await assert.rejects(p.flush());
+    assert.equal(requests, 1, "A conflict must not be automatically replayed");
+    p.resolve(true);
+    assert.equal(p.state().conflicts.length, 1);
+  }
   const q = setup(memory(), [row()], async () => null);
   q.change("one", { selected_answer: 1 });
   await assert.rejects(q.flush(), /did not confirm/);

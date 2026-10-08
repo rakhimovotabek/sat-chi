@@ -136,9 +136,9 @@ test(
           { id: initial[2].id, selected_answer: 1, expected_revision: 0 },
           { id: initial[0].id, selected_answer: 0, expected_revision: 0 },
         ]);
-        // PostgREST maps PostgreSQL serialization_failure (40001) to HTTP 500.
-        assert.equal(conflict.status, 500);
-        assert.equal(conflict.data.code, "40001");
+        // Application conflicts use HTTP409 rather than retryable SQLSTATE40001.
+        assert.equal(conflict.status, 409);
+        assert.equal(conflict.data.code, "PT409");
         assert.deepEqual(await rows(), before);
       },
     );

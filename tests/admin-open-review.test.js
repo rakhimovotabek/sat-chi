@@ -38,7 +38,7 @@ for (const kind of ["homework", "book", "bank"])
         (await call("learning_metrics", [student], ["uuid"])).correct,
         1,
       );
-      await assert.rejects(decide(false, 0), (e) => e.code === "40001");
+      await assert.rejects(decide(false, 0), (e) => e.code === "PT409");
       assert.equal((await row()).correct, true);
       await assert.rejects(
         call(

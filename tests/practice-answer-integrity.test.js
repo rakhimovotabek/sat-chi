@@ -65,7 +65,7 @@ test("real SQL versioned saves reject stale writers, preserve independent answer
         ]);
         assert.equal(result.filter((r) => r.status === "fulfilled").length, 1);
         const failed = result.find((r) => r.status === "rejected");
-        assert.equal(failed.reason.code, "40001");
+        assert.equal(failed.reason.code, "PT409");
         assert.equal((await rows())[2].selected_answer, 1);
       },
     );
@@ -79,7 +79,7 @@ test("real SQL versioned saves reject stale writers, preserve independent answer
     await t.test("atomic batch conflict rolls back other changes", async () => {
       await assert.rejects(
         save([change(items[3], 1), change(items[0], 2)]),
-        (e) => e.code === "40001",
+        (e) => e.code === "PT409",
       );
       assert.equal((await rows())[3].selected_answer, null);
     });
@@ -149,7 +149,7 @@ test("real SQL versioned saves reject stale writers, preserve independent answer
             item.id,
             "f9000000-0000-0000-0000-000000000001",
           ]),
-          (e) => e.code === "40001",
+          (e) => e.code === "PT409",
         );
         assert.equal(
           (

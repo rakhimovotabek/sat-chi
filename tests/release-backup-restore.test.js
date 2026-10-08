@@ -155,6 +155,7 @@ test(
       "20261008000300_admin_open_response_review.sql",
       "20261008000400_homework_snapshot_assets.sql",
       "20261009000100_book_approval_cache.sql",
+      "20261009000200_practice_conflict_http.sql",
     ]) {
       if (applied.includes(file.split("_")[0])) continue;
       await query(await readFile(join("supabase/migrations", file), "utf8"));

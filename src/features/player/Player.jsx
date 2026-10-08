@@ -210,7 +210,7 @@ export default function Player() {
       // Refresh authoritative versions after Check changes/locks an answer.
       state.reload();
     } catch (e) {
-      if (e.code === "40001") state.reload();
+      if (e.code === "PT409" || e.code === "40001") state.reload();
       setError(e.message);
     } finally {
       setChecking(false);

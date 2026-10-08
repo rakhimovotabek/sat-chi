@@ -11,7 +11,7 @@ async function checked(
       new Error(
         error.code === "PGRST202"
           ? "Saving is unavailable on this server. Your answers have not been saved to the server. Ask an administrator to update it, then retry saving."
-          : error.code === "40001"
+          : error.code === "PT409" || error.code === "40001"
             ? error.message
             : error.code === "23505"
               ? "This content has already been imported."
@@ -238,7 +238,7 @@ export async function savePracticeChanges(id, changes) {
       new Error(
         error.code === "PGRST202"
           ? "Saving is unavailable on this server. Your pending answers are kept on this device. Ask an administrator to update the server before retrying."
-          : error.code === "40001"
+          : error.code === "PT409" || error.code === "40001"
             ? error.message
             : `Could not save your answers. ${error.message || "Retry saving."}`,
       ),

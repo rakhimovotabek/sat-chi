@@ -182,7 +182,7 @@ export function createPracticePersistence({
       error = "";
     } catch (e) {
       error = e.message;
-      if (e.code === "40001") {
+      if (e.code === "PT409" || e.code === "40001") {
         needsReload = true;
         for (const entry of batch) conflicts.add(entry.id);
       }
