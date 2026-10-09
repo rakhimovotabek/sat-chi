@@ -11,7 +11,10 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 const exec = promisify(execFile);
 export const admin = "f1000000-0000-0000-0000-000000000001",
-  student = "f1000000-0000-0000-0000-000000000002";
+  student = "f1000000-0000-0000-0000-000000000002",
+  studentB = "f1000000-0000-0000-0000-000000000003",
+  studentC = "f1000000-0000-0000-0000-000000000004";
+const fixtureUsers = { admin, student, studentB, studentC };
 const quote = (v) => "'" + String(v).replaceAll("'", "''") + "'";
 async function port() {
   const server = tcpServer();
@@ -255,8 +258,7 @@ export async function nativeAppEnvironment() {
       id: uid,
       aud: "authenticated",
       role: "authenticated",
-      email:
-        uid === admin ? "admin@fixture.invalid" : "student@fixture.invalid",
+      email: `${Object.keys(fixtureUsers).find((key) => fixtureUsers[key] === uid)}@fixture.invalid`,
       app_metadata: { provider: "email" },
       user_metadata: {},
       created_at: new Date().toISOString(),
@@ -310,13 +312,17 @@ export async function nativeAppEnvironment() {
           const chunks = [];
           for await (const chunk of req) chunks.push(chunk);
           const body = JSON.parse(Buffer.concat(chunks));
-          const uid =
-            body.email === "admin@fixture.invalid"
-              ? admin
-              : body.email === "student@fixture.invalid"
-                ? student
-                : null;
-          if (!uid || body.password !== "disposable-test-only") {
+          const refreshing =
+            url.searchParams.get("grant_type") === "refresh_token";
+          const uid = refreshing
+            ? claims(body.refresh_token).sub
+            : fixtureUsers[body.email?.split("@")[0]];
+          if (
+            !uid ||
+            (!refreshing &&
+              (body.email !== user(uid).email ||
+                body.password !== "disposable-test-only"))
+          ) {
             send({ msg: "Invalid local fixture credentials" }, 400);
             return;
           }
@@ -392,7 +398,7 @@ export async function nativeAppEnvironment() {
     const config = join(folder, "postgrest.conf");
     await writeFile(
       config,
-      `db-uri = "postgresql://authenticator@127.0.0.1:${dbPort}/postgres"\ndb-schemas = "public"\ndb-anon-role = "anon"\njwt-secret = "${secret}"\nserver-host = "127.0.0.1"\nserver-port = ${restPort}\n`,
+      `db-uri = "postgresql://authenticator@127.0.0.1:${dbPort}/postgres"\ndb-schemas = "public"\ndb-anon-role = "anon"\ndb-max-rows = 1000\njwt-secret = "${secret}"\nserver-host = "127.0.0.1"\nserver-port = ${restPort}\n`,
       { mode: 0o600 },
     );
     launch("postgrest", process.env.SATCHI_TEST_POSTGREST, [config]);
@@ -444,6 +450,13 @@ export async function nativeAppEnvironment() {
       apiUrl,
       databasePort: dbPort,
       serviceToken: token({ role: "service_role" }),
+      tokenFor: (uid, overrides = {}) =>
+        token({
+          sub: uid,
+          role: "authenticated",
+          aud: "authenticated",
+          ...overrides,
+        }),
       sql,
       json,
       as,

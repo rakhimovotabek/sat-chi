@@ -119,6 +119,17 @@ export async function loginDatabase(
         const args = [],
           where = [];
         for (const [key, value] of url.searchParams) {
+          if (
+            name === "question_check_attempts" &&
+            key === "book_practice_items.session_id" &&
+            value.startsWith("eq.")
+          ) {
+            args.push(value.slice(3));
+            where.push(
+              `item_id in (select id from public.book_practice_items where session_id=$${args.length})`,
+            );
+            continue;
+          }
           if (!/^[a-z_]+$/.test(key)) throw new Error("Invalid column");
           if (value.startsWith("eq.")) {
             args.push(value.slice(3));

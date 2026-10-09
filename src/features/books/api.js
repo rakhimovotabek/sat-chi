@@ -206,18 +206,26 @@ export async function getPractice(id) {
       ...openReview.find((o) => o.item_id === r.item_id),
     }));
   }
-  const attempts = ["bank", "book"].includes(session.kind)
-    ? await checked(
+  const attempts = [];
+  if (["bank", "book"].includes(session.kind)) {
+    // PostgREST caps individual responses. Load all owned session history in
+    // bounded pages so long sessions cannot silently lose their latest checks.
+    const pageSize = 1000;
+    for (let offset = 0; ; offset += pageSize) {
+      const page = await checked(
         supabase
           .from("question_check_attempts")
-          .select("*")
-          .in(
-            "item_id",
-            items.map((i) => i.id),
-          )
-          .order("attempt_order"),
-      )
-    : [];
+          .select("*,book_practice_items!inner(session_id)")
+          .eq("book_practice_items.session_id", id)
+          .order("attempt_order")
+          .order("id")
+          .range(offset, offset + pageSize - 1),
+      );
+      attempts.push(...page);
+      if (page.length < pageSize) break;
+    }
+  }
+
   return {
     session,
     items: items.map((i) => ({
