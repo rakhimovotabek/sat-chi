@@ -12,7 +12,7 @@ export function ExplanationContent({ explanation }) {
   // Only package image Markdown is interpreted; all other content stays text.
   const parts = [];
   const pattern =
-    /!\[([^\]]*)\]\((https:\/\/[^\s)]+\/storage\/v1\/object\/authenticated\/book-package-assets\/[a-f0-9]{64}\/[a-f0-9]{64}\.png)\)/g;
+    /!\[([^\]]*)\]\((https:\/\/[^\s)]+\/storage\/v1\/object\/authenticated\/book-package-assets\/[a-f0-9]{64}\/[a-f0-9]{64}\.(?:png|jpe?g))\)/g;
   let position = 0;
   for (const match of explanation.matchAll(pattern)) {
     if (match.index > position)
