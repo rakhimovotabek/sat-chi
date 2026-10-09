@@ -3,17 +3,23 @@ begin;
 lock table public.books, public.book_topics, public.questions,
  public.book_practice_sessions, public.import_jobs in share row exclusive mode;
 create temporary table reset_protected_hashes(relation text, predicate text, digest text);
+-- Capture intended source deletions before cascades. These derived rows are not
+-- student history; unknown/new relations remain protected by default.
+create temporary table reset_source_questions as select id from public.questions;
+create temporary table reset_source_books as select id from public.books;
 do $$ declare t text; p text; d text; begin
  for t in select tablename from pg_tables where schemaname='public' loop
  p := case
  when t='book_practice_sessions' then 'kind<>''book'''
- when t in ('book_practice_items','book_practice_keys','question_check_attempts') then
+ when t in ('book_practice_items','book_practice_keys','book_practice_open_keys','practice_open_reviews','question_check_attempts') then
  case when t='book_practice_items' then 'session_id in (select id from public.book_practice_sessions where kind<>''book'')'
  else 'item_id in (select i.id from public.book_practice_items i join public.book_practice_sessions s on s.id=i.session_id where s.kind<>''book'')' end
  when t='student_activity' then 'kind<>''book'' and (session_id is null or session_id in (select id from public.book_practice_sessions where kind<>''book''))'
  when t='study_plan_tasks' then 'session_id is null or session_id in (select id from public.book_practice_sessions where kind<>''book'')'
  when t='import_jobs' then 'source_type<>''book'''
  when t in ('content_review_items','content_review_audit','import_runs') then 'source_id is null or source_id in (select id from public.import_jobs where source_type<>''book'')'
+ when t in ('question_bank_eligibility','book_open_answers') then 'question_id not in (select id from reset_source_questions)'
+ when t in ('book_import_packages','book_package_assets') then 'book_id not in (select id from reset_source_books)'
  when t in ('books','book_topics','questions','question_answers','content_imports','local_question_imports') then null
  else 'true' end;
  if p is not null then
