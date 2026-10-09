@@ -1,3 +1,4 @@
+import { CLIENT_VERSION } from "./client-version.js";
 import { createClient } from "@supabase/supabase-js";
 
 const url = import.meta.env.VITE_SUPABASE_URL?.trim();
@@ -16,7 +17,7 @@ export const isSupabaseConfigured = Boolean(url && anonKey && isHttpUrl(url));
 // A missing configuration leaves the login screen available with setup guidance.
 export const supabase = isSupabaseConfigured
   ? createClient(url, anonKey, {
-      global: { headers: { "x-satchi-client-version": "20261008" } },
+      global: { headers: { "x-satchi-client-version": CLIENT_VERSION } },
       auth: {
         persistSession: true,
         autoRefreshToken: true,

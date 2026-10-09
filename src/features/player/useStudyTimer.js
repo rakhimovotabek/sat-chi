@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { heartbeat } from "../learning/api.js";
+import { CLIENT_VERSION } from "../../lib/client-version.js";
+import { sendStudyTimeBatch } from "./study-time-batch.js";
 import useAuth from "../../hooks/useAuth.js";
 export default function useStudyTimer(id, position, session, active) {
   const { session: auth } = useAuth();
@@ -23,34 +25,38 @@ export default function useStudyTimer(id, position, session, active) {
     pending.current.clear();
     entries.push([position, 0]);
     const send = async () => {
-      for (const [p, seconds] of entries) {
-        try {
-          if (keepalive) {
-            await fetch(
-              `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/rpc/practice_heartbeat`,
-              {
-                method: "POST",
-                keepalive: true,
-                headers: {
-                  apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-                  Authorization: `Bearer ${auth.access_token}`,
-                  "Content-Type": "application/json",
+      try {
+        await sendStudyTimeBatch(
+          entries,
+          pending.current,
+          async (p, seconds) => {
+            if (keepalive) {
+              await fetch(
+                `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/rpc/practice_heartbeat`,
+                {
+                  method: "POST",
+                  keepalive: true,
+                  headers: {
+                    apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+                    Authorization: `Bearer ${auth.access_token}`,
+                    "Content-Type": "application/json",
+                    "x-satchi-client-version": CLIENT_VERSION,
+                  },
+                  body: JSON.stringify({
+                    p_session: id,
+                    p_position: p,
+                    p_seconds: seconds,
+                  }),
                 },
-                body: JSON.stringify({
-                  p_session: id,
-                  p_position: p,
-                  p_seconds: seconds,
-                }),
-              },
-            ).then((r) => {
-              if (!r.ok) throw new Error("Sync failed");
-            });
-          } else await heartbeat(id, p, seconds);
-        } catch {
-          pending.current.set(p, (pending.current.get(p) || 0) + seconds);
-          setWarning("Study time could not sync. Retry before leaving.");
-          throw new Error("Study time could not sync. Retry before leaving.");
-        }
+              ).then((r) => {
+                if (!r.ok) throw new Error("Sync failed");
+              });
+            } else await heartbeat(id, p, seconds);
+          },
+        );
+      } catch {
+        setWarning("Study time could not sync. Retry before leaving.");
+        throw new Error("Study time could not sync. Retry before leaving.");
       }
       setWarning("");
     };
