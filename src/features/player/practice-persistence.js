@@ -193,6 +193,9 @@ export function createPracticePersistence({
     }
   }
   return {
+    // Exclude dirty overlays: only server-acknowledged values may outrank an
+    // older in-flight read. Pending drafts must still use the recovery outbox.
+    confirmedItems: () => items.map((i) => ({ ...base.get(i.id) })),
     state,
     subscribe(fn) {
       listeners.add(fn);

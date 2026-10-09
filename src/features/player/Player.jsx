@@ -21,6 +21,7 @@ import { formatTime, sectionResults } from "../learning/homework-model.js";
 import Stimulus from "./Stimulus.jsx";
 import QuestionImage from "../../components/QuestionImage.jsx";
 import BookExplanation from "./BookExplanation.jsx";
+import { preloadQuestionImages } from "../../components/question-image-source.js";
 import Navigator from "./Navigator.jsx";
 import { practiceSummary, questionAnswerIssue } from "./model.js";
 import { createPracticePersistence } from "./practice-persistence.js";
@@ -40,6 +41,7 @@ export default function Player() {
     [clearDrawings, setClearDrawings] = useState(0),
     [drawingError, setDrawingError] = useState("");
   const checkEvent = useRef(null);
+  const checkPending = useRef(false);
   const [checking, setChecking] = useState(false);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -62,6 +64,10 @@ export default function Player() {
       !items[index]?.solved_at,
   );
   useEffect(() => {
+    const next = items[index + 1]?.question;
+    if (next && ownsSession) preloadQuestionImages(next, auth.user.id);
+  }, [items, index, ownsSession, auth.user.id]);
+  useEffect(() => {
     const warn = (e) => {
       if (unsaved.current) {
         e.preventDefault();
@@ -81,10 +87,19 @@ export default function Player() {
     } catch {
       /* Visible recovery warning below. */
     }
+    const confirmed = new Map(
+      (state.background ? persistence.current?.confirmedItems() || [] : []).map(
+        (row) => [row.id, row],
+      ),
+    );
+    const incoming = state.data.items.map((row) => {
+      const previous = confirmed.get(row.id);
+      return previous?.answer_revision > row.answer_revision ? previous : row;
+    });
     const controller = createPracticePersistence({
       userId: auth.user.id,
       sessionId,
-      items: state.data.items,
+      items: incoming,
       submitted: Boolean(state.data.session.submitted_at),
       storage,
       save: (changes) => savePracticeChanges(sessionId, changes),
@@ -96,9 +111,9 @@ export default function Player() {
       setSaving(next.pending > 0);
       setSaveState(next);
     });
-    setIndex(
+    setIndex((previous) =>
       Math.min(
-        state.data.session.current_position || 0,
+        state.background ? previous : state.data.session.current_position || 0,
         Math.max(0, state.data.items.length - 1),
       ),
     );
@@ -168,8 +183,9 @@ export default function Player() {
   }
   async function check() {
     const item = items[index];
-    if (item.selected_answer == null || checking) return;
-    checkEvent.current ||= crypto.randomUUID();
+    if (item.selected_answer == null || checkPending.current) return;
+    checkPending.current = true;
+    const event = (checkEvent.current ||= crypto.randomUUID());
     setChecking(true);
     setError("");
     try {
@@ -189,7 +205,7 @@ export default function Player() {
         item.question.question_type === "open"
           ? item.selected_response
           : item.selected_answer,
-        checkEvent.current,
+        event,
       );
       setItems((rows) =>
         rows.map((i) =>
@@ -207,12 +223,15 @@ export default function Player() {
         ),
       );
       checkEvent.current = null;
-      // Refresh authoritative versions after Check changes/locks an answer.
-      state.reload();
+      // Keep the question DOM/images mounted while reconciling authoritative
+      // versions after Check changes/locks an answer. Never skip the revision read.
+      state.reload({ background: true });
     } catch (e) {
-      if (e.code === "PT409" || e.code === "40001") state.reload();
+      if (e.code === "PT409" || e.code === "40001")
+        state.reload({ background: true });
       setError(e.message);
     } finally {
+      checkPending.current = false;
       setChecking(false);
     }
   }
@@ -351,6 +370,18 @@ export default function Player() {
           <p>Study time: {formatTime(state.data.session.elapsed_seconds)}</p>
         </section>
       )}
+      {state.refreshError && (
+        <div className="form-error" role="alert">
+          Could not refresh checked answers. {state.refreshError}
+          <button
+            type="button"
+            className="button button-secondary button-compact"
+            onClick={() => state.reload({ background: true })}
+          >
+            Retry loading saved answers
+          </button>
+        </div>
+      )}
       {(error || saveState.error) && (
         <div className="form-error" role="alert">
           {error || saveState.error}
@@ -456,7 +487,7 @@ export default function Player() {
             }}
           />
         )}
-        <span role="status">
+        <span role="status" aria-label="Answer save status">
           {submitted
             ? "Submitted"
             : saving
@@ -742,6 +773,7 @@ export default function Player() {
                 current.selected_answer == null ||
                 current.eliminated.includes(current.selected_answer)
               }
+              type="button"
               onClick={check}
             >
               {checking ? "Checking…" : "Check"}

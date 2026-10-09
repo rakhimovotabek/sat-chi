@@ -84,12 +84,51 @@ test(
       join(tmpdir(), "satchi-reliability-browser-"),
     );
     t.after(() => rm(profileDir, { recursive: true, force: true }));
-    const launch = () =>
-      chromium.launchPersistentContext(profileDir, {
-        headless: true,
-        channel: "chromium",
-        args: ["--disable-features=BackForwardCache"],
+    const launch = async () => {
+      const browserContext = await chromium.launchPersistentContext(
+        profileDir,
+        {
+          headless: true,
+          channel: "chromium",
+        },
+      );
+      await browserContext.addInitScript(() => {
+        window.authStorageTrace = [];
+        const get = Storage.prototype.getItem;
+        const remove = Storage.prototype.removeItem;
+        Storage.prototype.getItem = function (key) {
+          const raw = get.call(this, key);
+          if (key === "sb-127-auth-token") {
+            let value;
+            try {
+              value = JSON.parse(raw);
+            } catch {
+              /* Record invalid JSON. */
+            }
+            window.authStorageTrace.push({
+              operation: "read",
+              stored: Boolean(raw),
+              valid: Boolean(
+                value?.access_token &&
+                  value?.refresh_token &&
+                  value?.expires_at,
+              ),
+              hasUser: Boolean(value?.user?.id),
+              unexpired: value?.expires_at > Date.now() / 1000,
+            });
+            if (window.authStorageTrace.length > 100)
+              window.authStorageTrace.shift();
+          }
+          return raw;
+        };
+        Storage.prototype.removeItem = function (key) {
+          if (key === "sb-127-auth-token")
+            window.authStorageTrace.push({ operation: "remove" });
+          return remove.call(this, key);
+        };
       });
+      return browserContext;
+    };
     let context = await launch();
     t.after(() => context.close());
     let page = await context.newPage();
@@ -172,6 +211,7 @@ test(
             const raw = localStorage.getItem("sb-127-auth-token");
             const auth = raw ? JSON.parse(raw) : null;
             return {
+              trace: window.authStorageTrace,
               path: location.pathname,
               storedAuth: Boolean(auth),
               hasUser: Boolean(auth?.user),

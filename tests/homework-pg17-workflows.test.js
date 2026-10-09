@@ -46,7 +46,6 @@ test(
     const browser = await chromium.launch({
       headless: true,
       channel: "chromium",
-      args: ["--disable-features=BackForwardCache"],
     });
     t.after(() => browser.close());
     const teacher = await (await browser.newContext()).newPage();

@@ -41,7 +41,9 @@ for (const type of ["text MCQ", "image MCQ", "open response"])
     if (type === "open response")
       await page.getByLabel("Your answer").fill("43/5");
     else await page.getByRole("radio").nth(1).check();
-    await expect(page.getByRole("status")).toHaveText("Save failed");
+    await expect(
+      page.getByRole("status", { name: "Answer save status" }),
+    ).toHaveText("Save failed");
     expect(store.items[0].selected_answer).toBeNull();
     await page
       .getByRole("link", { name: "Books", exact: true })
@@ -49,15 +51,21 @@ for (const type of ["text MCQ", "image MCQ", "open response"])
       .click();
     await expect(page).not.toHaveURL(url);
     await page.goto(url);
-    await expect(page.getByRole("status")).toHaveText("Save failed");
+    await expect(
+      page.getByRole("status", { name: "Answer save status" }),
+    ).toHaveText("Save failed");
     if (type === "open response")
       await expect(page.getByLabel("Your answer")).toHaveValue("43/5");
     else await expect(page.getByRole("radio").nth(1)).toBeChecked();
     await page.reload();
-    await expect(page.getByRole("status")).toHaveText("Save failed");
+    await expect(
+      page.getByRole("status", { name: "Answer save status" }),
+    ).toHaveText("Save failed");
     offline = false;
     await page.getByRole("button", { name: "Retry saving" }).click();
-    await expect(page.getByRole("status")).toHaveText("All changes saved");
+    await expect(
+      page.getByRole("status", { name: "Answer save status" }),
+    ).toHaveText("All changes saved");
     await page.reload();
     if (type === "open response")
       await expect(page.getByLabel("Your answer")).toHaveValue("43/5");
@@ -89,13 +97,17 @@ test("save status waits for acknowledgement and older acknowledgement cannot cle
     await r.fallback();
   });
   await page.getByRole("radio").nth(1).check();
-  await expect(page.getByRole("status")).toHaveText("Saving answers…");
+  await expect(
+    page.getByRole("status", { name: "Answer save status" }),
+  ).toHaveText("Saving answers…");
   await page.getByRole("radio").nth(2).check();
   await expect(
     page.getByText("All changes saved", { exact: true }),
   ).toHaveCount(0);
   release();
-  await expect(page.getByRole("status")).toHaveText("All changes saved");
+  await expect(
+    page.getByRole("status", { name: "Answer save status" }),
+  ).toHaveText("All changes saved");
   expect(store.items[0].selected_answer).toBe(2);
   await page.reload();
   await expect(page.getByRole("radio").nth(2)).toBeChecked();

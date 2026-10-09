@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import Modal from "./Modal.jsx";
-import { supabase } from "../lib/supabase.js";
+import {
+  resolveQuestionImage,
+  invalidateQuestionImage,
+} from "./question-image-source.js";
+import useAuth from "../hooks/useAuth.js";
 export default function QuestionImage({ src, alt, allowZoom = true }) {
+  const { session } = useAuth();
+  const owner = session?.user?.id;
   const [url, setUrl] = useState(null),
     [failed, setFailed] = useState(false),
     [retry, setRetry] = useState(0);
@@ -15,30 +21,9 @@ export default function QuestionImage({ src, alt, allowZoom = true }) {
     setFailed(false);
     setUrl(null);
     async function resolve() {
-      const packageAsset = src.includes(
-        "/storage/v1/object/authenticated/book-package-assets/",
-      );
-      const bucket = packageAsset ? "book-package-assets" : "question-assets";
-      const marker = `/storage/v1/object/authenticated/${bucket}/`;
-      if (!src.includes(marker)) {
-        setUrl(src);
-        return;
-      }
       try {
-        const path = src.split(marker)[1];
-        if (
-          !(
-            packageAsset
-              ? /^[a-f0-9]{64}\/[a-f0-9]{64}\.(?:png|jpe?g)$/
-              : /^[a-f0-9]{64}\/[a-f0-9]{64}\.webp$/
-          ).test(path)
-        )
-          throw new Error("Invalid asset");
-        const { data, error } = await supabase.storage
-          .from(bucket)
-          .createSignedUrl(path, 3600);
-        if (error) throw error;
-        if (active) setUrl(data.signedUrl);
+        const signed = await resolveQuestionImage(src, owner);
+        if (active) setUrl(signed);
       } catch {
         if (active) setFailed(true);
       }
@@ -47,7 +32,7 @@ export default function QuestionImage({ src, alt, allowZoom = true }) {
     return () => {
       active = false;
     };
-  }, [src, retry]);
+  }, [src, owner, retry]);
   return (
     <>
       <figure>
@@ -59,7 +44,11 @@ export default function QuestionImage({ src, alt, allowZoom = true }) {
             </figcaption>
             <button
               className="button button-secondary button-compact"
-              onClick={() => setRetry((v) => v + 1)}
+              type="button"
+              onClick={() => {
+                invalidateQuestionImage(src, owner);
+                setRetry((v) => v + 1);
+              }}
             >
               Retry image
             </button>

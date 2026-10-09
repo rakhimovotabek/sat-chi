@@ -231,3 +231,14 @@ test("multiple recovery records are read even when acknowledged records are remo
   assert.equal(restored.state().items[1].selected_answer, 2);
   assert.equal(restored.state().unsaved, true);
 });
+
+test("authoritative reconciliation uses acknowledged values, never a pending draft overlay", async () => {
+  const p = setup(memory(), [row("one")]);
+  p.change("one", { selected_answer: 1 });
+  await p.flush();
+  p.change("one", { selected_answer: 2 });
+  assert.equal(p.state().items[0].selected_answer, 2);
+  assert.equal(p.confirmedItems()[0].selected_answer, 1);
+  assert.equal(p.confirmedItems()[0].answer_revision, 1);
+  assert.equal(p.state().unsaved, true);
+});
