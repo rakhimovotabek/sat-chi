@@ -159,9 +159,29 @@ test(
       await tab.goto(app.appUrl + "/practice/" + sid, {
         waitUntil: "domcontentloaded",
       });
-      await expect(
-        tab.getByRole("button", { name: /Question \d+ of/ }),
-      ).toBeVisible();
+      try {
+        await expect(
+          tab.getByRole("button", { name: /Question \d+ of/ }),
+        ).toBeVisible();
+      } catch (error) {
+        // Fixture-only metadata, never token values. Distinguish signed-out
+        // recovery from answer loss and retain the first failure's evidence.
+        console.error(
+          "Practice recovery diagnostics",
+          await tab.evaluate(() => {
+            const raw = localStorage.getItem("sb-127-auth-token");
+            const auth = raw ? JSON.parse(raw) : null;
+            return {
+              path: location.pathname,
+              storedAuth: Boolean(auth),
+              hasUser: Boolean(auth?.user),
+              unexpired: auth?.expires_at > Date.now() / 1000,
+            };
+          }),
+          exceptions,
+        );
+        throw error;
+      }
     };
     const go = async (tab, position) => {
       await tab.getByRole("button", { name: /Question \d+ of/ }).click();
@@ -263,6 +283,12 @@ test(
               ),
           )
           .toBe(true);
+        console.log(
+          "Before persistent browser restart",
+          await page.evaluate(() => ({
+            storedAuth: Boolean(localStorage.getItem("sb-127-auth-token")),
+          })),
+        );
         await context.close();
         context = await launch();
         page = await context.newPage();
