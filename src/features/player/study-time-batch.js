@@ -12,3 +12,21 @@ export async function sendStudyTimeBatch(entries, pending, send) {
     }
   }
 }
+
+// Take the batch only when its turn starts. A preceding failed request may
+// have restored entries after this flush was queued.
+export function createStudyTimeQueue(pending) {
+  let queue = Promise.resolve();
+  return (position, send) => {
+    const request = queue
+      .catch(() => {})
+      .then(async () => {
+        const entries = [...pending.entries()];
+        pending.clear();
+        entries.push([position, 0]);
+        await sendStudyTimeBatch(entries, pending, send);
+      });
+    queue = request;
+    return request;
+  };
+}
