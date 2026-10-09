@@ -145,3 +145,12 @@ npm run build
 ```
 
 For restore rehearsal, set `SATCHI_BACKUP_ARCHIVE` to a private checksummed successful archive, then run `node --test tests/release-backup-restore.test.js`. That test contacts only an isolated cluster; its output does not disclose student records. Retain backup/verification files outside Git with restricted permissions. Serialize heavy suites on this laptop.
+
+
+## Check/image and browser-restart follow-up — 2026-10-09
+
+**NO-GO remains.** The reported same-question refresh was workspace teardown during authoritative reload, not document navigation. Background reconciliation now preserves question/image DOM and newer server-acknowledged revisions; a synchronous Check guard prevents duplicate event entry. Images reuse bounded account-scoped capabilities and preload only the next question.
+
+Corrected full unit/database/native run: 253 checks, 243 passed, 10 failed, zero skipped. Authentication storage loss on restart is reproduced; removing invalid browser launch flags did not cure it. Final focused changes passed 14 persistence/cache tests and 5 actual Chromium/PostgreSQL17/PostgREST tests. Scoped browser results, limitations and final build/lint evidence are in [check-and-auth-recovery-report.md](check-and-auth-recovery-report.md). Do not deploy until the full restart workflow is resolved and verified. Existing pending migration order and production safeguards remain unchanged.
+
+Source/test commit `5c1deef`: final scoped browser suite44/45 passed; intermittent stale-tab selection failed then exact rerun passed1/1. Full lint/build passed. This evidence does not change NO-GO.

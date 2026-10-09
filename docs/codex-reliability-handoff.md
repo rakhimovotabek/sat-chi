@@ -95,3 +95,57 @@ The four October8 migrations and090001/090002 were already deployed in previous 
 5. **Release preparation:** review pending migrations/local commits, use the established backup/write-gate procedure if a future release is explicitly authorized, then perform disposable authenticated hosted verification. No deployment or production test writes now.
 
 This is a manual continuation checkpoint, not a promise of automatic resumption after usage resets.
+
+
+## Paused on user request: Check and authentication investigation (2026-10-09)
+
+HEAD remains `e06ea61`, branch `main`. Current repairs and tests are uncommitted; preserve them. Nothing deployed/pushed; no production requests/migrations/data changes. No test suite is currently running: full unit run and shutdown experiment completed.
+
+Confirmed Check defects and repairs:
+- Successful Check called `state.reload()`, rendering ContentState and detaching question images. Native before: image detached, 0 document navigations, 2 signing requests and 1 image request. This was UI teardown, not document reload.
+- `useContent.reload({background:true})` now keeps data/DOM mounted, reports failed refresh inline with retry, and retains current navigation position. Authoritative versions still refetch. Background retention is scoped to matching dependencies using loadedFor. Default callers retain original foreground behavior.
+- Synchronous double clicks could enter before checking state updated, then send a cleared attempt ID after awaits. Added synchronous checkPending ref and captured event ID; added explicit button type.
+- Owner-scoped bounded in-memory signing cache: 128 entries, 55-minute TTL for one-hour capability, promise deduplication, failed-entry removal and explicit retry invalidation. No persistent/shared-account capability cache. Preloads only next question (max 5 assets), retains max 10 preload Image objects, skips duplicate preload URLs. No compression/reimport/content changes.
+- Modified source: src/features/books/useContent.js, src/features/player/Player.jsx, src/components/QuestionImage.jsx. New helpers: src/components/question-image-cache.js and question-image-source.js.
+
+Tests/evidence (private logs outside Git under /home/otabek/satchi-release-backups):
+- check-recovery-before.log reproduced image teardown; its 20 restart checks passed.
+- check-recovery-after.log: 3 passed, including reference-image, four image options, open response and 20 genuine process restarts.
+- check-recovery-final.log: 4 passed; slow/double Check, failed authoritative refresh retry, navigation, real reload/fresh login and 20 restarts. Grading/save acknowledgements compared with actual PG17/PostgREST rows. Check produced 0 document navigations, 0 signing requests, 0 image requests, no detachment.
+- check-auth-complete-unit.log: 251 total, 241 passed, 10 failed, 0 skipped, 1147 seconds. First restart failure plus cascading children/parent; all other checks passed, including reset, concurrency, backup restoration and the new native Check coverage. Native Check measurements: reference 670ms, four options 169ms, open 118ms (observed action/settling spans, not provider latency benchmarks).
+- check-auth-first.log: original reliability journey passed all 13 in isolation before repairs.
+- question-image-cache.test.js: 2 passed. Full lint passed before final loadedFor tweak; rerun final lint/build still needed. Relevant Playwright regressions still needed.
+- auth-shutdown-reproduction.log: immediate fresh login/raw process-close 8/8 persisted; tab-lifecycle-close 8/8 persisted. This experiment DID NOT reproduce loss or establish graceful close as its cure. Do not replace original failing assertion or claim an Auth fix from this result.
+- Early adversarial harness used network abort with 5-second assertion despite SDK bounded GET backoff (1/2/4s); two synchronous clicks also exposed a real Check error. Corrected fault injection to explicit HTTP400 post-Check read rejection; actual grading/persistence stays native. One early stalled isolated test worker was stopped with only its descendants; temporary isolated directory may remain outside repository.
+
+Authentication evidence/blocker:
+- Modified tests/real-user-reliability.test.js: token-free Storage.getItem/removeItem trace installed before app scripts; original recovery assertions/timeouts unchanged. No application Auth change.
+- Complete run confirms storedAuth:true immediately before close. After restart, FIRST SDK storage reads all stored:false, valid:false, hasUser:false, unexpired:false; NO recorded auth-key removal. Then /login. Authoritative saved answers were checked before shutdown. This is profile/storage loss across restart, not a reproduced grading/save conflict or SDK removal after reading a valid session. Exact Chromium shutdown/disk/origin mechanism remains unresolved.
+- Added tests/auth-restart-shutdown.test.js to compare immediate shutdown modes. Raw control also passes; do not infer unsupported causality.
+- Check flicker and this failure are independent: original restart workflow saves Homework answers without pressing Check.
+
+Next steps on resume:
+1. Inspect git diff/status; preserve all uncommitted files and appended handoff.
+2. Investigate storage loss in COMPLETE-run conditions. Add origin/profile/process-exit diagnostics or private Chromium browser logs (no tokens), capture storage before app and profile persistence. Do not use storage injection, forced login, arbitrary sleeps, relaxed assertions or unsupported Auth changes to green the suite.
+3. Fix actual reproduced shutdown/recovery cause; retain original native recovery assertion and verify DB answers after restart/fresh login. Then rerun complete native unit suite.
+4. Run relevant browser specs (books, book-explanations, auth-stability, annotations, practice persistence), full lint and production build.
+5. Commit verified changes locally, update readiness report with honest final GO/NO-GO; no deployment/push/production migrations. At pause: NO-GO, exact storage-loss mechanism unresolved.
+
+Native tool environment: SATCHI_TEST_POSTGRES_BIN=/home/otabek/.cache/satchi-test-tools/pg17/opt/pgsql-17/bin; SATCHI_TEST_POSTGREST=/home/otabek/.cache/satchi-test-tools/postgrest14/postgrest; LD_LIBRARY_PATH=/home/otabek/.cache/satchi-test-tools/pg17/opt/pgsql-17/lib. Complete run used private SATCHI_BACKUP_ARCHIVE=/home/otabek/satchi-release-backups/20261008T190945Z/application.dump. Serialize heavy suites.
+
+Offline aggregate original image file copies across backup directories: JPEG median 25,601B/p95 66,418/max122,588; PNG median2,853.5B/p95 82,516/max439,186; WebP median12,962B/p95 27,984/max45,720. Copies may duplicate across archives; not unique production asset counts. Native transport uses 1px PNG fixture, so production CDN/TTFB and original-pixel rendering are NOT verified. No assets reencoded or production accessed.
+
+
+## Bounded final Check/restart checkpoint — 2026-10-09
+
+Decision remains **NO-GO**. Check teardown, synchronous repeated-click entry and late background-snapshot regression have focused verified repairs. Loaded reference/choice images stay attached with zero document navigation or repeated signing/image requests during Check. Cache is memory-only, bounded, owner-scoped and cleared on account change; preloading covers only the next question. No production changes or new migrations.
+
+Corrected full suite: 253 checks, 243 passed, 10 failed, zero skipped. First failure: browser restart loses Auth storage before the SDK's first read, despite session present before shutdown. Later failures cascade. Removing a duplicate Chromium disable-features switch fixes a confirmed launch configuration defect but does NOT solve the full-suite loss. No Auth assertions or revision protections were weakened. Repeated targeted restart successes must not be represented as resolving this blocker.
+
+After final late-snapshot reconciliation: 14 focused unit regressions and 5 native PostgreSQL17/PostgREST/Chromium checks passed, including 20 process restarts and authoritative persisted-answer assertions. Complete suite was run before this final small reconciliation change; it was not repeated again given the unresolved blocker and user usage budget. Scoped browser/lint/build final counts are in docs/check-and-auth-recovery-report.md.
+
+Next work must focus only on the first failing restart in tests/real-user-reliability.test.js: preserve the failing profile before teardown, compare origin/local-storage disk state before and after process shutdown, and distinguish Chromium/profile persistence from harness origin or teardown contamination. Do not force login, inject storage state, sleep, or relax recovery assertions to green the suite. Once root cause is fixed, repeat that journey and then the complete suite. Real managed Auth/Storage latency remains outside fixture-based native transport tests.
+
+Private evidence: /home/otabek/satchi-release-backups/check-auth-final-complete-unit.log, check-final-reconciliation-native.log, check-final-persistence-unit.log, check-final-scoped-browser.log, check-final-lint.log, check-final-build.log. Backup contents/credentials remain outside Git. All testing used isolated data. No deployment/push/production migration authorized or performed in this task.
+
+Verified source/test commit: `5c1deef` on main. Final scoped browser run: 44 passed, 1 failed stale-tab radio selection; unchanged isolated rerun passed 1/1. Do not hide this intermittent failure. Full lint/build passed. Docs are committed separately. Next targeted investigation should preserve first-failure evidence for both Auth storage disappearance and stale-tab initial state synchronization.
