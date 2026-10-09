@@ -212,6 +212,10 @@ test(
             const auth = raw ? JSON.parse(raw) : null;
             return {
               trace: window.authStorageTrace,
+              origin: location.origin,
+              unrelatedStorageRetained:
+                localStorage.getItem("satchi-restart-diagnostic") ===
+                "retained",
               path: location.pathname,
               storedAuth: Boolean(auth),
               hasUser: Boolean(auth?.user),
@@ -327,6 +331,10 @@ test(
           "Before persistent browser restart",
           await page.evaluate(() => ({
             storedAuth: Boolean(localStorage.getItem("sb-127-auth-token")),
+            origin: location.origin,
+            marker:
+              (localStorage.setItem("satchi-restart-diagnostic", "retained"),
+              true),
           })),
         );
         await context.close();

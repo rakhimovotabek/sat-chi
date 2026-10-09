@@ -149,3 +149,7 @@ Next work must focus only on the first failing restart in tests/real-user-reliab
 Private evidence: /home/otabek/satchi-release-backups/check-auth-final-complete-unit.log, check-final-reconciliation-native.log, check-final-persistence-unit.log, check-final-scoped-browser.log, check-final-lint.log, check-final-build.log. Backup contents/credentials remain outside Git. All testing used isolated data. No deployment/push/production migration authorized or performed in this task.
 
 Verified source/test commit: `5c1deef` on main. Final scoped browser run: 44 passed, 1 failed stale-tab radio selection; unchanged isolated rerun passed 1/1. Do not hide this intermittent failure. Full lint/build passed. Docs are committed separately. Next targeted investigation should preserve first-failure evidence for both Auth storage disappearance and stale-tab initial state synchronization.
+
+## Final-budget checkpoint
+
+User conditionally authorized release after Auth failure classification. Only the targeted13-check native journey was rerun: all passed in113.8s; no full suite. Added origin/unrelated localStorage marker failure diagnostics; scoped lint passed. Missing localStorage is not an invalid sessionStorage assumption, but neither a production bug nor test-only cause is proven. Conditional release did not proceed. No production requests/state changes, migrations, push or deployment. Next action is first-failure profile retention/local-storage inspection, as recorded in check-and-auth-recovery-report.md. Existing source fixes5c1deef and docs9f470f0 are preserved.

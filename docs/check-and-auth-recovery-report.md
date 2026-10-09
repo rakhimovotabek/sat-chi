@@ -55,3 +55,20 @@ Private logs under /home/otabek/satchi-release-backups/: check-recovery-before.l
 No new migration is needed for these two repairs. The previously reviewed090003→090004→090005 remain pending, with their original release safeguards. Production/managed Auth and Storage smoke verification remains an authorized-release checkpoint, not a claim of this isolated testing.
 
 Local source/test commit: `5c1deef`. No push or deployment. Remaining blockers: complete-suite Auth restart storage loss and intermittent SQL-backed two-tab browser selection failure; production Storage initial-load latency remains unmeasured.
+
+
+## Final-budget release decision — 2026-10-09
+
+**BLOCKED: conditional deployment authorization has not been satisfied.** No production request, migration, push, deployment, gate change or account mutation was performed in this decision step.
+
+This is not a sessionStorage lifetime assumption. `src/lib/supabase.js` sets persistSession=true, and the installed Supabase Auth SDK uses browser localStorage by default. The test closes and reopens the same persistent Chromium profile and the same application origin. Recovery is therefore a valid expectation, absent browser storage clearing/eviction or a harness defect. The recorded failure shows Auth present before close, absent at the first restarted storage reads, and no recorded removal. Existing acknowledged answers remain in PostgreSQL. No evidence establishes that production Auth code deletes a valid restored session, but the failure has not been classified conclusively as test-only either.
+
+Minimum additional diagnostic performed: only `tests/real-user-reliability.test.js`, with real PostgreSQL17/PostgREST14/Chromium and unchanged recovery/database assertions. **13 passed, 0 failed/skipped, 113.8 seconds.** Includes restart/fresh login, pending-save recovery, stale tabs, expired fixture JWT, admin grading, Question Bank and broad recurring7→8. Auth/Storage transports are fixtures. The new diagnostic records the application origin and an unrelated localStorage marker on recovery failure; it stores no token values and does not seed/rewrite Auth storage. The missing-storage failure did not recur, so there is no evidence yet to compare unrelated storage in the failing case. Scoped diagnostic lint passed. No full-suite rerun, architecture change, skipped assertion or timing relaxation was made.
+
+Conclusion: no acknowledged-answer loss has been established; a production authentication defect has not been proven; a test-harness cause also has not been proven. Passing this run plus20 prior targeted restarts does not explain the original first failure. The release is therefore not asserted safe under the explicit requirement to classify that failure before cutover.
+
+Next action: capture the persistent profile on the next first failure before cleanup, retaining origin/unrelated-marker diagnostics, and inspect its local-storage state before SDK startup. If unrelated storage is absent too, establish the browser/profile teardown or origin-isolation cause rather than changing Auth. If Auth alone disappears with unrelated storage intact, trace the mutation/refresh operation. Do not conduct another broad audit or substitute automatic login. The intermittent stale-tab radio failure (44/45 scoped suite, exact rerun passed) remains recorded separately.
+
+Migrations090003→090004→090005 remain unapplied by this task. GitHub and Netlify remain unchanged. Production maintenance/admission was not queried or changed; last documented state is compatible mode with zero exemptions, not newly verified live state. The existing release runbook remains ready after the diagnostic blocker is resolved. No new release safeguard requirement or migration change has been introduced.
+
+Private evidence: /home/otabek/satchi-release-backups/final-release-auth-diagnostic.log and final-release-diagnostic-lint.log.
