@@ -1,8 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, rm, readFile } from "node:fs/promises";
+import {
+  mkdtemp,
+  rm,
+  readFile,
+  cp,
+  mkdir,
+  realpath,
+  stat,
+  readdir,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { randomUUID } from "node:crypto";
 import { chromium, expect } from "@playwright/test";
 import {
   nativeAppEnvironment,
@@ -83,7 +94,42 @@ test(
     const profileDir = await mkdtemp(
       join(tmpdir(), "satchi-reliability-browser-"),
     );
-    t.after(() => rm(profileDir, { recursive: true, force: true }));
+    const marker = randomUUID();
+    let launchSequence = 0;
+    let recoveryFailed = false;
+    const evidenceRoot = process.env.SATCHI_AUTH_EVIDENCE_DIR;
+    const diskState = async () => {
+      const directory = join(profileDir, "Default", "Local Storage", "leveldb");
+      const files = await readdir(directory).catch(() => []);
+      const buffers = await Promise.all(
+        files
+          .filter((file) => /\.(log|ldb)$/.test(file))
+          .map((file) => readFile(join(directory, file))),
+      );
+      const identity = await stat(profileDir);
+      return {
+        profile: await realpath(profileDir),
+        device: identity.dev,
+        inode: identity.ino,
+        localStorageFiles: files.length,
+        authKeyOnDisk: buffers.some((value) =>
+          value.includes(Buffer.from("sb-127-auth-token")),
+        ),
+        markerKeyOnDisk: buffers.some((value) =>
+          value.includes(Buffer.from("satchi-restart-diagnostic")),
+        ),
+      };
+    };
+    const preserve = async (label) => {
+      if (!evidenceRoot) return;
+      await mkdir(evidenceRoot, { recursive: true, mode: 0o700 });
+      await cp(profileDir, join(evidenceRoot, label), { recursive: true });
+      await writeFile(
+        join(evidenceRoot, label + ".json"),
+        JSON.stringify(await diskState()),
+        { mode: 0o600 },
+      );
+    };
     const launch = async () => {
       const browserContext = await chromium.launchPersistentContext(
         profileDir,
@@ -92,45 +138,71 @@ test(
           channel: "chromium",
         },
       );
-      await browserContext.addInitScript(() => {
-        window.authStorageTrace = [];
-        const get = Storage.prototype.getItem;
-        const remove = Storage.prototype.removeItem;
-        Storage.prototype.getItem = function (key) {
-          const raw = get.call(this, key);
-          if (key === "sb-127-auth-token") {
-            let value;
-            try {
-              value = JSON.parse(raw);
-            } catch {
-              /* Record invalid JSON. */
-            }
-            window.authStorageTrace.push({
-              operation: "read",
-              stored: Boolean(raw),
-              valid: Boolean(
-                value?.access_token &&
-                  value?.refresh_token &&
-                  value?.expires_at,
-              ),
-              hasUser: Boolean(value?.user?.id),
-              unexpired: value?.expires_at > Date.now() / 1000,
-            });
-            if (window.authStorageTrace.length > 100)
-              window.authStorageTrace.shift();
-          }
-          return raw;
-        };
-        Storage.prototype.removeItem = function (key) {
-          if (key === "sb-127-auth-token")
-            window.authStorageTrace.push({ operation: "remove" });
-          return remove.call(this, key);
-        };
+      console.log("Persistent context identity", {
+        launchSequence: ++launchSequence,
+        ...(await diskState()),
       });
+      await browserContext.addInitScript(
+        ({ marker, origin }) => {
+          if (location.origin === origin)
+            window.authRestartInitial = {
+              origin: location.origin,
+              markerRetained:
+                localStorage.getItem("satchi-restart-diagnostic") === marker,
+              authRetained: Boolean(localStorage.getItem("sb-127-auth-token")),
+            };
+          window.authStorageTrace = [];
+          const get = Storage.prototype.getItem;
+          const remove = Storage.prototype.removeItem;
+          Storage.prototype.getItem = function (key) {
+            const raw = get.call(this, key);
+            if (key === "sb-127-auth-token") {
+              let value;
+              try {
+                value = JSON.parse(raw);
+              } catch {
+                /* Record invalid JSON. */
+              }
+              window.authStorageTrace.push({
+                operation: "read",
+                stored: Boolean(raw),
+                valid: Boolean(
+                  value?.access_token &&
+                    value?.refresh_token &&
+                    value?.expires_at,
+                ),
+                hasUser: Boolean(value?.user?.id),
+                unexpired: value?.expires_at > Date.now() / 1000,
+              });
+              if (window.authStorageTrace.length > 100)
+                window.authStorageTrace.shift();
+            }
+            return raw;
+          };
+          Storage.prototype.removeItem = function (key) {
+            if (key === "sb-127-auth-token")
+              window.authStorageTrace.push({ operation: "remove" });
+            return remove.call(this, key);
+          };
+          const clear = Storage.prototype.clear;
+          Storage.prototype.clear = function () {
+            window.authStorageTrace.push({
+              operation: "clear",
+              local: this === localStorage,
+            });
+            return clear.call(this);
+          };
+        },
+        { marker, origin: app.appUrl },
+      );
       return browserContext;
     };
     let context = await launch();
-    t.after(() => context.close());
+    t.after(async () => {
+      await context.close();
+      if (recoveryFailed) await preserve("failed-after-close");
+      await rm(profileDir, { recursive: true, force: true });
+    });
     let page = await context.newPage();
     const exceptions = [],
       failures = [],
@@ -203,6 +275,8 @@ test(
           tab.getByRole("button", { name: /Question \d+ of/ }),
         ).toBeVisible();
       } catch (error) {
+        recoveryFailed = true;
+        await preserve("failed-before-cleanup");
         // Fixture-only metadata, never token values. Distinguish signed-out
         // recovery from answer loss and retain the first failure's evidence.
         console.error(
@@ -212,10 +286,8 @@ test(
             const auth = raw ? JSON.parse(raw) : null;
             return {
               trace: window.authStorageTrace,
+              firstReadBeforeSdk: window.authRestartInitial,
               origin: location.origin,
-              unrelatedStorageRetained:
-                localStorage.getItem("satchi-restart-diagnostic") ===
-                "retained",
               path: location.pathname,
               storedAuth: Boolean(auth),
               hasUser: Boolean(auth?.user),
@@ -329,19 +401,31 @@ test(
           .toBe(true);
         console.log(
           "Before persistent browser restart",
-          await page.evaluate(() => ({
-            storedAuth: Boolean(localStorage.getItem("sb-127-auth-token")),
-            origin: location.origin,
-            marker:
-              (localStorage.setItem("satchi-restart-diagnostic", "retained"),
-              true),
-          })),
+          await page.evaluate((marker) => {
+            localStorage.setItem("satchi-restart-diagnostic", marker);
+            return {
+              storedAuth: Boolean(localStorage.getItem("sb-127-auth-token")),
+              origin: location.origin,
+              markerWritten: true,
+            };
+          }, marker),
         );
         await context.close();
+        console.log("Closed profile disk identity", await diskState());
+        await preserve("before-restart");
         context = await launch();
         page = await context.newPage();
         watch(page);
         await open(page, sid);
+        assert.equal(
+          await page.evaluate(
+            (marker) =>
+              localStorage.getItem("satchi-restart-diagnostic") === marker,
+            marker,
+          ),
+          true,
+          "Unrelated origin storage must survive the same-profile restart",
+        );
         for (const row of mixed) {
           await go(page, row.position);
           if (row.question.question_type === "open")
