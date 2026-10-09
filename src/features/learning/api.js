@@ -208,15 +208,22 @@ export const startVocabPool = (sets, mode, count, filter = "all") =>
     p_count: count,
     p_filter: filter,
   });
-export const vocabPassages = (sets, page = 0) =>
-  checked(
-    supabase
-      .from("vocabulary_passages")
-      .select("*")
-      .in("set_id", sets)
-      .order("id")
-      .range(page * 10, page * 10 + 9),
-  );
+export async function vocabPassages(sets) {
+  if (!sets.length) return [];
+  const passages = [];
+  for (let page = 0; ; page++) {
+    const rows = await checked(
+      supabase
+        .from("vocabulary_passages")
+        .select("*")
+        .in("set_id", sets)
+        .order("id")
+        .range(page * 10, page * 10 + 9),
+    );
+    passages.push(...rows);
+    if (rows.length < 10) return passages;
+  }
+}
 export const deleteVocabBook = (id) =>
   checked(supabase.from("vocabulary_books").delete().eq("id", id));
 export const importVocab = (payload) =>
