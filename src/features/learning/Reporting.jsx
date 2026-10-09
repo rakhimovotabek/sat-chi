@@ -353,9 +353,15 @@ export function AdminDashboard({ results = false }) {
             {[
               ["Active students", state.data.students],
               ["Groups", state.data.groups],
-              ["Assigned homework", state.data.assignments],
-              ["Completed homework", state.data.completed],
-              ["Questions answered", state.data.questions],
+              ["Active one-time assignments", state.data.assignments],
+              ["Completed one-time assignments", state.data.completed],
+              ...(state.data.daily_started == null
+                ? []
+                : [
+                    ["Started daily assignments", state.data.daily_started],
+                    ["Completed daily assignments", state.data.daily_completed],
+                  ]),
+              ["Answers in submitted sessions", state.data.questions],
             ].map(([label, n]) => (
               <article className="card metric-card" key={label}>
                 <small>{label}</small>
