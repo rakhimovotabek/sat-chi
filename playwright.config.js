@@ -4,7 +4,12 @@ export default defineConfig({
   fullyParallel: false,
   timeout: 60000,
   expect: { timeout: 10000 },
-  use: { baseURL: "http://127.0.0.1:5199", headless: true },
+  use: {
+    baseURL: "http://127.0.0.1:5199",
+    headless: true,
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
+  },
   webServer: {
     command: "npm run dev -- --host 127.0.0.1 --port 5199 --strictPort",
     url: "http://127.0.0.1:5199",

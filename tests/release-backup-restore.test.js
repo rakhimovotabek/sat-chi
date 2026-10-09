@@ -140,7 +140,9 @@ test(
           ? "answer_revision"
           : table === "homework_questions"
             ? "open_key"
-            : "__unused__",
+            : table === "daily_homework_versions"
+              ? "pool_count"
+              : "__unused__",
       );
     const storageBefore = await rowDigest("storage", "objects");
     const applied = JSON.parse(
@@ -156,6 +158,9 @@ test(
       "20261008000400_homework_snapshot_assets.sql",
       "20261009000100_book_approval_cache.sql",
       "20261009000200_practice_conflict_http.sql",
+      "20261009000300_daily_homework_indexed_pool.sql",
+      "20261009000400_book_progress_history.sql",
+      "20261009000500_admin_homework_overview.sql",
     ]) {
       if (applied.includes(file.split("_")[0])) continue;
       await query(await readFile(join("supabase/migrations", file), "utf8"));
@@ -174,7 +179,9 @@ test(
             ? "answer_revision"
             : table === "homework_questions"
               ? "open_key"
-              : "__unused__",
+              : table === "daily_homework_versions"
+                ? "pool_count"
+                : "__unused__",
         ),
         before,
         "Existing public rows must survive migration: " + table,
@@ -218,6 +225,44 @@ test(
         "Book RLS/catalog and practice startup must stay well below the deployed timeout on the full restored dataset",
       );
     }
+    const reviewAdmin = await query(
+      "select id from public.profiles where role='admin' and active order by id limit 1",
+    );
+    assert.ok(
+      reviewAdmin,
+      "Restored fixture must include an active administrator",
+    );
+    const poolConfig = JSON.stringify({
+      title: "Isolated release performance probe",
+      timezone: "Asia/Tashkent",
+      startDate: new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Tashkent",
+      }),
+      count: 8,
+      selection: "random",
+      filters: {},
+      students: [student],
+      allowLate: true,
+      allowRepeat: true,
+    }).replaceAll("'", "''");
+    const poolOutput = await query(
+      `begin;set local statement_timeout='8s';set local role authenticated;select set_config('request.jwt.claim.sub','${reviewAdmin}',true);explain(analyze,buffers,format json) select public.save_daily_homework('${poolConfig}'::jsonb);rollback;`,
+    );
+    const poolPlan = JSON.parse(
+      poolOutput.slice(
+        poolOutput.indexOf("[\n"),
+        poolOutput.lastIndexOf("]") + 1,
+      ),
+    )[0];
+    assert.ok(
+      poolPlan["Execution Time"] < 8000,
+      "Broad recurring save must fit the deployed timeout on restored existing content",
+    );
+    assert.equal(
+      await query(historySql),
+      history,
+      "Rolled-back performance probes must preserve answers",
+    );
     await writeFile(
       join(folder, "application-integrity-baseline.private.json"),
       JSON.stringify(protectedRows, null, 2),
@@ -233,6 +278,7 @@ test(
           pendingMigrationsRehearsed: rehearsed,
           bookApprovalMatchesOriginal: true,
           fullDatasetStudentBookQueriesUnderThreeSeconds: true,
+          fullDatasetBroadDailySaveMilliseconds: poolPlan["Execution Time"],
           existingAnswerRowsUnchanged: true,
           allExistingPublicRowsPreserved: true,
           existingPublicTablesVerified: Object.keys(protectedRows).length,
@@ -241,6 +287,7 @@ test(
             "question_bank_eligibility derived refresh",
             "homework_questions.open_key backfill",
             "book_practice_items.answer_revision default zero",
+            "daily_homework_versions.pool_count default null",
           ],
           limitations: [
             "Managed ownership not restored; original ACLs restored with native role stubs",

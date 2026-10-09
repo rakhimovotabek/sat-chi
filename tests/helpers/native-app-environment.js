@@ -417,8 +417,10 @@ export async function nativeAppEnvironment() {
       { VITE_SUPABASE_URL: apiUrl, VITE_SUPABASE_ANON_KEY: anon },
     );
     await waitFor(appUrl);
-    const upgrade = async () => {
-      for (const file of migrations.filter((f) => f >= "20261008000000"))
+    const upgrade = async (before = null) => {
+      for (const file of migrations.filter(
+        (f) => f >= "20261008000000" && (!before || f < before),
+      ))
         await sql(await readFile(join("supabase/migrations", file), "utf8"));
       await sql("notify pgrst,'reload schema'");
       const bearer = token({
