@@ -580,7 +580,7 @@ test("recurring save uses maintained student eligibility instead of rescanning l
     );
     const row = (
       await db.query(
-        "select data,jsonb_array_length(pool) size from public.daily_homework_versions where template_id=$1 order by revision desc limit 1",
+        "select data,coalesce(pool_count,jsonb_array_length(pool)) size from public.daily_homework_versions where template_id=$1 order by revision desc limit 1",
         [id],
       )
     ).rows[0];
