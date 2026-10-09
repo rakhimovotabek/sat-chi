@@ -50,6 +50,7 @@ const files = [
   "tests/real-user-reliability.test.js",
   "tests/large-practice-transport.test.js",
   "tests/book-progress-history.test.js",
+  "tests/book-open-progress.test.js",
   "tests/book-jpeg-explanation.test.js",
   "tests/vocabulary-context-pages.test.js",
   "tests/admin-overview-scope.test.js",
