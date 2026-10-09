@@ -14,12 +14,14 @@ export default function Books({ admin = false }) {
   const [query, setQuery] = useState(""),
     [page, setPage] = useState(0);
   useEffect(() => {
+    // Only a changed search should reset paging, never the initial mount.
+    if (search === query) return;
     const timer = setTimeout(() => {
       setQuery(search);
       setPage(0);
     }, 250);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, query]);
   const state = useContent(() => getBookCatalog(page, query), [page, query]);
   const books = state.data?.books || [];
   return (

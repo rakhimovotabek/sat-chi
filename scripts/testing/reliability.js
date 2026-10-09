@@ -48,6 +48,7 @@ const files = [
   "tests/study-time-batch.test.js",
   "tests/homework-indexed-pool.test.js",
   "tests/reliability-release-readiness.test.js",
+  "tests/catalog-pagination-native.test.js",
   "tests/real-user-reliability.test.js",
   "tests/large-practice-transport.test.js",
   "tests/book-progress-history.test.js",

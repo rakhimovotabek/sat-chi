@@ -14,12 +14,14 @@ export default function VocabularyStudy({ embedded = false, filterOverride }) {
     [search, setSearch] = useState(""),
     [query, setQuery] = useState("");
   useEffect(() => {
+    // Only a changed search should reset paging, never the initial mount.
+    if (search === query) return;
     const timeout = setTimeout(() => {
       setQuery(search);
       setPage(0);
     }, 250);
     return () => clearTimeout(timeout);
-  }, [search]);
+  }, [search, query]);
   const state = useContent(async () => {
     const pool = task
       ? await rpc("study_task_vocabulary", { p_task: task })
