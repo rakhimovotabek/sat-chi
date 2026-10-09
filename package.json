@@ -21,7 +21,8 @@
     "import:check-vocabulary": "node scripts/imports/check-vocabulary.js",
     "lint": "eslint src scripts tests",
     "import:covers": "node scripts/imports/backfill-covers.js",
-    "import:vocabook": "node scripts/imports/vocabook-package.js"
+    "import:vocabook": "node scripts/imports/vocabook-package.js",
+    "test:reliability": "node scripts/testing/reliability.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

@@ -114,5 +114,32 @@ test(
       responses.every((r) => r.status === 200 && r.length < 1000),
       JSON.stringify(responses),
     );
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page
+      .getByRole("button", { name: "Question 1 of 500", exact: true })
+      .click();
+    const overview = page.getByRole("dialog", { name: "Question Overview" });
+    await expect(overview.locator(".question-number")).toHaveCount(500);
+    await overview.getByRole("button", { name: /^Question 500,/ }).click();
+    await expect(
+      page.getByRole("button", { name: "Question 500 of 500", exact: true }),
+    ).toBeVisible();
+    assert.equal(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      true,
+    );
+    await expect
+      .poll(() =>
+        app.json(
+          `select current_position from public.book_practice_sessions where id='${sid}'`,
+        ),
+      )
+      .toBe(499);
+    await page.reload();
+    await expect(
+      page.getByRole("button", { name: "Question 500 of 500", exact: true }),
+    ).toBeVisible();
   },
 );
