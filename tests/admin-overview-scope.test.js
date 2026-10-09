@@ -73,6 +73,56 @@ test(
     assert.equal(counts.daily_started, 1);
     assert.equal(counts.daily_completed, 1);
     assert.equal(counts.questions, 15);
+    const timed = await rpc(admin, "save_daily_homework", {
+      p_data: {
+        title: "Incomplete timed overview fixture",
+        timezone: "Asia/Tashkent",
+        startDate: day,
+        count: 2,
+        selection: "fixed",
+        questionIds: app.ids.slice(3, 5),
+        students: [student],
+        filters: {},
+        timeLimit: 60,
+        allowLate: true,
+        allowRepeat: false,
+      },
+    });
+    const partial = await rpc(student, "start_daily_homework", {
+      p_template: timed,
+      p_day: day,
+    });
+    const first = await app.json(
+      `select to_jsonb(i)from public.book_practice_items i where session_id='${partial}' order by position limit 1`,
+    );
+    await rpc(student, "save_practice_changes", {
+      p_session: partial,
+      p_changes: [
+        {
+          id: first.id,
+          expected_revision: first.answer_revision,
+          selected_answer: 1,
+        },
+      ],
+    });
+    await app.sql(
+      `update public.book_practice_sessions set started_at=now()-interval '120 seconds' where id='${partial}'`,
+    );
+    await rpc(student, "finish_book_practice", { p_session_id: partial }, 204);
+    assert.equal(
+      await app.json(
+        `select coalesce(to_jsonb(completed_at),'null'::jsonb)from public.daily_homework_instances where session_id='${partial}'`,
+      ),
+      null,
+    );
+    counts = await rpc(admin, "admin_overview");
+    assert.equal(counts.daily_started, 2);
+    assert.equal(
+      counts.daily_completed,
+      1,
+      "a timed partial submission earns no daily completion credit",
+    );
+    assert.equal(counts.questions, 16);
     await rpc(student, "admin_overview", {}, 403);
     const browser = await chromium.launch({
       headless: true,
@@ -94,9 +144,9 @@ test(
     for (const [label, value] of [
       ["Active one-time assignments", "0"],
       ["Completed one-time assignments", "1"],
-      ["Started daily assignments", "1"],
+      ["Started daily assignments", "2"],
       ["Completed daily assignments", "1"],
-      ["Answers in submitted sessions", "15"],
+      ["Answers in submitted sessions", "16"],
     ]) {
       const card = page
         .locator(".metric-card")
