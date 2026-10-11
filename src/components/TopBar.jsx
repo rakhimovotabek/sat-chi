@@ -1,4 +1,5 @@
 import Icon from './Icon.jsx';
+import NightLight from './NightLight.jsx';
 import { useState } from 'react';
 import useAuth from '../hooks/useAuth.js';
 
@@ -23,6 +24,7 @@ export default function TopBar({ workspace, title, menuOpen, onToggleMenu }) {
         <div className="breadcrumb"><span>{workspace === 'admin' ? 'Admin' : 'Student'} workspace</span><span aria-hidden="true">/</span><strong>{title}</strong></div>
       </div>
       <div className="account-controls">
+        <NightLight />
         <div className="account-summary"><strong>{profile.display_name || profile.username || 'Account'}</strong><span>{profile.role}</span></div>
         <button className="button button-secondary button-compact" disabled={busy} onClick={logout}>{busy ? 'Logging out…' : 'Log out'}</button>
         {error && <span className="logout-error" role="alert">{error}</span>}

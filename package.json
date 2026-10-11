@@ -22,7 +22,8 @@
     "lint": "eslint src scripts tests",
     "import:covers": "node scripts/imports/backfill-covers.js",
     "import:vocabook": "node scripts/imports/vocabook-package.js",
-    "test:reliability": "node scripts/testing/reliability.js"
+    "test:reliability": "node scripts/testing/reliability.js",
+    "dev:isolated": "node scripts/testing/manual-development.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

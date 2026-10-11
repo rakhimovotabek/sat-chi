@@ -1,3 +1,4 @@
+import Icon from "../../components/Icon.jsx";
 import { useEffect } from "react";
 import "./annotations.css";
 export default function AnnotationToolbar({
@@ -19,13 +20,16 @@ export default function AnnotationToolbar({
     <div className="annotation-tools" role="group" aria-label="Drawing tools">
       <button
         className="button button-secondary button-compact"
+        type="button"
+        aria-label="Pen"
+        title="Pen"
         aria-pressed={active && tool === "pen"}
         onClick={() => {
           setTool("pen");
           setActive(true);
         }}
       >
-        Pen
+        <Icon name="pen" />
       </button>
       {active && (
         <>

@@ -175,3 +175,10 @@ studentNavigation.push({
   label: "Settings",
   icon: "profile",
 });
+
+// Share the same authorized standings RPC and metric in both workspaces.
+adminNavigation.splice(
+  adminNavigation.findIndex((p) => p.slug === "results") + 1,
+  0,
+  { slug: "standings", label: "Standings", icon: "standings" },
+);

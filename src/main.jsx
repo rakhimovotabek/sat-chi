@@ -15,6 +15,16 @@ import "./styles/review.css";
 import "./styles/study-workspace.css";
 import "./styles/testing-workspace.css";
 
+import { readNightLight } from "./lib/night-light.js";
+try {
+  document.documentElement.classList.toggle(
+    "night-light",
+    readNightLight(localStorage),
+  );
+} catch {
+  /* Storage may be unavailable. */
+}
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>

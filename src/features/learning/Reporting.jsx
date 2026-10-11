@@ -1,3 +1,5 @@
+import AdminAnswer from "./AdminAnswer.jsx";
+import { rpc } from "./api.js";
 import DailyHomeworkAnalytics from "./DailyHomeworkAnalytics.jsx";
 import OpenResponseReview from "./OpenResponseReview.jsx";
 import PracticeAnalytics from "./PracticeAnalytics.jsx";
@@ -276,7 +278,7 @@ export function Standings() {
       <PageHeader
         title="Standings"
         eyebrow="Learning together"
-        description="Ranked by answered questions in completed sessions. Only names and learning totals are shared."
+        description="All-time ranking by distinct answered SAT questions across Books, Question Bank and Homework. Submitted work and recorded Checks qualify; repeat checks do not add points. Only names and learning totals are shared."
       />
       <div className="learning-tabs">
         <button
@@ -442,7 +444,13 @@ export function StudentDetail() {
 }
 export function AdminSession() {
   const { sessionId } = useParams(),
-    state = useContent(() => getPractice(sessionId), [sessionId]);
+    state = useContent(async () => {
+      const data = await getPractice(sessionId);
+      const keys = await rpc("admin_practice_answer_keys", {
+        p_session: sessionId,
+      });
+      return { ...data, review: keys };
+    }, [sessionId]);
   const result = state.data && practiceSummary(state.data.items);
   return (
     <>
@@ -505,23 +513,10 @@ export function AdminSession() {
                     {formatTime(a.active_seconds)} cumulative
                   </p>
                 ))}
-                <p className="reading-text">{i.question.question_text}</p>
-                <p>
-                  Student answer:{" "}
-                  {i.selected_answer == null
-                    ? "Unanswered"
-                    : i.question.question_type === "open"
-                      ? i.selected_response
-                      : i.question.options[i.selected_answer]}
-                </p>
-                {state.data.review.find((r) => r.item_id === i.id) && (
-                  <p className="page-description">
-                    {
-                      state.data.review.find((r) => r.item_id === i.id)
-                        .explanation
-                    }
-                  </p>
-                )}
+                <AdminAnswer
+                  item={i}
+                  review={state.data.review.find((r) => r.item_id === i.id)}
+                />
                 {state.data.session.submitted_at &&
                   i.question.question_type === "open" && (
                     <OpenResponseReview

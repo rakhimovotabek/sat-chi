@@ -1,4 +1,6 @@
 const paths = {
+  night: "M20 15A8 8 0 0 1 9 4a8 8 0 1 0 11 11z",
+  pen: "M4 20l1-5L16 4l4 4L9 19z M14 6l4 4",
   dashboard: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
   homework: "M9 4H5v17h14V4h-4 M9 3h6v4H9z M8 12h8 M8 16h5",
   books:

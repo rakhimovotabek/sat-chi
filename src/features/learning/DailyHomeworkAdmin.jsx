@@ -384,11 +384,17 @@ export default function DailyHomeworkAdmin() {
                         <td>{t.state}</td>
                         <td>
                           <div className="button-row daily-admin-actions">
+                            <Link
+                              className="button button-secondary"
+                              to={`/admin/homework/${t.id}?recurring=true`}
+                            >
+                              View
+                            </Link>
                             <button
                               className="button button-secondary"
                               onClick={() => setDetail(t.id)}
                             >
-                              View
+                              History summary
                             </button>
                             {t.state !== "archived" && (
                               <>

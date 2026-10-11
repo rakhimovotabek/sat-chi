@@ -135,6 +135,12 @@ export default function Homework({ admin = false }) {
                       )}
                     </td>
                     <td>
+                      <Link
+                        className="button button-secondary button-compact"
+                        to={`/admin/homework/${row.id}`}
+                      >
+                        View
+                      </Link>
                       <button
                         className="button button-secondary button-compact"
                         disabled={action.busy}

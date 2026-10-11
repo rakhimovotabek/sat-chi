@@ -30,6 +30,9 @@ const BookDetail = lazy(() => import("./features/books/BookDetail.jsx"));
 const Questions = lazy(() => import("./features/books/Questions.jsx"));
 const Player = lazy(() => import("./features/player/Player.jsx"));
 const Groups = lazy(() => import("./features/learning/Groups.jsx"));
+const HomeworkResults = lazy(
+  () => import("./features/learning/HomeworkResults.jsx"),
+);
 const Homework = lazy(() => import("./features/learning/Homework.jsx"));
 const QuestionBank = lazy(() => import("./features/learning/QuestionBank.jsx"));
 const Vocabulary = lazy(() => import("./features/learning/Vocabulary.jsx"));
@@ -157,6 +160,11 @@ export default function App() {
               />
               <Route path="results" element={<AdminDashboard results />} />
               <Route path="students/:studentId" element={<StudentDetail />} />
+              <Route
+                path="homework/:homeworkId"
+                element={<HomeworkResults />}
+              />
+              <Route path="standings" element={<Standings />} />
               <Route path="sessions/:sessionId" element={<AdminSession />} />
               <Route path="settings" element={<Settings />} />
               <Route path="imports" element={<ImportStatus />} />
@@ -174,6 +182,7 @@ export default function App() {
                       "question-bank",
                       "vocabulary",
                       "results",
+                      "standings",
                       "content-review",
                       "settings",
                     ].includes(p.slug),

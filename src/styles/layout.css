@@ -300,3 +300,26 @@
  .sidebar.sidebar-open { position:fixed; z-index:101; top:72px; bottom:0; left:0; width:min(320px,85vw); height:calc(100dvh - 72px); border-right:1px solid var(--border); overflow-y:auto; box-shadow:8px 0 24px #11182715; }
  .sidebar-scrim { display:block; position:fixed; z-index:100; inset:72px 0 0; border:0; background:#11182755; }
 }
+
+/* Warm display overlay tints images and embedded tools without remounts. */
+html.night-light::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  background: rgba(255, 178, 65, 0.1);
+}
+.admin-answer-options {
+  list-style: none;
+  padding: 0;
+}
+.admin-answer-options li {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0;
+}
+.admin-answer-options .selected-admin-answer {
+  border: 2px solid #2858c9;
+}
