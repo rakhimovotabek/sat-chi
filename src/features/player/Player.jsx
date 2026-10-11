@@ -29,7 +29,11 @@ import QuestionImage from "../../components/QuestionImage.jsx";
 import BookExplanation from "./BookExplanation.jsx";
 import { preloadQuestionImages } from "../../components/question-image-source.js";
 import Navigator from "./Navigator.jsx";
-import { practiceSummary, questionAnswerIssue } from "./model.js";
+import {
+  practiceSummary,
+  questionAnswerIssue,
+  allAnswerChoicesEmbedded,
+} from "./model.js";
 import { createPracticePersistence } from "./practice-persistence.js";
 export default function Player() {
   const globalTools = useContext(LearningToolsContext);
@@ -312,6 +316,7 @@ export default function Player() {
   const usableChoices = !questionAnswerIssue(q);
   const embeddedChoices =
     q.image_url && q.import_metadata?.questionImageIncludesOptions === true;
+  const compactEmbeddedChoices = allAnswerChoicesEmbedded(q);
   const answer = review.find((v) => v.item_id === current.id);
   const result = practiceSummary(items);
   return (
@@ -616,7 +621,7 @@ export default function Player() {
               </label>
             ) : (
               <fieldset
-                className="answer-choices"
+                className={`answer-choices ${compactEmbeddedChoices ? "embedded-answer-choices" : ""}`}
                 disabled={
                   submitted ||
                   submitting ||
@@ -627,7 +632,11 @@ export default function Player() {
               >
                 <legend className="visually-hidden">Choose your answer</legend>
                 {embeddedChoices && (
-                  <p>Select the matching choice from the question image.</p>
+                  <p>
+                    {compactEmbeddedChoices
+                      ? "Select the answer shown in the image."
+                      : "Select the matching choice from the question image."}
+                  </p>
                 )}
                 {!usableChoices && (
                   <p role="alert">
@@ -657,7 +666,8 @@ export default function Player() {
                           >
                             {String.fromCharCode(65 + i)}
                           </span>
-                          {q.option_image_urls?.[i] ? (
+                          {compactEmbeddedChoices ? null : q
+                              .option_image_urls?.[i] ? (
                             <span className="book-option-content">
                               <QuestionImage
                                 src={q.option_image_urls[i]}

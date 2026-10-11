@@ -96,7 +96,7 @@ test("embedded HardBook source choices render A–D controls without inventing c
   );
   await openPractice(page);
   await expect(
-    page.getByText("Select the matching choice from the question image."),
+    page.getByText("Select the answer shown in the image."),
   ).toBeVisible();
   await expect(page.getByRole("radio")).toHaveCount(4);
   await page.getByRole("radio").nth(1).check();

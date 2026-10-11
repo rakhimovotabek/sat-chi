@@ -692,3 +692,12 @@ html[data-night-light="extra-warm"] .learning-modal { background-color: #ffe3b0;
 .practice-header-details:empty { display: none; }
 .practice-header-title { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
 .topbar-heading { flex-wrap: wrap; gap: 10px; min-width: 0; }
+
+/* Source-image choices keep the same accessible radios and elimination tools. */
+.answer-panel .embedded-answer-choices { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.embedded-answer-choices > p { grid-column: 1 / -1; margin: 0 0 4px; }
+.embedded-answer-choices .answer-choice { padding: 6px; gap: 4px; }
+.embedded-answer-choices .answer-choice label { min-height: 36px; justify-content: center; gap: 6px; }
+@media (max-width: 640px) {
+  .answer-panel .embedded-answer-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

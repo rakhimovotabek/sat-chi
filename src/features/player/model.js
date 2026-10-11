@@ -49,3 +49,26 @@ export function questionAnswerIssue(question) {
     ? null
     : "Missing answer choices";
 }
+
+// Display-only: collapse placeholders only when every choice is in the source
+// image. Any real text or separate choice image must retain its existing UI.
+export function allAnswerChoicesEmbedded(question) {
+  return Boolean(
+    question.question_type !== "open" &&
+      question.image_url &&
+      question.import_metadata?.questionImageIncludesOptions === true &&
+      Array.isArray(question.options) &&
+      question.options.length === 4 &&
+      (question.option_image_urls == null ||
+        (Array.isArray(question.option_image_urls) &&
+          !question.option_image_urls.some(Boolean))) &&
+      question.options.every(
+        (option) =>
+          typeof option === "string" &&
+          (!option.trim() ||
+            /^(?:[A-D][.)]\s*)?Choice(?:\s+[A-D])?\s+in\s+(?:the\s+)?(?:question|source)\s+image\.?$/i.test(
+              option.trim(),
+            )),
+      ),
+  );
+}
