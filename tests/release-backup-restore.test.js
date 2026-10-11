@@ -161,6 +161,8 @@ test(
       "20261009000300_daily_homework_indexed_pool.sql",
       "20261009000400_book_progress_history.sql",
       "20261009000500_admin_homework_overview.sql",
+      "20261011000100_admin_homework_results.sql",
+      "20261011000200_consistent_learning_standings.sql",
     ]) {
       if (applied.includes(file.split("_")[0])) continue;
       await query(await readFile(join("supabase/migrations", file), "utf8"));
