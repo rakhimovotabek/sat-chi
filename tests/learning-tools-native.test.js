@@ -82,6 +82,29 @@ test(
     await expect(
       header.getByRole("button", { name: "Pen", exact: true }),
     ).toBeVisible();
+    const split = async () =>
+      assert.ok(
+        await page.evaluate(
+          () =>
+            document.querySelector(".stimulus-panel").getBoundingClientRect()
+              .right <=
+            document.querySelector(".answer-panel").getBoundingClientRect()
+              .left,
+        ),
+      );
+    await split();
+    await expect(
+      page.getByRole("button", { name: "Eliminate", exact: true }),
+    ).toHaveCount(0);
+    const eliminate = page.locator(".eliminate-choice").first();
+    await expect(eliminate).toBeVisible();
+    await eliminate.click();
+    await expect(eliminate).toHaveAttribute("aria-pressed", "true");
+    await eliminate.click();
+    await expect(eliminate).toHaveAttribute("aria-pressed", "false");
+    await expect(
+      page.getByText("All changes saved", { exact: true }),
+    ).toBeVisible();
     const before = requests.length;
     await header
       .getByRole("button", { name: "Calculator", exact: true })
@@ -113,6 +136,41 @@ test(
       .first();
     const formula = async () =>
       (await expression.innerText()).replace(/[\s\u200b]/g, "");
+    const resize = panel.getByRole("button", {
+      name: "Resize calculator bottom-right",
+    });
+    const original = await panel.boundingBox();
+    const handle = await resize.boundingBox();
+    await page.mouse.move(
+      handle.x + handle.width / 2,
+      handle.y + handle.height / 2,
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      handle.x + handle.width / 2 + 40,
+      handle.y + handle.height / 2 + 50,
+      { steps: 5 },
+    );
+    await page.mouse.up();
+    const resized = await panel.boundingBox();
+    assert.ok(resized.width > original.width + 20);
+    assert.ok(resized.height > original.height + 30);
+    await stable();
+    const reference = page.getByRole("dialog", {
+      name: "Reference sheet",
+      exact: true,
+    });
+    await header
+      .getByRole("button", { name: "Reference sheet", exact: true })
+      .click();
+    await expect(reference).toBeVisible();
+    await expect(panel).toBeVisible();
+    await page
+      .getByRole("button", { name: "Close Reference sheet", exact: true })
+      .click();
+    await expect(reference).toBeHidden();
+    await expect(panel).toBeVisible();
+    await stable();
     const expressionBefore = await formula();
     assert.equal(expressionBefore, "y=x");
     await page.evaluate(
@@ -157,6 +215,25 @@ test(
         .filter((r) => r.type === "image" && r.url.includes(app.apiUrl)).length,
       0,
     );
+    await split();
+    // Reverse sequence: Reference first, then Calculator, closing independently.
+    await header
+      .getByRole("button", { name: "Reference sheet", exact: true })
+      .click();
+    await header
+      .getByRole("button", { name: "Calculator", exact: true })
+      .click();
+    await expect(reference).toBeVisible();
+    await expect(panel).toBeVisible();
+    assert.equal(await formula(), expressionBefore);
+    await page
+      .getByRole("button", { name: "Close Calculator", exact: true })
+      .click();
+    await expect(reference).toBeVisible();
+    await page
+      .getByRole("button", { name: "Close Reference sheet", exact: true })
+      .click();
+    await stable();
     const night = header.getByRole("button", {
       name: "Night Light",
       exact: true,

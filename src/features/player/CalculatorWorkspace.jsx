@@ -13,7 +13,7 @@ import {
   readCalculatorLayout,
   writeCalculatorLayout,
 } from "./calculator-layout.js";
-const corners = ["top-left", "top-right", "bottom-left", "bottom-right"];
+const corners = ["bottom-right"];
 const viewport = () => ({
   width: window.innerWidth,
   height: window.innerHeight,
@@ -35,7 +35,8 @@ export default function CalculatorWorkspace({
   });
   const [available, setAvailable] = useState(() => workspace.clientWidth),
     [view, setView] = useState(viewport);
-  const [open, setOpen] = useState(""),
+  const [calculatorOpen, setCalculatorOpen] = useState(false),
+    [referenceOpen, setReferenceOpen] = useState(false),
     [mounted, setMounted] = useState(false),
     [interacting, setInteracting] = useState(false);
   const saved = useRef(null),
@@ -46,7 +47,7 @@ export default function CalculatorWorkspace({
     mode = dockable ? "docked" : "stacked";
   const box = fitFloating(layout.floating, view),
     width = dockWidth(available, layout.ratio),
-    shown = open === "Calculator" && enabled;
+    shown = calculatorOpen && enabled;
   useEffect(() => {
     const observer = new ResizeObserver(() =>
       setAvailable(workspace.clientWidth),
@@ -74,7 +75,7 @@ export default function CalculatorWorkspace({
     if (shown) closeButton.current?.focus({ preventScroll: true });
   }, [shown]);
   function close() {
-    setOpen("");
+    setCalculatorOpen(false);
     trigger.current?.focus({ preventScroll: true });
   }
   function begin(e, kind, corner) {
@@ -92,6 +93,7 @@ export default function CalculatorWorkspace({
       y: e.clientY,
       box,
       ratio: layout.ratio,
+      height: layout.floating.height,
       kind,
       corner,
     };
@@ -103,18 +105,30 @@ export default function CalculatorWorkspace({
     const dx = e.clientX - g.x,
       dy = e.clientY - g.y;
     setLayout((l) =>
-      g.kind === "divider"
+      g.kind === "resize" && mode !== "floating"
         ? {
             ...l,
             ratio: dockWidth(available, g.ratio + dx / available) / available,
+            floating: {
+              ...l.floating,
+              height: Math.max(
+                360,
+                Math.min(g.height + dy, Math.max(360, view.height - 100)),
+              ),
+            },
           }
-        : {
-            ...l,
-            floating:
-              g.kind === "move"
-                ? moveFloating(g.box, dx, dy, view)
-                : resizeFloating(g.box, g.corner, dx, dy, view),
-          },
+        : g.kind === "divider"
+          ? {
+              ...l,
+              ratio: dockWidth(available, g.ratio + dx / available) / available,
+            }
+          : {
+              ...l,
+              floating:
+                g.kind === "move"
+                  ? moveFloating(g.box, dx, dy, view)
+                  : resizeFloating(g.box, g.corner, dx, dy, view),
+            },
     );
   }
   function end() {
@@ -129,6 +143,20 @@ export default function CalculatorWorkspace({
     const dx =
         e.key === "ArrowLeft" ? -step : e.key === "ArrowRight" ? step : 0,
       dy = e.key === "ArrowUp" ? -step : e.key === "ArrowDown" ? step : 0;
+    if (corner && mode !== "floating") {
+      setLayout((l) => ({
+        ...l,
+        ratio: dockWidth(available, l.ratio + dx / available) / available,
+        floating: {
+          ...l.floating,
+          height: Math.max(
+            360,
+            Math.min(l.floating.height + dy, Math.max(360, view.height - 100)),
+          ),
+        },
+      }));
+      return;
+    }
     setLayout((l) => ({
       ...l,
       floating: corner
@@ -151,17 +179,19 @@ export default function CalculatorWorkspace({
               aria-controls="practice-calculator"
               onClick={() => {
                 setMounted(true);
-                setOpen("Calculator");
+                setCalculatorOpen((v) => !v);
               }}
             >
               <Icon name="calculator" />
+              Calculator
             </button>
             <button
               className="button button-secondary button-compact"
               type="button"
               aria-label="Reference sheet"
               title="Reference sheet"
-              onClick={() => setOpen("Reference sheet")}
+              aria-expanded={referenceOpen}
+              onClick={() => setReferenceOpen((v) => !v)}
             >
               <Icon name="reference" />
             </button>
@@ -185,7 +215,15 @@ export default function CalculatorWorkspace({
                   width: box.width,
                   height: box.height,
                 }
-              : undefined
+              : {
+                  height: Math.max(
+                    360,
+                    Math.min(
+                      layout.floating.height,
+                      Math.max(360, view.height - 100),
+                    ),
+                  ),
+                }
           }
           onPointerMove={move}
           onPointerUp={end}
@@ -243,17 +281,17 @@ export default function CalculatorWorkspace({
             </div>
           </header>
           <Calculator saved={saved} />
-          {mode === "floating" &&
-            corners.map((c) => (
-              <button
-                key={c}
-                className={`calculator-resize-handle ${c}`}
-                aria-label={`Resize calculator ${c}`}
-                title="Drag to resize; arrow keys also resize"
-                onPointerDown={(e) => begin(e, "resize", c)}
-                onKeyDown={(e) => keyResize(e, c)}
-              />
-            ))}
+          {corners.map((c) => (
+            <button
+              key={c}
+              type="button"
+              className={`calculator-resize-handle ${c}`}
+              aria-label={`Resize calculator ${c}`}
+              title="Drag to resize; arrow keys also resize"
+              onPointerDown={(e) => begin(e, "resize", c)}
+              onKeyDown={(e) => keyResize(e, c)}
+            />
+          ))}
         </section>
       )}
       <div
@@ -289,21 +327,25 @@ export default function CalculatorWorkspace({
           }));
         }}
       />
-      {open === "Reference sheet" && enabled && (
+      {referenceOpen && enabled && (
         <section
           className="player-tool-window reference-window"
           role="dialog"
           aria-label="Reference sheet"
           onKeyDown={(e) => {
-            if (e.key === "Escape") close();
+            if (e.key === "Escape") {
+              e.stopPropagation();
+              setReferenceOpen(false);
+            }
           }}
         >
           <header>
             <h2>Reference sheet</h2>
             <button
               className="button button-secondary button-compact"
+              type="button"
               aria-label="Close Reference sheet"
-              onClick={close}
+              onClick={() => setReferenceOpen(false)}
             >
               Close
             </button>

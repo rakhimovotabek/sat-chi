@@ -39,3 +39,11 @@ Current running isolated URL: **http://127.0.0.1:41061**.
 Restart with `npm run dev:isolated` from this repository. Use the localhost URL printed by that command (the port is allocated dynamically). It applies local migrations only to a disposable database. Reload/login preserve data during the run; restarting the command creates fresh fixtures. The native PostgreSQL 17/PostgREST tools must remain in the existing local cache. Desmos requires internet access.
 
 The pre-existing uncommitted production-release report is preserved outside this change's commit.
+
+## Calculator/layout follow-up
+
+The Calculator button now includes visible text. Calculator and Reference Sheet have independent state; either opening order works and closing either preserves the other. The calculator opens automatically in a shadowed left panel with reserved workspace space, keeping questions/answers on the right without overlap. A visible bottom-right pointer/keyboard resize handle adjusts bounded width and height without recreating Desmos. Free title-bar dragging is intentionally not implemented: keeping the left track reserved guarantees question visibility.
+
+The original question-left/answers-right desktop split is retained when closed. Opening Calculator stacks question content and answers in the reserved right column. The temporary short-choice two-column styling is no longer applied; original per-option X controls are visible without a separate Eliminate toggle.
+
+Follow-up verification: one focused Chromium integration test and three calculator-layout tests passed, zero failures/skips. Chromium used real PostgreSQL 17/PostgREST and official Desmos, with fixture Auth/Storage. It verified the normal split, pointer resizing (both dimensions increase), unchanged question/image/canvas identities, both Reference/Calculator opening orders, retained `y=x`, no extra tool-triggered application requests or question-image downloads, elimination/restore, Check/database persistence and reload recovery, Night Light, Overview dismissal, Pen, and Question Bank/Homework saves. Scoped lint, production build and diff checks passed. No database or production changes.

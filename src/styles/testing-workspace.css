@@ -674,3 +674,10 @@ html[data-night-light="extra-warm"] .learning-modal { background-color: #ffe3b0;
   .topbar { min-height: 64px; padding-block: 10px; }
 }
 .eliminate-choice[hidden] { display: none; }
+
+/* Reserve a left track for the floating-looking calculator; never move question DOM. */
+.calculator-workspace-window[data-mode="docked"], .calculator-workspace-window[data-mode="stacked"] { position: sticky; top: 90px; }
+.calculator-resize-handle.bottom-right { width: 28px; height: 28px; background: #f3f5f8; border-radius: 6px 0 0; z-index: 2; }
+.practice-workspace .reference-window { position: fixed; right: 16px; top: 90px; width: min(600px, calc(100vw - 32px)); max-height: calc(100dvh - 110px); overflow: auto; z-index: 45; }
+.practice-workspace:has(> .calculator-workspace-window[data-mode="docked"]:not([hidden])) > .question-player { grid-column: 3; }
+@media (max-width: 760px) { .calculator-workspace-window[data-mode="stacked"] { position: relative; top: auto; } }

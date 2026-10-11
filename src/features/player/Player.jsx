@@ -30,8 +30,7 @@ import { practiceSummary, questionAnswerIssue } from "./model.js";
 import { createPracticePersistence } from "./practice-persistence.js";
 export default function Player() {
   const globalTools = useContext(LearningToolsContext);
-  const [eliminating, setEliminating] = useState(false),
-    [showAttempts, setShowAttempts] = useState(false);
+  const [showAttempts, setShowAttempts] = useState(false);
   const { session: auth, profile } = useAuth();
   const { sessionId } = useParams();
   const navigate = useNavigate();
@@ -543,7 +542,7 @@ export default function Player() {
             )}
           </Stimulus>
           <section
-            className={`answer-panel annotation-surface ${q.section === "Math" && !openResponse && !q.option_image_urls?.some(Boolean) && q.options?.every((v) => v.length <= 40) ? "short-choices" : ""}`}
+            className="answer-panel annotation-surface"
             aria-label="Question and answer choices"
           >
             <div
@@ -562,19 +561,6 @@ export default function Player() {
                 <Icon name="bookmark" />
                 {current.marked ? "Marked" : "Mark for review"}
               </button>
-              {!openResponse && (
-                <button
-                  type="button"
-                  className="button button-secondary button-compact"
-                  title="Show answer elimination controls"
-                  aria-pressed={eliminating}
-                  onClick={() => setEliminating((v) => !v)}
-                  disabled={submitted || submitting}
-                >
-                  <Icon name="eliminate" />
-                  Eliminate
-                </button>
-              )}
               {current.attempts?.length > 0 && (
                 <button
                   type="button"
@@ -694,7 +680,6 @@ export default function Player() {
                         </label>
                         {!submitted && !current.solved_at && (
                           <button
-                            hidden={!eliminating}
                             className="eliminate-choice"
                             type="button"
                             aria-label={`${eliminated ? "Restore" : "Eliminate"} choice ${String.fromCharCode(65 + i)}`}
