@@ -76,6 +76,15 @@ test(
         ),
       );
     const header = page.locator(".topbar");
+    await expect(header.locator(".practice-header-title")).toHaveText(
+      await app.json(
+        `select to_json(title) from public.book_practice_sessions where id='${sid}';`,
+      ),
+    );
+    await expect(
+      header.getByRole("button", { name: "Back to practice", exact: true }),
+    ).toBeVisible();
+    await expect(page.locator(".practice-heading")).toHaveCount(0);
     await expect(
       header.getByRole("button", { name: "Calculator", exact: true }),
     ).toBeVisible();
@@ -156,6 +165,30 @@ test(
     assert.ok(resized.width > original.width + 20);
     assert.ok(resized.height > original.height + 30);
     await stable();
+    const questionBeforeDrag = await page
+      .locator(".question-player")
+      .boundingBox();
+    const dragBar = panel.locator(".calculator-workspace-header");
+    await expect(dragBar).toHaveCSS("cursor", "grab");
+    const dragBox = await dragBar.boundingBox();
+    await page.mouse.move(dragBox.x + 100, dragBox.y + 20);
+    await page.mouse.down();
+    await expect(dragBar).toHaveCSS("cursor", "grabbing");
+    await page.mouse.move(dragBox.x + 40, dragBox.y - 30, { steps: 8 });
+    await page.mouse.up();
+    await expect(panel).toHaveAttribute("data-mode", "floating");
+    const dragged = await panel.boundingBox();
+    assert.ok(dragged.x < resized.x - 30);
+    assert.ok(dragged.y < resized.y - 30);
+    const questionAfterDrag = await page
+      .locator(".question-player")
+      .boundingBox();
+    assert.equal(questionAfterDrag.x, questionBeforeDrag.x);
+    await stable();
+    await resize.focus();
+    await page.keyboard.press("ArrowRight");
+    assert.ok((await panel.boundingBox()).width > dragged.width);
+    const retainedPosition = await panel.boundingBox();
     const reference = page.getByRole("dialog", {
       name: "Reference sheet",
       exact: true,
@@ -170,6 +203,7 @@ test(
       .click();
     await expect(reference).toBeHidden();
     await expect(panel).toBeVisible();
+    assert.deepEqual(await panel.boundingBox(), retainedPosition);
     await stable();
     const expressionBefore = await formula();
     assert.equal(expressionBefore, "y=x");
@@ -354,6 +388,10 @@ test(
       window.__image = document.querySelector(".stimulus-panel img");
       window.__canvas = document.querySelector(".answer-panel canvas");
     });
+    await header
+      .getByRole("button", { name: "Calculator", exact: true })
+      .click();
+    await stable();
     const check = page.waitForResponse(
       (r) =>
         r.url().includes("/rpc/check_book_practice_answer") &&
@@ -437,6 +475,10 @@ test(
     await page
       .getByRole("button", { name: "Close Calculator", exact: true })
       .click();
+    await page
+      .getByRole("button", { name: "Back to practice", exact: true })
+      .click();
+    await expect(page).not.toHaveURL(/\/practice\//);
     assert.deepEqual(errors, []);
   },
 );

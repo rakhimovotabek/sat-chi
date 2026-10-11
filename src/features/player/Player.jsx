@@ -1,5 +1,8 @@
 import { createPortal } from "react-dom";
-import { LearningToolsContext } from "../../components/LearningToolsContext.js";
+import {
+  LearningToolsContext,
+  PracticeHeadingContext,
+} from "../../components/LearningToolsContext.js";
 import Icon from "../../components/Icon.jsx";
 import DrawingLayer from "./DrawingLayer.jsx";
 import AnnotationToolbar from "./AnnotationToolbar.jsx";
@@ -30,6 +33,7 @@ import { practiceSummary, questionAnswerIssue } from "./model.js";
 import { createPracticePersistence } from "./practice-persistence.js";
 export default function Player() {
   const globalTools = useContext(LearningToolsContext);
+  const practiceHeading = useContext(PracticeHeadingContext);
   const [showAttempts, setShowAttempts] = useState(false);
   const { session: auth, profile } = useAuth();
   const { sessionId } = useParams();
@@ -310,25 +314,21 @@ export default function Player() {
   const result = practiceSummary(items);
   return (
     <div className="practice-page">
-      <div className="practice-heading">
-        <div>
-          <p className="eyebrow">
-            {submitted
-              ? "Practice review"
-              : session.kind === "bank"
-                ? "Question Bank practice"
-                : "Book practice"}
-          </p>
-          <h1>{session.title}</h1>
-        </div>
-        <button
-          className="button button-secondary"
-          onClick={leave}
-          disabled={submitting}
-        >
-          Back to practice
-        </button>
-      </div>
+      {practiceHeading &&
+        createPortal(
+          <>
+            <strong className="practice-header-title">{session.title}</strong>
+            <button
+              type="button"
+              className="button button-secondary button-compact"
+              disabled={submitting}
+              onClick={leave}
+            >
+              Back to practice
+            </button>
+          </>,
+          practiceHeading,
+        )}
       {submitted && (
         <section className="practice-results" aria-label="Practice results">
           <div>

@@ -540,16 +540,16 @@
 @media(max-width:480px) { .question-overview .question-numbers { grid-template-columns: repeat(5,minmax(0,1fr)); } }
 /* Question Bank calculator occupies a real grid track; its DOM never moves. */
 .practice-workspace { min-width: 0; }
-.practice-workspace:has(> .calculator-workspace-window[data-mode="docked"]:not([hidden])) {
+.practice-workspace:has(> .calculator-workspace-window[data-reserve="true"]:not([hidden])) {
   display: grid;
   grid-template-columns: var(--calculator-dock-width) 12px minmax(0, 1fr);
   align-items: start;
 }
-.practice-workspace:has(> .calculator-workspace-window[data-mode="docked"]:not([hidden])) > .question-player {
+.practice-workspace:has(> .calculator-workspace-window[data-reserve="true"]:not([hidden])) > .question-player {
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
 }
-.practice-workspace:has(> .calculator-workspace-window[data-mode="docked"]:not([hidden])) .stimulus-panel {
+.practice-workspace:has(> .calculator-workspace-window[data-reserve="true"]:not([hidden])) .stimulus-panel {
   border-right: 0;
   border-bottom: 1px solid var(--border);
 }
@@ -679,5 +679,16 @@ html[data-night-light="extra-warm"] .learning-modal { background-color: #ffe3b0;
 .calculator-workspace-window[data-mode="docked"], .calculator-workspace-window[data-mode="stacked"] { position: sticky; top: 90px; }
 .calculator-resize-handle.bottom-right { width: 28px; height: 28px; background: #f3f5f8; border-radius: 6px 0 0; z-index: 2; }
 .practice-workspace .reference-window { position: fixed; right: 16px; top: 90px; width: min(600px, calc(100vw - 32px)); max-height: calc(100dvh - 110px); overflow: auto; z-index: 45; }
-.practice-workspace:has(> .calculator-workspace-window[data-mode="docked"]:not([hidden])) > .question-player { grid-column: 3; }
+.practice-workspace:has(> .calculator-workspace-window[data-reserve="true"]:not([hidden])) > .question-player { grid-column: 3; }
 @media (max-width: 760px) { .calculator-workspace-window[data-mode="stacked"] { position: relative; top: auto; } }
+
+/* Manual dragging floats the panel while its original question track stays reserved. */
+.calculator-reserved-space { grid-column: 1; grid-row: 1; min-height: 360px; }
+.practice-workspace > .calculator-divider { grid-column: 2; grid-row: 1; }
+.practice-workspace:has(> .calculator-workspace-window[data-reserve="true"]:not([hidden])) > .question-player { grid-row: 1; }
+.calculator-workspace-header { cursor: grab; touch-action: none; user-select: none; }
+.calculator-interacting .calculator-workspace-header { cursor: grabbing; }
+.practice-header-details { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.practice-header-details:empty { display: none; }
+.practice-header-title { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.topbar-heading { flex-wrap: wrap; gap: 10px; min-width: 0; }

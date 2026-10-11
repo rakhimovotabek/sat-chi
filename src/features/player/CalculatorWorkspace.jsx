@@ -44,7 +44,8 @@ export default function CalculatorWorkspace({
     trigger = useRef(null),
     closeButton = useRef(null);
   const dockable = canDock(available, view.width),
-    mode = dockable ? "docked" : "stacked";
+    mode =
+      layout.mode === "floating" ? "floating" : dockable ? "docked" : "stacked";
   const box = fitFloating(layout.floating, view),
     width = dockWidth(available, layout.ratio),
     shown = calculatorOpen && enabled;
@@ -79,19 +80,25 @@ export default function CalculatorWorkspace({
     trigger.current?.focus({ preventScroll: true });
   }
   function begin(e, kind, corner) {
-    if (
-      e.button !== 0 ||
-      (kind === "move" && (mode !== "floating" || e.target.closest("button")))
-    )
+    if (e.button !== 0 || (kind === "move" && e.target.closest("button")))
       return;
     e.preventDefault();
     e.currentTarget.focus({ preventScroll: true });
     e.currentTarget.setPointerCapture(e.pointerId);
+    const rect = e.currentTarget
+      .closest(".calculator-workspace-window")
+      ?.getBoundingClientRect();
+    const startBox =
+      kind === "move" && mode !== "floating"
+        ? { x: rect.left, y: rect.top, width: rect.width, height: rect.height }
+        : box;
+    if (kind === "move" && mode !== "floating")
+      setLayout((l) => ({ ...l, mode: "floating", floating: startBox }));
     gesture.current = {
       id: e.pointerId,
       x: e.clientX,
       y: e.clientY,
-      box,
+      box: startBox,
       ratio: layout.ratio,
       height: layout.floating.height,
       kind,
@@ -203,6 +210,7 @@ export default function CalculatorWorkspace({
           id="practice-calculator"
           className={`calculator-workspace-window ${interacting ? "calculator-interacting" : ""}`}
           data-mode={mode}
+          data-reserve={dockable ? "true" : undefined}
           role="dialog"
           aria-modal={mode === "mobile" ? true : undefined}
           aria-label="Calculator"
@@ -254,12 +262,8 @@ export default function CalculatorWorkspace({
         >
           <header
             className="calculator-workspace-header"
-            tabIndex={mode === "floating" ? 0 : undefined}
-            aria-label={
-              mode === "floating"
-                ? "Move calculator with arrow keys"
-                : undefined
-            }
+            tabIndex={0}
+            aria-label="Move calculator with arrow keys"
             onPointerDown={(e) => begin(e, "move")}
             onKeyDown={(e) => {
               if (e.target === e.currentTarget && mode === "floating")
@@ -294,9 +298,12 @@ export default function CalculatorWorkspace({
           ))}
         </section>
       )}
+      {shown && dockable && mode === "floating" && (
+        <div className="calculator-reserved-space" aria-hidden="true" />
+      )}
       <div
         className="calculator-divider"
-        hidden={!shown || mode !== "docked"}
+        hidden={!shown || !dockable}
         role="separator"
         aria-label="Calculator width"
         aria-orientation="vertical"

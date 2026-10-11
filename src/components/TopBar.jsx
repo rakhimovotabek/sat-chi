@@ -9,6 +9,7 @@ export default function TopBar({
   menuOpen,
   onToggleMenu,
   learningToolsRef,
+  practiceHeadingRef,
 }) {
   const { profile, signOut } = useAuth();
   const [busy, setBusy] = useState(false);
@@ -42,6 +43,7 @@ export default function TopBar({
           <span aria-hidden="true">/</span>
           <strong>{title}</strong>
         </div>
+        <span className="practice-header-details" ref={practiceHeadingRef} />
       </div>
       <div className="account-controls">
         <span

@@ -47,3 +47,13 @@ The Calculator button now includes visible text. Calculator and Reference Sheet 
 The original question-left/answers-right desktop split is retained when closed. Opening Calculator stacks question content and answers in the reserved right column. The temporary short-choice two-column styling is no longer applied; original per-option X controls are visible without a separate Eliminate toggle.
 
 Follow-up verification: one focused Chromium integration test and three calculator-layout tests passed, zero failures/skips. Chromium used real PostgreSQL 17/PostgREST and official Desmos, with fixture Auth/Storage. It verified the normal split, pointer resizing (both dimensions increase), unchanged question/image/canvas identities, both Reference/Calculator opening orders, retained `y=x`, no extra tool-triggered application requests or question-image downloads, elimination/restore, Check/database persistence and reload recovery, Night Light, Overview dismissal, Pen, and Question Bank/Homework saves. Scoped lint, production build and diff checks passed. No database or production changes.
+
+## Title-bar dragging and compact header
+
+The title bar now supports unmodified left-button pointer dragging with grab/grabbing cursors, pointer capture and release/cancel cleanup. The close button does not start dragging. The first drag switches the same calculator DOM to a bounded floating overlay, leaving a spacer in the original left grid track so the question does not move. Bottom-right resizing still works in floating mode. Reference Sheet state is independent and never changes calculator position.
+
+Practice title and the existing Back action now render in a dedicated main-header portal next to the breadcrumb. The duplicate practice-card heading is removed. Responsive header wrapping preserves the tools; Back retains its save/navigation handler and submission-disabled state. No persistence, grading or submission logic changed.
+
+The focused Chromium regression covers title/header placement, drag cursor/movement/release, unchanged question position, resize after dragging, expression/position preservation through Reference Sheet, close behavior, Check with Calculator open, database-confirmed persistence, narrow screens and Back navigation. Auth/Storage remain fixtures; PostgreSQL/PostgREST and Desmos are real. No production changes or migrations.
+
+Result: passed (56 seconds), zero failures or skips. Scoped ESLint, production build and diff checks also passed.
