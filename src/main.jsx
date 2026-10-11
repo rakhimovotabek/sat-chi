@@ -15,11 +15,12 @@ import "./styles/review.css";
 import "./styles/study-workspace.css";
 import "./styles/testing-workspace.css";
 
-import { readNightLight } from "./lib/night-light.js";
+import { readNightLightLevel, applyNightLight } from "./lib/night-light.js";
 try {
-  document.documentElement.classList.toggle(
-    "night-light",
-    readNightLight(localStorage),
+  applyNightLight(
+    readNightLightLevel(localStorage),
+    document.documentElement,
+    localStorage,
   );
 } catch {
   /* Storage may be unavailable. */

@@ -641,3 +641,36 @@
   color: #fff;
   border-color: #1261d8;
 }
+
+/* Shared header tools; controls stay outside the stable question subtree. */
+.learning-global-tools, .question-action-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.learning-global-tools:empty { display: none; }
+.account-controls { flex-wrap: wrap; }
+.learning-global-tools .button { min-width: 40px; padding-inline: 9px; }
+.question-action-toolbar { padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.question-index { min-width: 36px; padding: 7px; background: var(--accent); color: white; border-radius: 7px; text-align: center; }
+.question-action-toolbar .button { display: inline-flex; align-items: center; gap: 6px; }
+.calculator-workspace-window[data-mode="docked"] { border-radius: 12px; box-shadow: 0 12px 30px #172b4d20; height: min(620px, 75dvh); position: sticky; top: 90px; }
+.night-light-level { font-size: 11px; }
+html[data-night-light="warm"] { --night-light-tint: rgba(255, 183, 65, 0.20); }
+html[data-night-light="extra-warm"] { --night-light-tint: rgba(255, 157, 40, 0.32); }
+html.night-light::after { background: var(--night-light-tint, rgba(255, 183, 65, 0.20)); }
+html.night-light .learning-modal { background-color: #fff1d7; }
+html[data-night-light="extra-warm"] .learning-modal { background-color: #ffe3b0; }
+/* Short Math choices benefit from two columns; prose stays in one column. */
+.answer-panel .answer-choices { gap: 10px; }
+@media (max-width: 760px) {
+  .topbar { align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+  .account-controls { gap: 6px; }
+  .learning-global-tools { gap: 5px; }
+  .question-action-toolbar { gap: 6px; }
+}
+@media (min-width: 1100px) {
+  .short-choices .answer-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .short-choices .answer-choice { margin: 0; }
+}
+@media (max-width: 760px) {
+  .app-shell { grid-template-rows: auto auto minmax(calc(100dvh - 64px), auto); }
+  .topbar { min-height: 64px; padding-block: 10px; }
+}
+.eliminate-choice[hidden] { display: none; }

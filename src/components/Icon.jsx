@@ -1,4 +1,9 @@
 const paths = {
+  calculator: "M6 2h12v20H6z M9 5h6v4H9z M9 13h.01 M15 13h.01 M9 17h.01 M15 17h.01",
+  reference: "M5 3h14v18H5z M8 7h8 M8 11h8 M8 15h5",
+  bookmark: "M6 3h12v18l-6-4-6 4z",
+  eliminate: "M4 4l16 16 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0",
+  history: "M3 5v5h5 M3 10a9 9 0 1 1 2 8 M12 7v5l3 2",
   night: "M20 15A8 8 0 0 1 9 4a8 8 0 1 0 11 11z",
   pen: "M4 20l1-5L16 4l4 4L9 19z M14 6l4 4",
   dashboard: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",

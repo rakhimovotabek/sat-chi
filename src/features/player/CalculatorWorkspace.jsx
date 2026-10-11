@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Icon from "../../components/Icon.jsx";
 import { createPortal } from "react-dom";
 import Calculator from "./DesmosCalculator.jsx";
 import MathReference from "./MathReference.jsx";
@@ -42,14 +43,7 @@ export default function CalculatorWorkspace({
     trigger = useRef(null),
     closeButton = useRef(null);
   const dockable = canDock(available, view.width),
-    mode =
-      view.width <= 760
-        ? "stacked"
-        : layout.mode === "docked" && dockable
-          ? "docked"
-          : layout.mode === "docked"
-            ? "stacked"
-            : "floating";
+    mode = dockable ? "docked" : "stacked";
   const box = fitFloating(layout.floating, view),
     width = dockWidth(available, layout.ratio),
     shown = open === "Calculator" && enabled;
@@ -150,6 +144,9 @@ export default function CalculatorWorkspace({
             <button
               ref={trigger}
               className="button button-secondary button-compact"
+              type="button"
+              aria-label="Calculator"
+              title="Graphing Calculator"
               aria-expanded={shown}
               aria-controls="practice-calculator"
               onClick={() => {
@@ -157,13 +154,16 @@ export default function CalculatorWorkspace({
                 setOpen("Calculator");
               }}
             >
-              Calculator
+              <Icon name="calculator" />
             </button>
             <button
               className="button button-secondary button-compact"
+              type="button"
+              aria-label="Reference sheet"
+              title="Reference sheet"
               onClick={() => setOpen("Reference sheet")}
             >
-              Reference sheet
+              <Icon name="reference" />
             </button>
           </>,
           toolbar,
@@ -228,37 +228,17 @@ export default function CalculatorWorkspace({
                 keyResize(e);
             }}
           >
-            <h2>Graphing calculator</h2>
+            <h2>Graphing Calculator</h2>
             <div className="calculator-window-controls">
-              <button
-                className="button button-secondary button-compact"
-                disabled={mode !== "docked" && !dockable}
-                aria-label={
-                  mode === "docked" ? "Float calculator" : "Dock calculator"
-                }
-                title={
-                  mode === "docked"
-                    ? "Switch to floating window"
-                    : dockable
-                      ? "Dock beside question"
-                      : "Docking needs a wider workspace"
-                }
-                onClick={() =>
-                  setLayout((l) => ({
-                    ...l,
-                    mode: mode === "docked" ? "floating" : "docked",
-                  }))
-                }
-              >
-                {mode === "docked" ? "Float" : "Dock"}
-              </button>
               <button
                 ref={closeButton}
                 className="button button-secondary button-compact"
+                type="button"
+                title="Close Calculator"
                 aria-label="Close Calculator"
                 onClick={close}
               >
-                Close
+                <Icon name="close" />
               </button>
             </div>
           </header>

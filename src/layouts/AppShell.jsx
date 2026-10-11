@@ -1,3 +1,4 @@
+import { LearningToolsContext } from "../components/LearningToolsContext.js";
 import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
 import Sidebar from "../components/Sidebar.jsx";
@@ -5,6 +6,7 @@ import TopBar from "../components/TopBar.jsx";
 import usePageTitle from "../hooks/usePageTitle.js";
 
 export default function AppShell({ workspace, navigation }) {
+  const [learningTools, setLearningTools] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -55,47 +57,50 @@ export default function AppShell({ workspace, navigation }) {
   usePageTitle(title);
 
   return (
-    <div
-      className={`app-shell workspace-${workspace} ${collapsed ? "sidebar-collapsed" : ""}`}
-    >
-      <a className="skip-link" href="#main-content">
-        Skip to content
-      </a>
-      <Sidebar
-        workspace={workspace}
-        navigation={navigation}
-        open={menuOpen}
-        onNavigate={() => setMenuOpen(false)}
-        collapsed={collapsed}
-        onToggleCollapse={toggleCollapse}
-      />
-      {menuOpen && (
-        <button
-          className="sidebar-scrim"
-          aria-label="Dismiss navigation"
-          onClick={() => setMenuOpen(false)}
-        />
-      )}
-      <TopBar
-        workspace={workspace}
-        title={title}
-        menuOpen={menuOpen}
-        onToggleMenu={() => setMenuOpen((open) => !open)}
-      />
-      <main
-        id="main-content"
-        className="main-content"
-        tabIndex={-1}
-        inert={menuOpen ? true : undefined}
+    <LearningToolsContext.Provider value={learningTools}>
+      <div
+        className={`app-shell workspace-${workspace} ${collapsed ? "sidebar-collapsed" : ""}`}
       >
-        <div className="content-container">
-          <Outlet />
-        </div>
-        <footer className="content-footer">
-          <span>SAT’chi</span>
-          <span>Built for focused learning.</span>
-        </footer>
-      </main>
-    </div>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+        <Sidebar
+          workspace={workspace}
+          navigation={navigation}
+          open={menuOpen}
+          onNavigate={() => setMenuOpen(false)}
+          collapsed={collapsed}
+          onToggleCollapse={toggleCollapse}
+        />
+        {menuOpen && (
+          <button
+            className="sidebar-scrim"
+            aria-label="Dismiss navigation"
+            onClick={() => setMenuOpen(false)}
+          />
+        )}
+        <TopBar
+          workspace={workspace}
+          learningToolsRef={setLearningTools}
+          title={title}
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen((open) => !open)}
+        />
+        <main
+          id="main-content"
+          className="main-content"
+          tabIndex={-1}
+          inert={menuOpen ? true : undefined}
+        >
+          <div className="content-container">
+            <Outlet />
+          </div>
+          <footer className="content-footer">
+            <span>SAT’chi</span>
+            <span>Built for focused learning.</span>
+          </footer>
+        </main>
+      </div>
+    </LearningToolsContext.Provider>
   );
 }

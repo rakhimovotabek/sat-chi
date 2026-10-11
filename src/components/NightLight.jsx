@@ -1,12 +1,17 @@
 import { useState } from "react";
 import Icon from "./Icon.jsx";
-import { applyNightLight } from "../lib/night-light.js";
+import { applyNightLight, nightLightLevels } from "../lib/night-light.js";
 export default function NightLight() {
-  const [enabled, setEnabled] = useState(() =>
-    document.documentElement.classList.contains("night-light"),
+  const [level, setLevel] = useState(
+    () => document.documentElement.dataset.nightLight || "off",
   );
+  const label =
+    level === "extra-warm" ? "Extra Warm" : level === "warm" ? "Warm" : "Off";
   function toggle() {
-    const next = !enabled;
+    const next =
+      nightLightLevels[
+        (nightLightLevels.indexOf(level) + 1) % nightLightLevels.length
+      ];
     let storage;
     try {
       storage = localStorage;
@@ -14,19 +19,20 @@ export default function NightLight() {
       /* Disabled storage must not disable the switch. */
     }
     applyNightLight(next, document.documentElement, storage);
-    setEnabled(next);
+    setLevel(next);
   }
   return (
     <button
       type="button"
       className="button button-secondary button-compact"
       aria-label="Night Light"
-      title="Night Light: warm display"
-      aria-pressed={enabled}
+      title={`Night Light: ${label}. Click to cycle Off, Warm, Extra Warm.`}
+      aria-pressed={level !== "off"}
+      data-level={level}
       onClick={toggle}
     >
       <Icon name="night" />
-      <span className="visually-hidden">Night Light</span>
+      <span className="night-light-level">{label}</span>
     </button>
   );
 }

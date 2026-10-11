@@ -7,6 +7,7 @@ import {
 } from "../src/features/learning/homework-results-model.js";
 import {
   readNightLight,
+  readNightLightLevel,
   applyNightLight,
   nightLightKey,
 } from "../src/lib/night-light.js";
@@ -55,6 +56,7 @@ test("Night Light persists preference, toggles root only and tolerates unavailab
     };
   const classes = new Set(),
     root = {
+      dataset: {},
       classList: {
         toggle: (key, on) => (on ? classes.add(key) : classes.delete(key)),
       },
@@ -62,7 +64,10 @@ test("Night Light persists preference, toggles root only and tolerates unavailab
   assert.equal(readNightLight(storage), false);
   applyNightLight(true, root, storage);
   assert.equal(readNightLight(storage), true);
-  assert.equal(values.get(nightLightKey), "true");
+  assert.equal(values.get(nightLightKey), "warm");
+  applyNightLight("extra-warm", root, storage);
+  assert.equal(readNightLightLevel(storage), "extra-warm");
+  assert.equal(root.dataset.nightLight, "extra-warm");
   assert.ok(classes.has("night-light"));
   applyNightLight(false, root, storage);
   assert.equal(readNightLight(storage), false);

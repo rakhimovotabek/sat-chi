@@ -1,16 +1,34 @@
 export const nightLightKey = "satchi.night-light";
-export function readNightLight(storage) {
+export const nightLightLevels = ["off", "warm", "extra-warm"];
+export function readNightLightLevel(storage) {
   try {
-    return storage.getItem(nightLightKey) === "true";
+    const value = storage.getItem(nightLightKey);
+    return value === "true"
+      ? "warm"
+      : nightLightLevels.includes(value)
+        ? value
+        : "off";
   } catch {
-    return false;
+    return "off";
   }
 }
-export function applyNightLight(enabled, root, storage) {
-  root.classList.toggle("night-light", enabled);
+// Preserve the existing boolean helpers for callers and older preferences.
+export const readNightLight = (storage) =>
+  readNightLightLevel(storage) !== "off";
+export function applyNightLight(value, root, storage) {
+  const level =
+    value === true
+      ? "warm"
+      : value === false
+        ? "off"
+        : nightLightLevels.includes(value)
+          ? value
+          : "off";
+  root.classList.toggle("night-light", level !== "off");
+  root.dataset.nightLight = level;
   try {
-    storage.setItem(nightLightKey, String(enabled));
+    storage.setItem(nightLightKey, level);
   } catch {
-    /* Preference still works for this page. */
+    /* Optional storage. */
   }
 }

@@ -1,7 +1,10 @@
+import { createPortal } from "react-dom";
+import { LearningToolsContext } from "../../components/LearningToolsContext.js";
+import Icon from "../../components/Icon.jsx";
 import DrawingLayer from "./DrawingLayer.jsx";
 import AnnotationToolbar from "./AnnotationToolbar.jsx";
 import FormattedText from "../../components/FormattedText.jsx";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
 import { useParams, useNavigate, Navigate } from "react-router";
 import useAuth from "../../hooks/useAuth.js";
 import useContent from "../books/useContent.js";
@@ -26,6 +29,9 @@ import Navigator from "./Navigator.jsx";
 import { practiceSummary, questionAnswerIssue } from "./model.js";
 import { createPracticePersistence } from "./practice-persistence.js";
 export default function Player() {
+  const globalTools = useContext(LearningToolsContext);
+  const [eliminating, setEliminating] = useState(false),
+    [showAttempts, setShowAttempts] = useState(false);
   const { session: auth, profile } = useAuth();
   const { sessionId } = useParams();
   const navigate = useNavigate();
@@ -448,6 +454,34 @@ export default function Player() {
           saving succeeds.
         </p>
       )}
+      {globalTools &&
+        createPortal(
+          <>
+            {calculatorWorkspace ? (
+              <span
+                className="player-math-tools"
+                ref={setToolsTarget}
+                hidden={q.section !== "Math"}
+              />
+            ) : (
+              q.section === "Math" && <MathTools />
+            )}
+
+            {calculatorWorkspace && (
+              <AnnotationToolbar
+                active={drawing}
+                setActive={setDrawing}
+                tool={drawingTool}
+                setTool={setDrawingTool}
+                onClear={() => {
+                  setDrawingError("");
+                  setClearDrawings((v) => v + 1);
+                }}
+              />
+            )}
+          </>,
+          globalTools,
+        )}
       <div className="player-toolbar">
         <span className="practice-clock">
           {session.timed ? "Time remaining · " : "Study time · "}
@@ -465,28 +499,6 @@ export default function Player() {
           )}
           {session.time_limit ? ` / ${formatTime(session.time_limit)}` : ""}
         </span>
-        {calculatorWorkspace ? (
-          <span
-            className="player-math-tools"
-            ref={setToolsTarget}
-            hidden={q.section !== "Math"}
-          />
-        ) : (
-          q.section === "Math" && <MathTools />
-        )}
-
-        {calculatorWorkspace && (
-          <AnnotationToolbar
-            active={drawing}
-            setActive={setDrawing}
-            tool={drawingTool}
-            setTool={setDrawingTool}
-            onClear={() => {
-              setDrawingError("");
-              setClearDrawings((v) => v + 1);
-            }}
-          />
-        )}
         <span role="status" aria-label="Answer save status">
           {submitted
             ? "Submitted"
@@ -498,13 +510,6 @@ export default function Player() {
                   : "Answers pending"
                 : "All changes saved"}
         </span>
-        <button
-          className={`button button-secondary button-compact ${current.marked ? "marked-control" : ""}`}
-          disabled={submitted || submitting}
-          onClick={() => change({ marked: !current.marked })}
-        >
-          {current.marked ? "Marked for review" : "Mark for review"}
-        </button>
       </div>
       {drawingError && (
         <p className="annotation-storage-error" role="alert">
@@ -538,9 +543,51 @@ export default function Player() {
             )}
           </Stimulus>
           <section
-            className="answer-panel annotation-surface"
+            className={`answer-panel annotation-surface ${q.section === "Math" && !openResponse && !q.option_image_urls?.some(Boolean) && q.options?.every((v) => v.length <= 40) ? "short-choices" : ""}`}
             aria-label="Question and answer choices"
           >
+            <div
+              className="question-action-toolbar"
+              role="group"
+              aria-label="Question tools"
+            >
+              <strong className="question-index">{index + 1}</strong>
+              <button
+                className={`button button-secondary button-compact ${current.marked ? "marked-control" : ""}`}
+                type="button"
+                title={current.marked ? "Marked for review" : "Mark for review"}
+                disabled={submitted || submitting}
+                onClick={() => change({ marked: !current.marked })}
+              >
+                <Icon name="bookmark" />
+                {current.marked ? "Marked" : "Mark for review"}
+              </button>
+              {!openResponse && (
+                <button
+                  type="button"
+                  className="button button-secondary button-compact"
+                  title="Show answer elimination controls"
+                  aria-pressed={eliminating}
+                  onClick={() => setEliminating((v) => !v)}
+                  disabled={submitted || submitting}
+                >
+                  <Icon name="eliminate" />
+                  Eliminate
+                </button>
+              )}
+              {current.attempts?.length > 0 && (
+                <button
+                  type="button"
+                  className="button button-secondary button-compact"
+                  aria-expanded={showAttempts}
+                  onClick={() => setShowAttempts((v) => !v)}
+                  title="Recorded attempts"
+                >
+                  <Icon name="history" />
+                  Attempts ({current.attempts.length})
+                </button>
+              )}
+            </div>
             <div className="question-meta">
               <span>{q.domain || "SAT practice"}</span>
               <span>{q.difficulty}</span>
@@ -647,6 +694,7 @@ export default function Player() {
                         </label>
                         {!submitted && !current.solved_at && (
                           <button
+                            hidden={!eliminating}
                             className="eliminate-choice"
                             type="button"
                             aria-label={`${eliminated ? "Restore" : "Eliminate"} choice ${String.fromCharCode(65 + i)}`}
@@ -681,12 +729,13 @@ export default function Player() {
                 className={`attempt-feedback answer-result ${current.solved_at ? "correct-choice" : "incorrect-choice"}`}
                 aria-live="polite"
               >
+                <strong>{current.solved_at ? "Correct" : "Incorrect"}</strong>
                 <p>
                   {current.solved_at
                     ? "Solved. Continue to the next question."
                     : "That answer is incorrect. Try another choice."}
                 </p>
-                <ol>
+                <ol hidden={!showAttempts}>
                   {current.attempts.map((a) => (
                     <li key={a.id}>
                       Attempt {a.attempt_order}:{" "}
@@ -757,13 +806,6 @@ export default function Player() {
           Question {index + 1} of {items.length}
         </button>
         <div className="inline-actions">
-          <button
-            className={`button ${practice && current.solved_at ? "" : "button-secondary"}`}
-            disabled={index === items.length - 1 || submitting || checking}
-            onClick={() => setIndex((i) => i + 1)}
-          >
-            Next
-          </button>
           {practice && !submitted && !current.solved_at && (
             <button
               className="button"
@@ -779,6 +821,13 @@ export default function Player() {
               {checking ? "Checking…" : "Check"}
             </button>
           )}
+          <button
+            className={`button ${practice && current.solved_at ? "" : "button-secondary"}`}
+            disabled={index === items.length - 1 || submitting || checking}
+            onClick={() => setIndex((i) => i + 1)}
+          >
+            Next
+          </button>
           {!practice && !submitted && (
             <button className="button" disabled={submitting} onClick={submit}>
               {submitting

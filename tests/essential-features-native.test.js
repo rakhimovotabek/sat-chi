@@ -229,6 +229,9 @@ test(
     await page
       .getByRole("button", { name: "Night Light", exact: true })
       .click();
+    await page
+      .getByRole("button", { name: "Night Light", exact: true })
+      .click();
     await expect(page.locator("html")).not.toHaveClass(/night-light/);
     assert.equal(
       (
@@ -270,6 +273,9 @@ test(
     );
     await page.getByRole("button", { name: "Check", exact: true }).click();
     assert.equal((await response).status(), 200);
+    await page
+      .getByRole("button", { name: "Attempts (1)", exact: true })
+      .click();
     await expect(
       page.getByText(/Attempt 1: B · Correct/).first(),
     ).toBeVisible();
