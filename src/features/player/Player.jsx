@@ -198,6 +198,8 @@ export default function Player() {
     setChecking(true);
     setError("");
     try {
+      // Check can be clicked while saving, but grading must use the durable
+      // latest selection. A failed/conflicting save stops grading here.
       await queue.current;
       await study.flush();
       const checkAnswer =
@@ -796,7 +798,6 @@ export default function Player() {
               className="button"
               disabled={
                 checking ||
-                saving ||
                 current.selected_answer == null ||
                 current.eliminated.includes(current.selected_answer)
               }

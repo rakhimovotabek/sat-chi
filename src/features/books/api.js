@@ -177,17 +177,21 @@ export const startPractice = (topic) =>
     "Could not start practice. Choose a published topic with 1–500 questions.",
   );
 export async function getPractice(id) {
-  const session = await checked(
-    supabase.from("book_practice_sessions").select("*").eq("id", id).single(),
-    "Practice is unavailable.",
-  );
-  const items = await checked(
-    supabase
-      .from("book_practice_items")
-      .select("*")
-      .eq("session_id", id)
-      .order("position"),
-  );
+  // Both reads enforce ownership through RLS independently. Start together;
+  // publish nothing until both succeed, retaining authoritative answer revisions.
+  const [session, items] = await Promise.all([
+    checked(
+      supabase.from("book_practice_sessions").select("*").eq("id", id).single(),
+      "Practice is unavailable.",
+    ),
+    checked(
+      supabase
+        .from("book_practice_items")
+        .select("*")
+        .eq("session_id", id)
+        .order("position"),
+    ),
+  ]);
   let review = [];
   if (session.submitted_at)
     review = await checked(
