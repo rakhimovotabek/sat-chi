@@ -279,7 +279,9 @@ export default function QuestionBank({ admin = false }) {
                 onChange={(e) => field("status", e.target.value)}
               >
                 <option value="">All questions</option>
-                <option value="unanswered">Unanswered</option>
+                  <option value="unanswered">Not attempted</option>
+                  <option value="attempted">Previously attempted</option>
+                  <option value="corrected">Corrected after mistake</option>
                 <option value="correct">Previously correct</option>
                 <option value="incorrect">Previously incorrect</option>
               </select>

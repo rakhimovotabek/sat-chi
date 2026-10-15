@@ -527,6 +527,13 @@
 .question-overview .question-number { position: relative; width: 100%; min-height: 36px; padding: 0; border: 1px solid #cbd2dc; border-radius: 9px; background: white; color: #39475a; font-variant-numeric: tabular-nums; }
 .question-number.is-correct,.legend-dot.is-correct { background: #168544; color: white; border-color: #168544; }
 .question-number.is-incorrect,.legend-dot.is-incorrect { background: #c63838; color: white; border-color: #c63838; }
+.question-overview .question-number.is-previously-correct, .legend-dot.is-previously-correct { background: #e5f4eb; color: #116b36; border: 2px dashed #168544; }
+.question-overview .question-number.is-previously-incorrect, .legend-dot.is-previously-incorrect { background: #fff0ef; color: #9d2727; border: 2px dashed #c63838; }
+.question-overview .question-number.is-previously-corrected, .legend-dot.is-previously-corrected { background: #fff4d6; color: #755000; border: 2px dashed #a97000; }
+.question-overview .question-number.is-checked-current, .legend-dot.is-checked-current { text-decoration: underline; text-underline-offset: 3px; }
+.prior-history { border-inline-start: 3px solid var(--accent, #245bcc); background: var(--surface-quiet, #f4f6fa); padding: 16px; margin-block: 16px; }
+.prior-history p { overflow-wrap: anywhere; }
+.prior-history summary { cursor: pointer; min-height: 44px; padding-block: 10px; }
 .question-number.is-current,.legend-dot.is-current { background: #1261d8; color: white; border-color: #1261d8; }
 .question-number.is-current.is-correct { box-shadow: inset 0 -4px #168544; }
 .question-number.is-current.is-incorrect { box-shadow: inset 0 -4px #c63838; }

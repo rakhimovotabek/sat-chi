@@ -179,7 +179,7 @@ export const startPractice = (topic) =>
 export async function getPractice(id) {
   // Both reads enforce ownership through RLS independently. Start together;
   // publish nothing until both succeed, retaining authoritative answer revisions.
-  const [session, items] = await Promise.all([
+  const [session, items, prior] = await Promise.all([
     checked(
       supabase.from("book_practice_sessions").select("*").eq("id", id).single(),
       "Practice is unavailable.",
@@ -191,6 +191,7 @@ export async function getPractice(id) {
         .eq("session_id", id)
         .order("position"),
     ),
+    checked(supabase.rpc("practice_prior_progress", { p_session: id })),
   ]);
   let review = [];
   if (session.submitted_at)
@@ -235,6 +236,7 @@ export async function getPractice(id) {
     items: items.map((i) => ({
       ...i,
       attempts: attempts.filter((a) => a.item_id === i.id),
+      prior: prior.find((p) => p.item_id === i.id) || null,
     })),
     review,
   };

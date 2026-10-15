@@ -94,11 +94,9 @@ test(
           "Correct",
         );
         await page.goto(app.appUrl + "/dashboard");
-        const card = page
-          .locator("article")
-          .filter({
-            has: page.locator("small", { hasText: /^First-attempt accuracy$/ }),
-          });
+        const card = page.locator("article").filter({
+          has: page.locator("small", { hasText: /^First-attempt accuracy$/ }),
+        });
         await expect(card.locator("strong")).toHaveText("0%");
         const totals = await app.json(
           app.as(student, "select public.learning_metrics()"),
@@ -148,6 +146,68 @@ test(
             )
           ).first_incorrect,
           1,
+        );
+      },
+    );
+    await t.test(
+      "subtopic history is visible in parent and bank without new homework submissions",
+      async () => {
+        const parent = await app.json(
+          `with p as(insert into public.book_topics(book_id,title,position)values('${app.book}','Advanced Math fixture parent',0)returning id)select to_jsonb(id)from p`,
+        );
+        await app.sql(
+          `update public.book_topics set parent_id='${parent}' where id='${app.topic}'`,
+        );
+        const canonical = await app.json(
+          `select to_jsonb(i.question->>'id')from public.book_practice_items i join public.question_check_attempts a on a.item_id=i.id order by a.created_at limit 1`,
+        );
+        const sid = await app.json(
+          app.as(student, `select public.start_book_practice('${parent}')`),
+        );
+        const position = await app.json(
+          `select position from public.book_practice_items where session_id='${sid}' and question->>'id'='${canonical}'`,
+        );
+        await page.goto(app.appUrl + "/practice/" + sid);
+        await page.getByRole("button", { name: /Question \d+ of/ }).click();
+        await page
+          .getByRole("dialog")
+          .getByRole("button", {
+            name: new RegExp(`^Question ${position + 1},`),
+          })
+          .click();
+        await expect(
+          page.getByRole("region", { name: "Previous question activity" }),
+        ).toContainText("Corrected after mistake");
+        await expect(page.getByRole("radio").nth(1)).not.toBeChecked();
+        await page
+          .getByText("View recorded answer history", { exact: true })
+          .click();
+        await expect(page.locator(".prior-history ol li")).toHaveCount(2);
+        await page.reload();
+        await expect(
+          page.getByRole("region", { name: "Previous question activity" }),
+        ).toContainText("Corrected after mistake");
+        const bank = await app.json(
+          app.as(
+            student,
+            `select public.start_bank_practice('{"book":"${app.book}","status":"corrected"}',1,false)`,
+          ),
+        );
+        await page.goto(app.appUrl + "/practice/" + bank);
+        await expect(page.locator(".prior-history")).toContainText(
+          "Previous answer: Choice B",
+        );
+        await page.getByRole("button", { name: /Question \d+ of/ }).click();
+        await expect(
+          page
+            .getByRole("dialog")
+            .getByRole("button", { name: /^Question 1,/ }),
+        ).toHaveClass(/is-previously-corrected/);
+        assert.equal(
+          await app.json(
+            `select count(*) from book_practice_items where session_id='${app.session}' and selected_answer is not null`,
+          ),
+          0,
         );
       },
     );

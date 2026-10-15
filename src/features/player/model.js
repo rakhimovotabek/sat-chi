@@ -27,11 +27,26 @@ export function questionState(item, current, submitted, practice = false) {
     item.selected_answer == null ? "unanswered" : "answered",
     item.marked ? "marked" : "",
   ];
+  if (practice && item.prior && !item.attempts?.length) {
+    const prior = item.prior;
+    states.push(
+      prior.first_correct === false && prior.eventually_correct
+        ? "previously-corrected"
+        : prior.correct === true
+          ? "previously-correct"
+          : prior.correct === false
+            ? "previously-incorrect"
+            : "previously-answered",
+    );
+  }
+  if (practice && item.attempts?.length) states.push("checked-current");
   if (
     (submitted || (practice && item.attempts?.length)) &&
     item.selected_answer != null
   )
-    states.push(item.correct ? "correct" : "incorrect");
+    states.push(
+      item.correct == null ? "pending" : item.correct ? "correct" : "incorrect",
+    );
   if (
     practice &&
     item.correct === true &&

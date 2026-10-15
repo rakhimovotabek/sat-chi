@@ -27,6 +27,7 @@ import { formatTime, sectionResults } from "../learning/homework-model.js";
 import Stimulus from "./Stimulus.jsx";
 import QuestionImage from "../../components/QuestionImage.jsx";
 import BookExplanation from "./BookExplanation.jsx";
+import PriorHistory from "./PriorHistory.jsx";
 import { preloadQuestionImages } from "../../components/question-image-source.js";
 import Navigator from "./Navigator.jsx";
 import {
@@ -712,6 +713,13 @@ export default function Player() {
                     );
                   })}
               </fieldset>
+            )}
+            {practice && (
+              <PriorHistory
+                key={current.id}
+                sessionId={sessionId}
+                item={current}
+              />
             )}
             {(isBook || practice) && (
               <BookExplanation
