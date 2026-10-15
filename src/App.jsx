@@ -25,6 +25,9 @@ const Onboarding = lazy(() => import("./pages/auth/Onboarding.jsx"));
 const AuthCallback = lazy(() => import("./pages/auth/AuthCallback.jsx"));
 const Landing = lazy(() => import("./pages/Landing.jsx"));
 const Students = lazy(() => import("./pages/admin/Students.jsx"));
+const StudentBookReview = lazy(
+  () => import("./features/learning/StudentBookAnalytics.jsx"),
+);
 const Books = lazy(() => import("./features/books/Books.jsx"));
 const BookDetail = lazy(() => import("./features/books/BookDetail.jsx"));
 const Questions = lazy(() => import("./features/books/Questions.jsx"));
@@ -160,6 +163,10 @@ export default function App() {
               />
               <Route path="results" element={<AdminDashboard results />} />
               <Route path="students/:studentId" element={<StudentDetail />} />
+              <Route
+                path="students/:studentId/books/:bookId"
+                element={<StudentBookReview />}
+              />
               <Route
                 path="homework/:homeworkId"
                 element={<HomeworkResults />}

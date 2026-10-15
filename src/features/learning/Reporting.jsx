@@ -17,6 +17,7 @@ import { practiceSummary } from "../player/model.js";
 import DashboardWork from "./DashboardWork.jsx";
 import SectionAccuracy from "./SectionAccuracy.jsx";
 import VocabularyStats from "./VocabularyStats.jsx";
+import { StudentBookAnalytics } from "./StudentBookAnalytics.jsx";
 function VocabularyOverview() {
   const state = useContent(() => vocabSummary());
   return (
@@ -418,7 +419,7 @@ export function StudentDetail() {
           supabase
             .from("profiles")
             .select(
-              "id,display_name,username,current_sat_score,target_sat_score,active",
+              "id,display_name,username,current_sat_score,target_sat_score,active,created_at",
             )
             .eq("id", studentId)
             .eq("role", "student")
@@ -454,8 +455,16 @@ export function StudentDetail() {
               {state.data.metrics.groups.map((g) => g.name).join(", ") ||
                 "No groups"}
             </p>
+            <p>
+              Account: {state.data.profile.username || "Username not supplied"}{" "}
+              · Joined{" "}
+              {new Date(state.data.profile.created_at).toLocaleDateString()}
+            </p>
+            <small>{studentId}</small>
           </section>
           <MetricCards data={state.data.metrics} />
+          <StudentBookAnalytics student={studentId} />
+          <SectionAccuracy data={state.data.metrics} />
           <PracticeAnalytics student={studentId} />
           <DailyHomeworkAnalytics student={studentId} />
           <Activity rows={state.data.metrics.activity} />

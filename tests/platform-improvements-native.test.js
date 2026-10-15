@@ -280,8 +280,14 @@ test(
         );
         await page.reload();
         await page.getByRole("button", { name: /Question \d+ of/ }).click();
-        if (await page.getByRole("button", { name: "Last questions", exact: true }).isEnabled())
-          await page.getByRole("button", { name: "Last questions", exact: true }).click();
+        if (
+          await page
+            .getByRole("button", { name: "Last questions", exact: true })
+            .isEnabled()
+        )
+          await page
+            .getByRole("button", { name: "Last questions", exact: true })
+            .click();
         await page
           .getByRole("dialog")
           .getByRole("button", { name: /^Question 1263,/ })
@@ -290,6 +296,54 @@ test(
         await expect(page.locator(".attempt-feedback")).toContainText(
           "Correct",
         );
+      },
+    );
+    await t.test(
+      "administrator profile opens read-only book review; backend rejects answer writes",
+      async () => {
+        const teacher = await (await browser.newContext()).newPage();
+        await login(teacher, "admin");
+        await teacher.goto(app.appUrl + "/admin/students/" + student);
+        await teacher
+          .getByRole("link", {
+            name: /SATakror disposable fixture.*Review read-only/,
+          })
+          .click();
+        await teacher
+          .getByLabel("Show questions", { exact: true })
+          .selectOption("corrected");
+        await expect(
+          teacher.getByRole("region", { name: "Read-only student answer" }),
+        ).toContainText("Initial result: Incorrect");
+        await expect(
+          teacher.getByRole("region", { name: "Read-only student answer" }),
+        ).toContainText("Currently correct");
+        await expect(teacher.getByRole("radio")).toHaveCount(0);
+        await expect(
+          teacher.getByRole("button", { name: /^(Check|Submit|Save answer)/ }),
+        ).toHaveCount(0);
+        const source = await app.json(
+          `select row_to_json(r)from(select i.id,i.session_id from book_practice_items i join question_check_attempts a on a.item_id=i.id order by a.created_at limit 1)r`,
+        );
+        await assert.rejects(
+          app.sql(
+            app.as(
+              admin,
+              `select public.save_practice_changes('${source.session_id}','[{"id":"${source.id}","expected_revision":0,"selected_answer":2}]')`,
+            ),
+          ),
+          /unavailable/,
+        );
+        await assert.rejects(
+          app.sql(
+            app.as(
+              admin,
+              `select public.finish_book_practice('${source.session_id}')`,
+            ),
+          ),
+          /unavailable/,
+        );
+        await teacher.close();
       },
     );
     assert.deepEqual(errors, [], "no browser exceptions");
