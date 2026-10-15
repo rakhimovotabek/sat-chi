@@ -346,6 +346,50 @@ test(
         await teacher.close();
       },
     );
+    await t.test(
+      "dashboard countdown persists across reload and isolates ticking from database reads",
+      async () => {
+        await page.goto(app.appUrl + "/dashboard");
+        await page
+          .getByRole("button", { name: "Set exam date", exact: true })
+          .click();
+        await page
+          .getByLabel("SAT exam date", { exact: true })
+          .fill("2099-12-05");
+        await page
+          .getByLabel("Exam timezone", { exact: true })
+          .fill("Asia/Tashkent");
+        await page
+          .getByRole("button", { name: "Save exam date", exact: true })
+          .click();
+        await expect(page.locator(".countdown-convention")).toContainText(
+          "2099-12-05 · Asia/Tashkent",
+        );
+        await page.reload();
+        await expect(page.locator(".countdown-convention")).toContainText(
+          "2099-12-05 · Asia/Tashkent",
+        );
+        let queries = 0;
+        const observe = (r) => {
+          if (r.url().includes("/rest/v1/")) queries++;
+        };
+        page.on("request", observe);
+        const before = await page.locator(".countdown-digits").innerText();
+        await expect
+          .poll(() => page.locator(".countdown-digits").innerText())
+          .not.toBe(before);
+        page.off("request", observe);
+        assert.equal(queries, 0, "one-second ticks do not fetch database data");
+        await page.setViewportSize({ width: 390, height: 844 });
+        assert.ok(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth + 1,
+          ),
+          "dashboard fits mobile viewport",
+        );
+        await page.setViewportSize({ width: 1280, height: 800 });
+      },
+    );
     assert.deepEqual(errors, [], "no browser exceptions");
     assert.deepEqual(failures, [], "no unexpected request failures");
   },

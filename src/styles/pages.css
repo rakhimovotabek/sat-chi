@@ -1,6 +1,24 @@
 .page-header {
   margin-bottom: 28px;
 }
+.sat-exam-panel { container-type: inline-size; padding: 24px; margin-block-end: 24px; background: var(--accent-soft); border: 1px solid var(--border); border-radius: 10px; }
+.countdown-digits { display: flex; gap: 24px; margin: 24px 0 16px; font-variant-numeric: tabular-nums; }
+.countdown-digits > div { display: flex; flex-direction: column-reverse; min-width: 72px; }
+.countdown-digits dt { color: var(--text-muted); font-size: 13px; text-transform: capitalize; }
+.countdown-digits dd { margin: 0; color: var(--accent); font-size: clamp(28px,5cqw,48px); font-weight: 650; line-height: 1.15; }
+.countdown-convention { max-width: 66ch; color: var(--text-muted); font-size: 13px; }
+.countdown-form { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; margin-block-start: 20px; }
+.countdown-form label { display: grid; gap: 6px; flex: 1 1 190px; }
+.countdown-form input { width: 100%; min-height: 44px; }
+.dashboard-start { display: flex; align-items: center; padding-block: 0 24px; }
+.dashboard-start h2 { font-size: 18px; }
+.dashboard-start p { margin-block: 8px 16px; }
+.dashboard-insights { margin-block: 24px; }
+.weekly-activity { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 8px; padding: 0; margin-block: 24px; list-style: none; font-size: 12px; font-variant-numeric: tabular-nums; }
+.weekly-activity li { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.activity-bar-track { display: flex; align-items: end; width: min(100%,32px); height: 88px; background: var(--accent-soft); border-radius: 4px; overflow: hidden; }
+.activity-bar-track > span { display: block; width: 100%; background: var(--accent); }
+@container (max-width: 420px) { .countdown-digits { gap: 12px; justify-content: space-between; } .countdown-digits > div { min-width: 0; } }
 .page-header h1 {
   font-size: clamp(26px, 2.4vw, 34px);
   line-height: 1.25;

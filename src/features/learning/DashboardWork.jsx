@@ -5,9 +5,8 @@ import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import { supabase } from "../../lib/supabase.js";
 import { checked, homework, rpc } from "./api.js";
-import { satDateLabel, satCountdown } from "../../data/sat-dates.js";
 export default function DashboardWork() {
-  const { session, profile } = useAuth(),
+  const { session } = useAuth(),
     state = useContent(async () => {
       const [assignments, sessions, plan] = await Promise.all([
         homework(),
@@ -17,7 +16,7 @@ export default function DashboardWork() {
             .select("id,title,kind,started_at,current_position,submitted_at")
             .eq("student_id", session.user.id)
             .in("kind", ["book", "bank"])
-            .order("started_at", { ascending: false })
+            .order("last_heartbeat", { ascending: false })
             .limit(10),
         ),
         rpc("refresh_study_plan"),
@@ -26,21 +25,11 @@ export default function DashboardWork() {
     }, [session.user.id]);
   const today =
     state.data?.homework.filter(
-      (h) =>
-        !h.submitted_at &&
-        new Date(h.due_at).toDateString() === new Date().toDateString(),
+      (h) => !h.submitted_at && new Date(h.due_at) >= new Date(),
     ) || [];
   return (
     <>
       <DailyDashboard />
-      {profile.target_test_date && (
-        <p className="sat-countdown">
-          SAT · {satDateLabel(profile.target_test_date)}{" "}
-          <strong>
-            {satCountdown(profile.target_test_date)} days remaining
-          </strong>
-        </p>
-      )}
       <ContentState {...state} onRetry={state.reload} />
       {state.data && (
         <>
@@ -48,7 +37,7 @@ export default function DashboardWork() {
             <h2>Your reminders</h2>
             <div className="button-row">
               <Link className="primary-link" to="/homework">
-                Homework: {today.length} due today
+                Homework: {today.length} upcoming assignments
               </Link>
               <Link className="primary-link" to="/study-plan">
                 {state.data.plan.preferences
@@ -63,7 +52,7 @@ export default function DashboardWork() {
           <div className="learning-columns">
             <section className="card learning-panel">
               <div className="section-heading">
-                <h2>Today's homework</h2>
+                <h2>Upcoming homework</h2>
                 <Link className="primary-link" to="/homework">
                   View all
                 </Link>
@@ -79,7 +68,9 @@ export default function DashboardWork() {
                       <strong>{h.title}</strong>
                       <small>
                         Due{" "}
-                        {new Date(h.due_at).toLocaleTimeString([], {
+                        {new Date(h.due_at).toLocaleString([], {
+                          month: "short",
+                          day: "numeric",
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
@@ -88,11 +79,11 @@ export default function DashboardWork() {
                   ))}
                 </div>
               ) : (
-                <p className="empty-copy">No unfinished homework due today.</p>
+                <p className="empty-copy">No upcoming unfinished homework.</p>
               )}
             </section>
             <section className="card learning-panel">
-              <h2>Continue practice</h2>
+              <h2>Continue Studying</h2>
               {state.data.sessions?.length ? (
                 <div className="item-list">
                   {state.data.sessions.map((s) => (

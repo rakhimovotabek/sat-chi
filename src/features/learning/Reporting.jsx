@@ -18,6 +18,8 @@ import DashboardWork from "./DashboardWork.jsx";
 import SectionAccuracy from "./SectionAccuracy.jsx";
 import VocabularyStats from "./VocabularyStats.jsx";
 import { StudentBookAnalytics } from "./StudentBookAnalytics.jsx";
+import SatCountdown from "./SatCountdown.jsx";
+import DashboardInsights from "./DashboardInsights.jsx";
 function VocabularyOverview() {
   const state = useContent(() => vocabSummary());
   return (
@@ -30,29 +32,40 @@ function VocabularyOverview() {
 import { performanceAreas } from "./study-plan-model.js";
 const percent = (correct, total) =>
   total ? `${Math.round((correct / total) * 100)}%` : "—";
-export function MetricCards({ data }) {
+export function MetricCards({ data, compact = false }) {
   return (
     <div className="metrics-grid">
-      {[
-        ["Questions attempted", data.attempted],
-        ["Correct on first attempt", data.first_correct ?? "—"],
-        ["Incorrect on first attempt", data.first_incorrect ?? "—"],
-        [
-          "First-attempt accuracy",
-          percent(data.first_correct, data.first_known),
-        ],
-        ["Eventually correct", data.eventually_correct ?? "—"],
-        ["Currently correct", data.now_correct ?? "—"],
-        ["Unknown first results", data.first_unknown ?? "—"],
-        ["Total study time", formatTime(data.study_seconds)],
-        [
-          "One-time homework completed",
-          `${data.homework_completed} / ${data.homework_total}`,
-        ],
-        ["Vocabulary mastered", data.vocabulary_known],
-        ["Current streak", `${data.streak || 0} days`],
-        ["Longest streak", `${data.longest_streak || 0} days`],
-      ].map(([name, value]) => (
+      {(compact
+        ? [
+            ["Questions attempted", data.attempted],
+            [
+              "First-attempt accuracy",
+              percent(data.first_correct, data.first_known),
+            ],
+            ["Eventually correct", data.eventually_correct ?? "—"],
+            ["Total study time", formatTime(data.study_seconds)],
+          ]
+        : [
+            ["Questions attempted", data.attempted],
+            ["Correct on first attempt", data.first_correct ?? "—"],
+            ["Incorrect on first attempt", data.first_incorrect ?? "—"],
+            [
+              "First-attempt accuracy",
+              percent(data.first_correct, data.first_known),
+            ],
+            ["Eventually correct", data.eventually_correct ?? "—"],
+            ["Currently correct", data.now_correct ?? "—"],
+            ["Unknown first results", data.first_unknown ?? "—"],
+            ["Total study time", formatTime(data.study_seconds)],
+            [
+              "One-time homework completed",
+              `${data.homework_completed} / ${data.homework_total}`,
+            ],
+            ["Vocabulary mastered", data.vocabulary_known],
+            ["Current streak", `${data.streak || 0} days`],
+            ["Longest streak", `${data.longest_streak || 0} days`],
+          ]
+      ).map(([name, value]) => (
         <article className="card metric-card" key={name}>
           <small>{name}</small>
           <strong>{value}</strong>
@@ -100,14 +113,10 @@ export function StudentDashboard() {
         eyebrow="Make progress, every day"
         description={`Welcome back, ${profile.display_name || profile.username || "learner"}. Build your next focused study session.`}
       />
-      <section className="welcome-panel">
+      <SatCountdown />
+      <section className="dashboard-start">
         <div className="welcome-copy">
-          <span className="welcome-label">Your learning plan</span>
-          <h2>
-            Purposeful practice.
-            <br />
-            Visible progress.
-          </h2>
+          <h2>Keep your study plan moving</h2>
           <p>
             {profile.target_sat_score
               ? `Your target: ${profile.target_sat_score}. `
@@ -124,29 +133,23 @@ export function StudentDashboard() {
             </Link>
           </div>
         </div>
-        <div className="welcome-art" aria-hidden="true">
-          <span>SAT</span>
-          <small>LEARN · PRACTICE · GROW</small>
-        </div>
       </section>
       <ContentState {...state} onRetry={state.reload} />
       {state.data && (
         <>
-          <MetricCards data={state.data} />
-          <SectionAccuracy data={state.data} />
+          <section aria-label="My Performance">
+            <h2>My Performance</h2>
+            <MetricCards data={state.data} compact />
+            <p className="empty-copy">
+              {state.data.first_correct} correct on first attempt ·{" "}
+              {state.data.first_incorrect} incorrect on first attempt ·{" "}
+              {state.data.first_unknown} unknown first results. Accuracy
+              excludes unknown history.
+            </p>
+          </section>
           <DashboardWork />
-          <VocabularyOverview />
-          <div className="learning-columns">
-            <section className="card learning-panel">
-              <h2>Today</h2>
-              <p className="big-number">{state.data.today}</p>
-              <p>Questions answered in completed practice today</p>
-              <Link className="primary-link" to="/progress">
-                See your progress →
-              </Link>
-            </section>
-            <Activity rows={state.data.activity} />
-          </div>
+          <DashboardInsights metrics={state.data} />
+          <Activity rows={state.data.activity} />
         </>
       )}
     </>
