@@ -91,6 +91,9 @@ export default function Login() {
           {busy ? "Signing in…" : "Sign In"}
         </button>
       </form>
+      <p className="auth-footnote">
+        <Link to="/forgot-password">Forgot password?</Link>
+      </p>
       <div className="auth-divider">or</div>
       <GoogleSignIn />
       <p className="auth-footnote">

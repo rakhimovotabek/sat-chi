@@ -20,6 +20,8 @@ import NotFoundPage from "./pages/NotFoundPage.jsx";
 import { adminNavigation, studentNavigation } from "./lib/navigation.js";
 import RequireAuth, { AuthLoading } from "./auth/RequireAuth.jsx";
 const Login = lazy(() => import("./pages/auth/Login.jsx"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword.jsx"));
+const ResetPassword = lazy(() => import("./pages/auth/ResetPassword.jsx"));
 const Signup = lazy(() => import("./pages/auth/Signup.jsx"));
 const Onboarding = lazy(() => import("./pages/auth/Onboarding.jsx"));
 const AuthCallback = lazy(() => import("./pages/auth/AuthCallback.jsx"));
@@ -80,6 +82,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route

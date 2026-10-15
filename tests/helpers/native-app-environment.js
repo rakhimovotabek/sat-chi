@@ -9,6 +9,7 @@ import { mkdtemp, readFile, readdir, writeFile, rm } from "node:fs/promises";
 import { createWriteStream } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { isolatedAuth } from "./isolated-auth.js";
 const exec = promisify(execFile);
 export const admin = "f1000000-0000-0000-0000-000000000001",
   student = "f1000000-0000-0000-0000-000000000002",
@@ -23,7 +24,7 @@ async function port() {
   await new Promise((r) => server.close(r));
   return value;
 }
-export async function nativeAppEnvironment() {
+export async function nativeAppEnvironment({ realAuth = null } = {}) {
   const folder = await mkdtemp(join(tmpdir(), "satchi-native-app-"));
   const bin = process.env.SATCHI_TEST_POSTGRES_BIN;
   const dbPort = await port(),
@@ -36,8 +37,9 @@ export async function nativeAppEnvironment() {
     processes = [],
     streams = [];
   let running = false,
-    gateway;
-  const sql = async (text) =>
+    gateway,
+    authService;
+  const sql = async (text, database = "postgres") =>
     (
       await exec(
         join(bin, "psql"),
@@ -48,7 +50,7 @@ export async function nativeAppEnvironment() {
           "-p",
           String(dbPort),
           "-d",
-          "postgres",
+          database,
           "-v",
           "ON_ERROR_STOP=1",
           "-At",
@@ -93,11 +95,12 @@ export async function nativeAppEnvironment() {
     if (value.exp <= Date.now() / 1000) throw new Error("Expired token");
     return value;
   };
-  const launch = (name, command, args, env = {}) => {
+  const launch = (name, command, args, env = {}, cwd) => {
     const stream = createWriteStream(join(folder, name + ".log"));
     streams.push(stream);
     const child = spawn(command, args, {
       env: { ...process.env, ...env },
+      cwd,
       stdio: ["ignore", "pipe", "pipe"],
     });
     child.stdout.pipe(stream);
@@ -106,7 +109,7 @@ export async function nativeAppEnvironment() {
     return child;
   };
   const waitFor = async (url) => {
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 300; i++) {
       try {
         if ((await fetch(url)).ok) return;
       } catch {
@@ -118,6 +121,7 @@ export async function nativeAppEnvironment() {
   };
   const close = async () => {
     for (const child of processes.reverse()) child.kill("SIGTERM");
+    if (authService) await authService.close();
     if (gateway) {
       gateway.closeAllConnections();
       await new Promise((r) => gateway.close(r));
@@ -263,6 +267,19 @@ export async function nativeAppEnvironment() {
       user_metadata: {},
       created_at: new Date().toISOString(),
     });
+    if (realAuth)
+      authService = await isolatedAuth({
+        binary: realAuth,
+        dbPort,
+        authPort: await port(),
+        apiUrl,
+        appUrl,
+        token,
+        secret,
+        launch,
+        sql,
+        waitFor,
+      });
     gateway = createServer(async (req, res) => {
       res.setHeader("Access-Control-Allow-Origin", appUrl);
       res.setHeader(
@@ -271,7 +288,7 @@ export async function nativeAppEnvironment() {
       );
       res.setHeader(
         "Access-Control-Allow-Methods",
-        "GET,POST,PATCH,DELETE,OPTIONS",
+        "GET,POST,PUT,PATCH,DELETE,OPTIONS",
       );
       if (req.method === "OPTIONS") {
         res.writeHead(204);
@@ -284,6 +301,26 @@ export async function nativeAppEnvironment() {
       };
       try {
         const url = new URL(req.url, apiUrl);
+        if (authService && url.pathname.startsWith("/auth/v1/")) {
+          const proxy = httpRequest(
+            {
+              hostname: "127.0.0.1",
+              port: authService.port,
+              path: req.url.slice("/auth/v1".length),
+              method: req.method,
+              headers: req.headers,
+            },
+            (reply) => {
+              res.writeHead(reply.statusCode, reply.headers);
+              reply.pipe(res);
+            },
+          );
+          proxy.on("error", () =>
+            send({ message: "Isolated Auth unavailable" }, 503),
+          );
+          req.pipe(proxy);
+          return;
+        }
         if (url.pathname.startsWith("/rest/v1/")) {
           const proxy = httpRequest(
             {
@@ -401,7 +438,7 @@ export async function nativeAppEnvironment() {
       `db-uri = "postgresql://authenticator@127.0.0.1:${dbPort}/postgres"\ndb-schemas = "public"\ndb-anon-role = "anon"\ndb-max-rows = 1000\njwt-secret = "${secret}"\nserver-host = "127.0.0.1"\nserver-port = ${restPort}\n`,
       { mode: 0o600 },
     );
-    launch("postgrest", process.env.SATCHI_TEST_POSTGREST, [config]);
+    launch("postgrest", process.env.SATCHI_TEST_POSTGREST, [config], { GHCRTS: "-N2" });
     await waitFor(`http://127.0.0.1:${restPort}/`);
     launch(
       "vite",
@@ -471,6 +508,7 @@ export async function nativeAppEnvironment() {
       session,
       assignment,
       daily,
+      authEmails: authService?.messages,
       path,
     };
   } catch (e) {
