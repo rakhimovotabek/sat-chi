@@ -58,6 +58,7 @@ test("practice result counts distinguish unanswered from incorrect and preserve 
     correct: 1,
     incorrect: 1,
     unanswered: 1,
+    pending: 0,
     accuracy: 50,
   });
   assert.ok(questionState(items[0], true, true).includes("correct"));
@@ -261,6 +262,7 @@ test("PostgreSQL content permissions, imports, snapshot practice and grading res
       correct: 1,
       incorrect: 1,
       unanswered: 1,
+      pending: 0,
       accuracy: 50,
     });
     await db.exec("reset role;set role anon;");

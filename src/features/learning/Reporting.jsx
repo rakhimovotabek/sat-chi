@@ -33,8 +33,16 @@ export function MetricCards({ data }) {
   return (
     <div className="metrics-grid">
       {[
-        ["Questions answered", data.attempted],
-        ["Accuracy", percent(data.correct, data.attempted)],
+        ["Questions attempted", data.attempted],
+        ["Correct on first attempt", data.first_correct ?? "—"],
+        ["Incorrect on first attempt", data.first_incorrect ?? "—"],
+        [
+          "First-attempt accuracy",
+          percent(data.first_correct, data.first_known),
+        ],
+        ["Eventually correct", data.eventually_correct ?? "—"],
+        ["Currently correct", data.now_correct ?? "—"],
+        ["Unknown first results", data.first_unknown ?? "—"],
         ["Total study time", formatTime(data.study_seconds)],
         [
           "One-time homework completed",
@@ -152,9 +160,17 @@ export function Progress() {
       group === "domain"
         ? `${b.section || "Practice"} · ${b.domain || "Unclassified"}`
         : b[group] || "Unclassified";
-    const r = rows.get(key) || { label: key, attempted: 0, correct: 0 };
+    const r = rows.get(key) || {
+      label: key,
+      attempted: 0,
+      correct: 0,
+      known: 0,
+      incorrect: 0,
+    };
     r.attempted += Number(b.attempted);
     r.correct += Number(b.correct);
+    r.known += Number(b.first_known || 0);
+    r.incorrect += Number(b.incorrect || 0);
     rows.set(key, r);
   }
   return (
@@ -162,7 +178,7 @@ export function Progress() {
       <PageHeader
         title="Progress"
         eyebrow="Your learning record"
-        description="See results from completed practice. Small samples describe your activity rather than predict an SAT score."
+        description="First-attempt accuracy uses recorded initial results across distinct questions. Corrections count separately toward mastery. Unknown historical first results are excluded from accuracy."
       />
       <ContentState {...state} onRetry={state.reload} />
       {state.data && (
@@ -241,7 +257,7 @@ export function Progress() {
                       <th>Answered</th>
                       <th>Correct</th>
                       <th>Incorrect</th>
-                      <th>Accuracy</th>
+                      <th>First-attempt accuracy</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -255,8 +271,11 @@ export function Progress() {
                           <td>{r.label}</td>
                           <td>{r.attempted}</td>
                           <td>{r.correct}</td>
-                          <td>{r.attempted - r.correct}</td>
-                          <td>{percent(r.correct, r.attempted)}</td>
+                          <td>{r.incorrect}</td>
+                          <td>
+                            {percent(r.correct, r.known)}
+                            {r.known < r.attempted ? " · partial history" : ""}
+                          </td>
                         </tr>
                       ))}
                   </tbody>
@@ -303,7 +322,7 @@ export function Standings() {
                 <th>Rank</th>
                 <th>Student</th>
                 <th>Questions</th>
-                <th>Accuracy</th>
+                <th>First-attempt accuracy</th>
                 <th>Homework</th>
                 <th>Study time</th>
               </tr>
@@ -314,7 +333,10 @@ export function Standings() {
                   <td>{i + 1}</td>
                   <td>{r.display_name || "Student"}</td>
                   <td>{r.questions}</td>
-                  <td>{percent(r.correct, r.questions)}</td>
+                  <td>
+                    {percent(r.correct, r.first_known)}
+                    {r.first_unknown > 0 ? " · partial history" : ""}
+                  </td>
                   <td>{r.homework}</td>
                   <td>{formatTime(r.study_seconds)}</td>
                 </tr>

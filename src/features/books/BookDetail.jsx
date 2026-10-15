@@ -48,6 +48,9 @@ function TopicTree({
                   <small>
                     {t.progress.solved} / {t.progress.total} solved ·{" "}
                     {t.progress.checked} checked
+                    {t.progress.first_accuracy != null &&
+                      ` · ${t.progress.first_accuracy}% first attempt`}
+                    {t.progress.first_unknown > 0 && " · partial history"}
                   </small>
                 )}
               </div>

@@ -86,7 +86,7 @@ export default function HomeworkResults() {
                 ["Completed", totals.completed],
                 ["Pending", totals.pending],
                 [
-                  "Average accuracy",
+                  "Current grading accuracy",
                   totals.accuracy == null
                     ? "—"
                     : `${totals.accuracy}% (graded answers)`,

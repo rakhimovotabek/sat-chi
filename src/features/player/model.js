@@ -1,13 +1,24 @@
 export function practiceSummary(items) {
   const correct = items.filter((i) => i.correct === true).length;
-  const unanswered = items.filter((i) => i.selected_answer == null).length;
+  const unanswered = items.filter(
+    (i) => i.selected_answer == null && !i.selected_response?.trim(),
+  ).length;
   const answered = items.length - unanswered;
+  const pending = items.filter(
+    (i) =>
+      (i.selected_answer != null || i.selected_response?.trim()) &&
+      i.correct == null,
+  ).length;
   return {
     total: items.length,
     correct,
-    incorrect: answered - correct,
+    incorrect: answered - correct - pending,
     unanswered,
-    accuracy: answered ? Math.round((correct / answered) * 100) : null,
+    pending,
+    accuracy:
+      answered - pending
+        ? Math.round((correct / (answered - pending)) * 100)
+        : null,
   };
 }
 export function questionState(item, current, submitted, practice = false) {

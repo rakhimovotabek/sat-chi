@@ -357,7 +357,7 @@ export default function Player() {
             <strong>{result.unanswered}</strong>
           </div>
           <div>
-            <small>Accuracy of answers</small>
+            <small>Current grading accuracy</small>
             <strong>
               {result.accuracy == null ? "—" : `${result.accuracy}%`}
             </strong>
