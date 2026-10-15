@@ -1,5 +1,6 @@
 import Modal from "../../components/Modal.jsx";
 import { questionState } from "./model.js";
+import { useState } from "react";
 export default function Navigator({
   items,
   current,
@@ -8,11 +9,14 @@ export default function Navigator({
   practice,
   onClose,
 }) {
+  const [page, setPage] = useState(Math.floor(current / 100));
+  const start = page * 100;
   return (
     <Modal title="Question Overview" onClose={onClose}>
       <div className="question-overview">
         <div className="question-numbers">
-          {items.map((item, i) => {
+          {items.slice(start, start + 100).map((item, offset) => {
+            const i = start + offset;
             const states = questionState(
               item,
               i === current,
@@ -39,6 +43,64 @@ export default function Navigator({
             );
           })}
         </div>
+        {items.length > 100 && (
+          <div className="button-row overview-pagination">
+            <button
+              type="button"
+              className="button button-secondary"
+              disabled={!page}
+              onClick={() => setPage(0)}
+            >
+              First questions
+            </button>
+            <button
+              type="button"
+              className="button button-secondary"
+              disabled={!page}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Previous questions
+            </button>
+            <span>
+              {start + 1}–{Math.min(start + 100, items.length)} of{" "}
+              {items.length}
+            </span>
+            <button
+              type="button"
+              className="button button-secondary"
+              disabled={start + 100 >= items.length}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next questions
+            </button>
+            <button
+              type="button"
+              className="button button-secondary"
+              disabled={start + 100 >= items.length}
+              onClick={() => setPage(Math.floor((items.length - 1) / 100))}
+            >
+              Last questions
+            </button>
+            <label>
+              Go to question
+              <input
+                type="number"
+                min="1"
+                max={items.length}
+                placeholder={`1–${items.length}`}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (
+                    Number.isInteger(value) &&
+                    value >= 1 &&
+                    value <= items.length
+                  )
+                    setPage(Math.floor((value - 1) / 100));
+                }}
+              />
+            </label>
+          </div>
+        )}
         <div className="navigator-legend">
           {[
             ["unanswered", "Unanswered"],

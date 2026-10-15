@@ -174,8 +174,28 @@ export const importContent = (payload, topic = null) =>
 export const startPractice = (topic) =>
   checked(
     supabase.rpc("start_book_practice", { p_topic_id: topic }),
-    "Could not start practice. Choose a published topic with 1–500 questions.",
+    "Could not start practice. Choose a published topic with eligible questions.",
   );
+export const startEntireBook = (book) =>
+  checked(
+    supabase.rpc("start_entire_book_practice", { p_book: book }),
+    "Could not open entire-book practice. Check that this book has eligible questions.",
+  );
+async function getAllPracticeItems(id) {
+  const rows = [];
+  for (let offset = 0; ; offset += 250) {
+    const page = await checked(
+      supabase
+        .from("book_practice_items")
+        .select("*")
+        .eq("session_id", id)
+        .order("position")
+        .range(offset, offset + 249),
+    );
+    rows.push(...page);
+    if (page.length < 250) return rows;
+  }
+}
 export async function getPractice(id) {
   // Both reads enforce ownership through RLS independently. Start together;
   // publish nothing until both succeed, retaining authoritative answer revisions.
@@ -184,15 +204,19 @@ export async function getPractice(id) {
       supabase.from("book_practice_sessions").select("*").eq("id", id).single(),
       "Practice is unavailable.",
     ),
-    checked(
-      supabase
-        .from("book_practice_items")
-        .select("*")
-        .eq("session_id", id)
-        .order("position"),
-    ),
+    getAllPracticeItems(id),
     checked(supabase.rpc("practice_prior_progress", { p_session: id })),
   ]);
+  for (let page = 1; page * 1000 < items.length; page++) {
+    prior.push(
+      ...(await checked(
+        supabase.rpc("practice_prior_progress", {
+          p_session: id,
+          p_page: page,
+        }),
+      )),
+    );
+  }
   let review = [];
   if (session.submitted_at)
     review = await checked(
@@ -231,12 +255,19 @@ export async function getPractice(id) {
     }
   }
 
+  const attemptsByItem = new Map(),
+    priorByItem = new Map(prior.map((p) => [p.item_id, p]));
+  for (const attempt of attempts) {
+    if (!attemptsByItem.has(attempt.item_id))
+      attemptsByItem.set(attempt.item_id, []);
+    attemptsByItem.get(attempt.item_id).push(attempt);
+  }
   return {
     session,
     items: items.map((i) => ({
       ...i,
-      attempts: attempts.filter((a) => a.item_id === i.id),
-      prior: prior.find((p) => p.item_id === i.id) || null,
+      attempts: attemptsByItem.get(i.id) || [],
+      prior: priorByItem.get(i.id) || null,
     })),
     review,
   };

@@ -10,7 +10,12 @@ import {
   deleteBook,
   deleteTopic,
   startPractice,
+  startEntireBook,
 } from "./api.js";
+import {
+  compactTopicChildren,
+  delegatesToOnlyChild,
+} from "./topic-presentation.js";
 import BookApproval from "./BookApproval.jsx";
 import BookForm from "./BookForm.jsx";
 import TopicForm from "./TopicForm.jsx";
@@ -25,82 +30,114 @@ function TopicTree({
   onDelete,
   onPractice,
   busy,
+  compactActions = false,
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const compact = !admin && compactTopicChildren(topics, parent);
+  const children = topics.filter((t) => t.parent_id === parent);
+  if (compact && !expanded)
+    return (
+      <div className="topic-details">
+        <button
+          className="button button-secondary"
+          aria-expanded={false}
+          onClick={() => setExpanded(true)}
+        >
+          Explore {children.length} original topics
+        </button>
+        <p className="empty-copy">
+          Use {parent ? "the section practice action" : "Practice Entire Book"}{" "}
+          to study these questions together.
+        </p>
+      </div>
+    );
   return (
     <ul className="topic-tree">
-      {topics
-        .filter((t) => t.parent_id === parent)
-        .map((t) => (
-          <li key={t.id}>
-            <div className="topic-row">
-              <div>
-                <strong>
-                  {admin ? (
-                    t.title
-                  ) : (
-                    <Link to={`/books/${bookId}/topics/${t.id}`}>
-                      {t.title} →
-                    </Link>
-                  )}
-                </strong>
-                <small>{t.questions?.[0]?.count || 0} direct questions</small>
-                {!admin && t.progress && (
-                  <small>
-                    {t.progress.solved} / {t.progress.total} solved ·{" "}
-                    {t.progress.checked} checked
-                    {t.progress.first_accuracy != null &&
-                      ` · ${t.progress.first_accuracy}% first attempt`}
-                    {t.progress.first_unknown > 0 && " · partial history"}
-                  </small>
-                )}
-              </div>
-              <div className="inline-actions">
+      {compact && (
+        <li>
+          <button
+            className="button button-secondary"
+            aria-expanded={true}
+            onClick={() => setExpanded(false)}
+          >
+            Collapse original topics
+          </button>
+        </li>
+      )}
+      {children.map((t) => (
+        <li key={t.id}>
+          <div className="topic-row">
+            <div>
+              <strong>
                 {admin ? (
-                  <>
-                    <button
-                      className="button button-secondary button-compact"
-                      onClick={() => onSelect(t)}
-                    >
-                      Questions
-                    </button>
-                    <button
-                      className="button button-secondary button-compact"
-                      onClick={() => onEdit(t)}
-                    >
-                      Edit topic
-                    </button>
-                    <button
-                      className="button button-danger button-compact"
-                      disabled={busy}
-                      onClick={() => onDelete(t)}
-                    >
-                      Delete topic
-                    </button>
-                  </>
+                  t.title
                 ) : (
-                  <button
-                    className="button button-compact"
-                    disabled={busy}
-                    onClick={() => onPractice(t)}
-                  >
-                    Start practice
-                  </button>
+                  <Link to={`/books/${bookId}/topics/${t.id}`}>
+                    {t.title} →
+                  </Link>
                 )}
-              </div>
+              </strong>
+              <small>{t.questions?.[0]?.count || 0} direct questions</small>
+              {!admin && t.progress && (
+                <small>
+                  {t.progress.solved} / {t.progress.total} solved ·{" "}
+                  {t.progress.checked} checked
+                  {t.progress.first_accuracy != null &&
+                    ` · ${t.progress.first_accuracy}% first attempt`}
+                  {t.progress.first_unknown > 0 && " · partial history"}
+                </small>
+              )}
             </div>
-            <TopicTree
-              topics={topics}
-              parent={t.id}
-              bookId={bookId}
-              admin={admin}
-              onSelect={onSelect}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onPractice={onPractice}
-              busy={busy}
-            />
-          </li>
-        ))}
+            <div className="inline-actions">
+              {admin ? (
+                <>
+                  <button
+                    className="button button-secondary button-compact"
+                    onClick={() => onSelect(t)}
+                  >
+                    Questions
+                  </button>
+                  <button
+                    className="button button-secondary button-compact"
+                    onClick={() => onEdit(t)}
+                  >
+                    Edit topic
+                  </button>
+                  <button
+                    className="button button-danger button-compact"
+                    disabled={busy}
+                    onClick={() => onDelete(t)}
+                  >
+                    Delete topic
+                  </button>
+                </>
+              ) : !compactActions &&
+                !compact &&
+                !delegatesToOnlyChild(topics, t) ? (
+                <button
+                  className="button button-compact"
+                  disabled={busy}
+                  onClick={() => onPractice(t)}
+                >
+                  Start practice
+                </button>
+              ) : null}
+            </div>
+          </div>
+          <TopicTree
+            topics={topics}
+            parent={t.id}
+            bookId={bookId}
+            admin={admin}
+            onSelect={onSelect}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onPractice={onPractice}
+            busy={busy}
+            compactActions={compact}
+          />
+        </li>
+      ))}
     </ul>
   );
 }
@@ -262,10 +299,26 @@ export default function BookDetail({ admin = false }) {
             </div>
           </>
         )}
-        <h2>{focused ? "Subtopics" : "Topics & subtopics"}</h2>
+        <div className="section-heading">
+          <h2>{focused ? "Subtopics" : "Topics & subtopics"}</h2>
+          {!admin && !focused && (
+            <button
+              className="button"
+              disabled={busy || !progress.total}
+              onClick={() =>
+                perform(async () =>
+                  navigate(`/practice/${await startEntireBook(bookId)}`),
+                )
+              }
+            >
+              Practice Entire Book
+            </button>
+          )}
+        </div>
         <p className="page-description">
-          Practice a topic includes its subtopics. Question answers are revealed
-          after submission.
+          Practice follows book order and includes the selected section's
+          subtopics. Previous activity stays visible; Check records your current
+          attempt.
         </p>
         {topics.length ? (
           <TopicTree

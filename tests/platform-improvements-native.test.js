@@ -211,6 +211,87 @@ test(
         );
       },
     );
+    await t.test(
+      "entire 1,263-question book is ordered, navigable and durable without eager image rendering",
+      async () => {
+        const largeBook = await app.json(
+          "with b as(insert into books(title,category,published)values('Large ordered book fixture','Math',true)returning id)select to_jsonb(id)from b",
+        );
+        const topic = await app.json(
+          `with t as(insert into book_topics(book_id,title,position)values('${largeBook}','Large section',0)returning id)select to_jsonb(id)from t`,
+        );
+        await app.sql(`insert into questions(topic_id,position,question_text,options,image_url)select '${topic}',n-1,'Large book fixture question '||n,'["1","2","3","4"]','https://fixture.invalid/storage/v1/object/authenticated/book-package-assets/${app.path}' from generate_series(1,1263)n;
+      insert into question_answers(question_id,correct_answer,explanation)select id,1,'Large fixture explanation'from questions where topic_id='${topic}';`);
+        await page.goto(app.appUrl + "/books/" + largeBook);
+        await page
+          .getByRole("button", { name: "Practice Entire Book", exact: true })
+          .click();
+        await page.waitForURL(/\/practice\//);
+        const sid = page.url().split("/").at(-1);
+        await expect(
+          page.getByRole("button", { name: "Question 1 of 1263", exact: true }),
+        ).toBeVisible();
+        assert.equal(
+          await app.json(
+            `select count(*) from book_practice_items where session_id='${sid}'`,
+          ),
+          1263,
+        );
+        assert.equal(
+          await app.json(
+            app.as(
+              student,
+              `select public.start_entire_book_practice('${largeBook}')`,
+            ),
+          ),
+          sid,
+        );
+        await page
+          .getByRole("button", { name: "Question 1 of 1263", exact: true })
+          .click();
+        await expect(page.locator(".question-numbers button")).toHaveCount(100);
+        await page
+          .getByRole("button", { name: "Last questions", exact: true })
+          .click();
+        await page
+          .getByRole("dialog")
+          .getByRole("button", { name: /^Question 1263,/ })
+          .click();
+        await expect(
+          page.getByRole("button", {
+            name: "Question 1263 of 1263",
+            exact: true,
+          }),
+        ).toBeVisible();
+        await expect(
+          page.locator(".question-stem, .question-text, .answers-panel"),
+        ).toContainText("Large book fixture question 1263");
+        assert.ok(
+          (await page
+            .locator(
+              ".player-workspace img, .practice-workspace img, .stimulus-panel img",
+            )
+            .count()) <= 4,
+        );
+        await page.getByRole("radio").nth(1).check();
+        await page.getByRole("button", { name: "Check", exact: true }).click();
+        await expect(page.locator(".attempt-feedback")).toContainText(
+          "Correct",
+        );
+        await page.reload();
+        await page.getByRole("button", { name: /Question \d+ of/ }).click();
+        if (await page.getByRole("button", { name: "Last questions", exact: true }).isEnabled())
+          await page.getByRole("button", { name: "Last questions", exact: true }).click();
+        await page
+          .getByRole("dialog")
+          .getByRole("button", { name: /^Question 1263,/ })
+          .click();
+        await expect(page.getByRole("radio").nth(1)).toBeChecked();
+        await expect(page.locator(".attempt-feedback")).toContainText(
+          "Correct",
+        );
+      },
+    );
     assert.deepEqual(errors, [], "no browser exceptions");
     assert.deepEqual(failures, [], "no unexpected request failures");
   },
