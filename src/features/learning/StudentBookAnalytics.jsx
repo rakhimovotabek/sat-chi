@@ -160,7 +160,10 @@ function QuestionReview({ student, book, question }) {
                     : a.correct
                       ? "Correct"
                       : "Incorrect"}{" "}
-                  · {a.source} · {new Date(a.created_at).toLocaleString()}
+                  · {a.source} ·{" "}
+                  {a.source === "legacy"
+                    ? "Snapshot; original answer time unavailable"
+                    : new Date(a.created_at).toLocaleString()}
                   {a.source === "legacy" && !a.first_known
                     ? " · original first outcome unknown"
                     : ""}

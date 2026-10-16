@@ -81,7 +81,7 @@ export default function PriorHistory({ sessionId, item }) {
                     (a.selected_answer == null
                       ? "No answer recorded"
                       : `Choice ${String.fromCharCode(65 + a.selected_answer)}`)}
-                  {` · ${a.correct == null ? "Pending grading" : a.correct ? "Correct" : "Incorrect"} · ${a.kind} · ${a.source} · ${new Date(a.created_at).toLocaleString()}`}
+                  {` · ${a.correct == null ? "Pending grading" : a.correct ? "Correct" : "Incorrect"} · ${a.kind} · ${a.source} · ${a.source === "legacy" ? "Snapshot; original answer time unavailable" : new Date(a.created_at).toLocaleString()}`}
                   {!a.first_known &&
                     a.source === "legacy" &&
                     " · first outcome unknown"}

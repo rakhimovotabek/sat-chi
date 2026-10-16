@@ -170,3 +170,51 @@ test("a recorded pending submission receives its first manual grade without rewr
     await db.close();
   }
 });
+
+test("legacy session-start anchors do not become recorded weekly study activity", async () => {
+  const { db, call, book } = await learningDatabase();
+  try {
+    const topic = (
+      await db.query("select id from book_topics where book_id=$1", [book])
+    ).rows[0].id;
+    const sid = await call("start_book_practice", [topic], ["uuid"]);
+    const item = (
+      await db.query(
+        "select id from book_practice_items where session_id=$1 order by position limit 1",
+        [sid],
+      )
+    ).rows[0].id;
+    await db.exec("reset role");
+    await db.query(
+      "insert into practice_grade_events(item_id,source,selected_answer,correct,first_known,created_at)values($1,'legacy',1,true,false,now())",
+      [item],
+    );
+    await db.query(
+      "update book_practice_items set selected_answer=1,correct=true where id=$1",
+      [item],
+    );
+    await db.exec(
+      "set role authenticated;select set_config('request.jwt.claim.sub','" +
+        student +
+        "',false)",
+    );
+    const activity = await call("dashboard_study_activity");
+    assert.equal(
+      activity.days.reduce((n, d) => n + d.questions, 0),
+      0,
+    );
+    const bank = await call(
+      "start_bank_practice",
+      [JSON.stringify({ book }), 12, false],
+      ["jsonb", "integer", "boolean"],
+    );
+    const history = await call("practice_prior_progress", [bank], ["uuid"]);
+    assert.equal(
+      history.find((h) => h.selected_answer === 1).recorded_at,
+      null,
+    );
+    assert.equal((await call("learning_metrics")).first_unknown, 1);
+  } finally {
+    await db.close();
+  }
+});
