@@ -34,7 +34,16 @@ test("homework statuses and section results reflect saved data", () => {
         correct: false,
       },
     ]),
-    [{ name: "Math", total: 2, correct: 1, incorrect: 0, unanswered: 1 }],
+    [
+      {
+        name: "Math",
+        total: 2,
+        correct: 1,
+        incorrect: 0,
+        unanswered: 1,
+        pending: 0,
+      },
+    ],
   );
 });
 test("vocabulary validation rejects malformed and duplicate words", () => {
@@ -845,7 +854,7 @@ test("real PostgreSQL learning workflows preserve ownership, private keys, froze
       ).rows.length,
       1,
     );
-    // Real graded attempts provide enough evidence for domain targeting.
+    // Repeated attempts on the same two questions do not create ten samples.
     for (let iteration = 0; iteration < 5; iteration++) {
       const weakSession = await call(
         "start_bank_practice",
@@ -895,11 +904,11 @@ test("real PostgreSQL learning workflows preserve ownership, private keys, froze
       call("review_book_practice", [retryMistake], ["uuid"]),
     );
     const weakMetrics = await call("learning_metrics");
-    assert.ok(
-      weakMetrics.attention.some(
-        (r) => r.domain === "Algebra" && r.attempted >= 10,
-      ),
-    );
+    const algebraSamples = weakMetrics.breakdowns
+      .filter((r) => r.domain === "Algebra")
+      .reduce((n, r) => n + Number(r.first_known), 0);
+    assert.ok(algebraSamples < 10);
+    assert.ok(!weakMetrics.attention.some((r) => r.domain === "Algebra"));
     await call(
       "save_study_preferences",
       [45, [0, 1, 2, 3, 4, 5, 6], "UTC", null, 1200, 1450],

@@ -112,7 +112,8 @@ export default function HomeworkResults() {
                     "Incorrect",
                     "Unanswered",
                     "Awaiting grading",
-                    "Accuracy",
+                    "Current grading accuracy",
+                    "First-attempt accuracy (question history)",
                     "Active time",
                     "Completed at",
                     "Details",
@@ -135,6 +136,14 @@ export default function HomeworkResults() {
                       {Number(r.correct) + Number(r.incorrect)
                         ? `${Math.round((r.correct / (Number(r.correct) + Number(r.incorrect))) * 100)}%`
                         : "—"}
+                    </td>
+                    <td>
+                      {r.question_history?.first_accuracy == null
+                        ? "—"
+                        : `${r.question_history.first_accuracy}%`}
+                      {r.question_history?.first_unknown > 0
+                        ? " · partial history"
+                        : ""}
                     </td>
                     <td>{formatTime(r.active_seconds)}</td>
                     <td>

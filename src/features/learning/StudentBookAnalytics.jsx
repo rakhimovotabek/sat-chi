@@ -161,7 +161,7 @@ function QuestionReview({ student, book, question }) {
                       ? "Correct"
                       : "Incorrect"}{" "}
                   · {a.source} · {new Date(a.created_at).toLocaleString()}
-                  {a.source === "legacy"
+                  {a.source === "legacy" && !a.first_known
                     ? " · original first outcome unknown"
                     : ""}
                 </li>

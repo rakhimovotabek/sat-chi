@@ -1,5 +1,9 @@
 export function practiceSummary(items) {
-  const correct = items.filter((i) => i.correct === true).length;
+  const correct = items.filter(
+    (i) =>
+      i.correct === true &&
+      (i.selected_answer != null || i.selected_response?.trim()),
+  ).length;
   const unanswered = items.filter(
     (i) => i.selected_answer == null && !i.selected_response?.trim(),
   ).length;

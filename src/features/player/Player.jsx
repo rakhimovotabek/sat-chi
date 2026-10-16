@@ -363,9 +363,32 @@ export default function Player() {
               {result.accuracy == null ? "—" : `${result.accuracy}%`}
             </strong>
           </div>
+          <div>
+            <small>First-attempt accuracy</small>
+            <strong>
+              {state.data.statistics?.first_accuracy == null
+                ? "—"
+                : `${state.data.statistics.first_accuracy}%`}
+            </strong>
+          </div>
+          {result.pending > 0 && (
+            <div>
+              <small>Pending grading</small>
+              <strong>{result.pending}</strong>
+            </div>
+          )}
         </section>
       )}
       {study.warning && <p className="empty-copy">{study.warning}</p>}
+      {submitted && (
+        <p className="empty-copy">
+          First-attempt accuracy uses shared question history for the answers in
+          this session. Current grading describes this submission.
+          {state.data.statistics?.first_unknown > 0
+            ? " Partial history: unknown initial outcomes are excluded."
+            : ""}
+        </p>
+      )}
       {submitted && (
         <section className="card learning-panel">
           <h2>Section results</h2>
@@ -376,6 +399,7 @@ export default function Player() {
                 <span>
                   {s.correct} correct · {s.incorrect} incorrect · {s.unanswered}{" "}
                   unanswered
+                  {s.pending > 0 ? ` · ${s.pending} pending grading` : ""}
                 </span>
               </div>
             ))}
@@ -563,6 +587,10 @@ export default function Player() {
                 className={`button button-secondary button-compact ${current.marked ? "marked-control" : ""}`}
                 type="button"
                 title={current.marked ? "Marked for review" : "Mark for review"}
+                aria-label={
+                  current.marked ? "Marked for review" : "Mark for review"
+                }
+                aria-pressed={Boolean(current.marked)}
                 disabled={submitted || submitting}
                 onClick={() => change({ marked: !current.marked })}
               >

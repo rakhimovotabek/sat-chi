@@ -29,7 +29,8 @@ export default function PracticeAnalytics({ student }) {
       <h2>Practice learning analytics</h2>
       <p>
         Question Bank checks, including unfinished sessions. Accuracy measures
-        checked questions; homework completion is reported separately.
+        checked questions; homework completion is reported separately. First
+        outcomes are shared across Books, Question Bank and Homework.
       </p>
       <ContentState {...summary} onRetry={summary.reload} />
       {data && (

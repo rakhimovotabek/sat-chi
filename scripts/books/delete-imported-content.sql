@@ -11,7 +11,7 @@ do $$ declare t text; p text; d text; begin
  for t in select tablename from pg_tables where schemaname='public' loop
  p := case
  when t='book_practice_sessions' then 'kind<>''book'''
- when t in ('book_practice_items','book_practice_keys','book_practice_open_keys','practice_open_reviews','question_check_attempts') then
+ when t in ('book_practice_items','book_practice_keys','book_practice_open_keys','practice_open_reviews','question_check_attempts','practice_grade_events') then
  case when t='book_practice_items' then 'session_id in (select id from public.book_practice_sessions where kind<>''book'')'
  else 'item_id in (select i.id from public.book_practice_items i join public.book_practice_sessions s on s.id=i.session_id where s.kind<>''book'')' end
  when t='student_activity' then 'kind<>''book'' and (session_id is null or session_id in (select id from public.book_practice_sessions where kind<>''book''))'

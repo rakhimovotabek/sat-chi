@@ -35,7 +35,7 @@ for (const kind of ["homework", "book", "bank"])
       assert.equal((await row()).correct, true);
       assert.equal((await review()).review_revision, 1);
       assert.equal(
-        (await call("learning_metrics", [student], ["uuid"])).correct,
+        (await call("learning_metrics", [student], ["uuid"])).now_correct,
         1,
       );
       await assert.rejects(decide(false, 0), (e) => e.code === "PT409");
@@ -57,7 +57,8 @@ for (const kind of ["homework", "book", "bank"])
       );
       await role(student);
       assert.equal((await review()).review_correct, true);
-      assert.equal((await call("learning_metrics")).correct, 1);
+      assert.equal((await call("learning_metrics")).now_correct, 1);
+      assert.equal((await call("learning_metrics")).first_incorrect, 1);
       await call("finish_book_practice", [session], ["uuid"]);
       assert.equal(
         (await row()).correct,
@@ -80,7 +81,7 @@ for (const kind of ["homework", "book", "bank"])
       await decide(false, 1);
       assert.equal((await review()).review_correct, false);
       assert.equal(
-        (await call("learning_metrics", [student], ["uuid"])).correct,
+        (await call("learning_metrics", [student], ["uuid"])).now_correct,
         0,
       );
       await decide(null, 2);

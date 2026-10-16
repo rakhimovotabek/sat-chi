@@ -15,12 +15,21 @@ export function sectionResults(items) {
     if (!row)
       result.set(
         name,
-        (row = { name, total: 0, correct: 0, incorrect: 0, unanswered: 0 }),
+        (row = {
+          name,
+          total: 0,
+          correct: 0,
+          incorrect: 0,
+          unanswered: 0,
+          pending: 0,
+        }),
       );
     row.total++;
-    if (item.selected_answer == null) row.unanswered++;
-    else if (item.correct) row.correct++;
-    else row.incorrect++;
+    if (item.selected_answer == null && !item.selected_response?.trim())
+      row.unanswered++;
+    else if (item.correct === true) row.correct++;
+    else if (item.correct === false) row.incorrect++;
+    else row.pending++;
   }
   return [...result.values()];
 }
