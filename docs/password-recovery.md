@@ -16,3 +16,7 @@ The isolated recovery regression uses real **Supabase Auth v2.197.0**, its own d
 The pinned Linux AMD64 Auth archive is available from the [official v2.197.0 release](https://github.com/supabase/auth/releases/tag/v2.197.0). Extract it, including `migrations/`, to `~/.cache/satchi-test-tools/auth2197/` or set `SATCHI_TEST_AUTH_BIN` to the extracted `auth` executable. Native test commands and tool locations are documented in the platform report.
 
 Hosted delivery, provider credentials, spam placement and the hosted redirect allowlist require a later authorized release check. A successful local reset does not establish hosted email delivery.
+
+## Production release update — 2026-10-16
+
+The authorized release verified the production Site URL, configured the exact production and standard local reset redirects while preserving existing URLs, and verified the ConfirmationURL template. Production recovery routes and invalid-link handling passed. Custom SMTP is not configured; hosted recovery email delivery is unverified and still requires the SMTP setup and controlled delivery test described above. See [release report](platform-production-release.md).

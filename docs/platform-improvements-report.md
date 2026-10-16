@@ -1,5 +1,7 @@
 # Platform improvements — local review report
 
+**Production update, 2026-10-16:** The separately authorized release is complete; normal access is restored. See [production release evidence and remaining SMTP limitation](platform-production-release.md). The local-review status below records the earlier pre-release assessment.
+
 Status: **GO for local review; NO-GO for deployment.** Implementation and focused verification are complete. Hosted configuration and any production action require a separate authorized release. Nothing was deployed or pushed; no migrations or record changes were made on hosted Supabase.
 
 ## 1. Accuracy and attempt history
