@@ -8,6 +8,8 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import tempfile
+import shutil
 import time
 
 p=argparse.ArgumentParser()
@@ -22,9 +24,10 @@ os.umask(0o077)
 manifest=json.loads((folder/'export-manifest.json').read_text())
 assert manifest['project']=='ileffhbbaomfimwulvpw'
 for name,digest in manifest['sha256'].items():assert hashlib.sha256((folder/name).read_bytes()).hexdigest()==digest,'Backup checksum failed'
-work=folder/'rehearsal';work.mkdir(mode=0o700)
+work=Path(tempfile.mkdtemp(prefix='rehearsal-',dir=folder))
+socket=Path(tempfile.mkdtemp(prefix='satchi-pg-'))
 data=work/'data'
-env={**os.environ,'LD_LIBRARY_PATH':str(bin.parent/'lib'),'PGTZ':'UTC','PGHOST':str(work),'PGPORT':'55469','PGDATABASE':'postgres','PGCONNECT_TIMEOUT':'5'}
+env={**os.environ,'LD_LIBRARY_PATH':str(bin.parent/'lib'),'PGTZ':'UTC','PGHOST':str(socket),'PGPORT':'55469','PGDATABASE':'postgres','PGCONNECT_TIMEOUT':'5'}
 for key in ['PGPASSWORD','PGUSER','PGOPTIONS']:env.pop(key,None)
 def command(args,timeout=300):
  r=subprocess.run(args,env=env,capture_output=True,text=True,timeout=timeout)
@@ -35,7 +38,7 @@ def command(args,timeout=300):
 def sql(q):return command([str(bin/'psql'),'-X','-At','-v','ON_ERROR_STOP=1','-c',q])
 def js(q):return json.loads(sql(q).split('\n')[-1])
 command([str(bin/'initdb'),'-D',str(data),'--no-locale','--encoding=UTF8','--auth=trust'])
-command([str(bin/'pg_ctl'),'-D',str(data),'-l',str(work/'postgres.private.log'),'-o',f"-k {work} -h '' -p 55469 -F -c max_connections=12",'start'])
+command([str(bin/'pg_ctl'),'-D',str(data),'-l',str(work/'postgres.private.log'),'-o',f"-k {socket} -h '' -p 55469 -F -c max_connections=12",'start'])
 started=True
 try:
  assert sql('show server_version').startswith('17.')
@@ -85,3 +88,4 @@ try:
  print('Backup restoration, eight migrations, existing-data integrity and production-size query checks passed.',flush=True)
 finally:
  if started:command([str(bin/'pg_ctl'),'-D',str(data),'-m','fast','stop'])
+ shutil.rmtree(socket)
