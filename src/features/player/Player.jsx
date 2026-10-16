@@ -632,7 +632,7 @@ export default function Player() {
                 <input
                   type="text"
                   inputMode="text"
-                  maxLength={200}
+                  maxLength={2000}
                   value={current.selected_response ?? ""}
                   disabled={
                     submitted ||
