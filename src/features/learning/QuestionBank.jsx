@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, Link, useLocation } from "react-router";
 import QuestionImage from "../../components/QuestionImage.jsx";
 import Icon from "../../components/Icon.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
@@ -7,7 +7,7 @@ import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import BookSelect from "../books/BookSelect.jsx";
 import useAuth from "../../hooks/useAuth.js";
-import { DOMAINS } from "./Filters.jsx";
+import { DOMAINS, OTHER_DOMAINS } from "./Filters.jsx";
 import {
   toggleDomain,
   toggleSkill,
@@ -24,12 +24,14 @@ function readConfiguration(key) {
   }
 }
 export default function QuestionBank({ admin = false }) {
+  const location = useLocation();
   const { profile } = useAuth(),
     key = `satchi.bank.${profile.id}`;
   const [saved] = useState(() => readConfiguration(key));
   const [filters, setFilters] = useState({
       ...saved.filters,
       section: saved.filters?.section || "Math",
+      ...location.state?.preset,
     }),
     [page, setPage] = useState(0),
     [expanded, setExpanded] = useState([]),
@@ -62,8 +64,8 @@ export default function QuestionBank({ admin = false }) {
   );
   const rows = facets.data || [];
   const standards = filters.section
-    ? DOMAINS[filters.section] || []
-    : Object.values(DOMAINS).flat();
+    ? [...(DOMAINS[filters.section] || []), OTHER_DOMAINS[filters.section]]
+    : [...Object.values(DOMAINS).flat(), ...Object.values(OTHER_DOMAINS)];
   const domains = [...new Set([...standards, ...rows.map((r) => r.domain)])];
   const matching = state.data?.count ?? 0;
   return (
@@ -113,7 +115,9 @@ export default function QuestionBank({ admin = false }) {
               ))}
             </div>
             <p className="bank-hint">
-              Choose domains or expand them to select individual skills.
+              Choose domains or expand them to select individual skills. Counts
+              reflect source, difficulty and history filters. Ambiguous topics
+              and strategies stay under Other.
             </p>
             <label className="bank-all">
               <input
@@ -279,9 +283,9 @@ export default function QuestionBank({ admin = false }) {
                 onChange={(e) => field("status", e.target.value)}
               >
                 <option value="">All questions</option>
-                  <option value="unanswered">Not attempted</option>
-                  <option value="attempted">Previously attempted</option>
-                  <option value="corrected">Corrected after mistake</option>
+                <option value="unanswered">Not attempted</option>
+                <option value="attempted">Previously attempted</option>
+                <option value="corrected">Corrected after mistake</option>
                 <option value="correct">Previously correct</option>
                 <option value="incorrect">Previously incorrect</option>
               </select>

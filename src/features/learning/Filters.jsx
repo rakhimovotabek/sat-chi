@@ -15,6 +15,10 @@ export const DOMAINS = {
     "Standard English Conventions",
   ],
 };
+export const OTHER_DOMAINS = {
+  Math: "Other Math Topics & Strategies",
+  "Reading & Writing": "Other Reading & Writing Topics",
+};
 export default function Filters({ value, onChange, status = true }) {
   const topics = useContent(
     () => (value.book ? getTopics(value.book) : Promise.resolve([])),
@@ -50,8 +54,11 @@ export default function Filters({ value, onChange, status = true }) {
         >
           <option value="">All domains</option>
           {(value.section
-            ? DOMAINS[value.section]
-            : Object.values(DOMAINS).flat()
+            ? [...DOMAINS[value.section], OTHER_DOMAINS[value.section]]
+            : [
+                ...Object.values(DOMAINS).flat(),
+                ...Object.values(OTHER_DOMAINS),
+              ]
           ).map((s) => (
             <option key={s}>{s}</option>
           ))}

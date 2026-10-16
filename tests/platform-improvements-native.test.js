@@ -390,6 +390,31 @@ test(
         await page.setViewportSize({ width: 1280, height: 800 });
       },
     );
+    await t.test(
+      "Question Bank exposes strategy topics under Other with contextual counts",
+      async () => {
+        await app.sql(
+          `update questions set domain='Desmos Hacks',skill='Graph shortcuts'where id='${app.ids[10]}';update content_review_items set status='approved'where item_type='question'and entity_id='${app.ids[10]}'`,
+        );
+        await page.goto(app.appUrl + "/question-bank");
+        await page
+          .getByLabel("Book / source", { exact: true })
+          .selectOption(app.book);
+        await page
+          .getByRole("button", {
+            name: "Expand Other Math Topics & Strategies skills",
+            exact: true,
+          })
+          .click();
+        await page.getByRole("checkbox", { name: /Graph shortcuts/ }).check();
+        await expect(
+          page.getByLabel("Matching question count", { exact: true }),
+        ).toHaveText("1");
+        await expect(page.locator(".bank-workspace")).toContainText(
+          "Other Math Topics & Strategies",
+        );
+      },
+    );
     assert.deepEqual(errors, [], "no browser exceptions");
     assert.deepEqual(failures, [], "no unexpected request failures");
   },
