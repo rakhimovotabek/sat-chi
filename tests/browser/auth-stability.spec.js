@@ -142,9 +142,7 @@ test("active practice retains question, answer, elimination, mark and overview t
   await expect(
     page.getByRole("radio", { name: "A 2", exact: true }),
   ).toBeDisabled();
-  await expect(
-    page.getByRole("button", { name: "Marked for review" }),
-  ).toBeVisible();
+  await expect(page.locator('button[title="Marked for review"]')).toBeVisible();
   await expect(
     page.getByRole("dialog", { name: "Question Overview" }),
   ).toBeVisible();

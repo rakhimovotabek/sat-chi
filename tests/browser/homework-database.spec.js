@@ -190,7 +190,9 @@ test("local PostgreSQL browser recurring occurrence appears, saves, completes an
       s.getByText("2 / 2 questions · Completed", { exact: true }),
     ).toBeVisible();
     await a.reload();
-    await a.getByRole("button", { name: "View", exact: true }).click();
+    await a
+      .getByRole("button", { name: "History summary", exact: true })
+      .click();
     await a.getByRole("tab", { name: "Today", exact: true }).click();
     await expect(
       a.getByRole("cell", { name: "Completed", exact: true }),

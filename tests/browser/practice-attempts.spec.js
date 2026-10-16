@@ -44,6 +44,7 @@ test("bank Check shows only attempted choices, retries and preserves overview/re
   expect(store.checks).toHaveLength(2);
   await page.reload();
   await expect(page.locator(".answer-choice.correct-choice")).toHaveCount(1);
+  await page.getByRole("button", { name: /Attempts \(2\)/ }).click();
   await expect(page.getByText(/Attempt 1: A/)).toBeVisible();
   await expect(page.locator(".answer-choice.correct-choice")).toHaveCSS(
     "background-color",

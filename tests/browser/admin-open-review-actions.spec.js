@@ -145,10 +145,12 @@ for (const inclusive of [false, true])
       await loginDatabase(page, admin, "admin", db, run);
       await page.goto(`/admin/sessions/${session}`);
       await expect(
-        page.getByText(
-          `Official answer: 8 to 9 (${inclusive ? "inclusive" : "exclusive"})`,
-          { exact: true },
-        ),
+        page
+          .getByRole("region", { name: "Open response review" })
+          .getByText(
+            `Official answer: 8 to 9 (${inclusive ? "inclusive" : "exclusive"})`,
+            { exact: true },
+          ),
       ).toBeVisible();
     } finally {
       await db.close();

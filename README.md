@@ -19,10 +19,16 @@ Commands:
 - `npm run dev`: local development server.
 - `npm run build`: production bundle in `dist/`.
 - `npm run preview`: serve a previously built bundle.
-- `npm test`: Edge Function authorization, validation, deletion, and compensation tests, using Node’s built-in test runner.
+- `npm test`: unit and embedded PostgreSQL regression tests using Node’s built-in runner; native test prerequisites are checked by `npm run test:platform`.
 - `npm ci`: repeatable install from the lockfile.
 
 Components use two-space indentation and PascalCase names. ESLint and Prettier are project-local: run `npm run lint`, `npm run format`, or the scoped `npm run format:check`. Browser verification uses `npm run test:e2e`; the complete unit/database suite uses `npm test`.
+
+## Isolated platform review
+
+`npm run dev:platform` starts disposable PostgreSQL 17, PostgREST and real Supabase Auth, then prints the exact loopback app URL and local recovery-email inbox. It seeds public book hierarchy/counts with labeled synthetic questions and test accounts; it never loads hosted credentials. Reloads and fresh login persist within the running process; restarting recreates the disposable data.
+
+Run `npm run test:platform` for focused platform/database/browser/Auth/restoration checks. Native dependencies, disposable logins, current test results and release limitations are documented in [the platform report](docs/platform-improvements-report.md). `npm run prepare:platform-previews` renders available exact-source first pages into ignored local assets without uploading anything.
 
 ## Project structure
 

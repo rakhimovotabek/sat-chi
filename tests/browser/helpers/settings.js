@@ -10,7 +10,7 @@ export async function settingsFixture(page, role = "student") {
     "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
   };
   await page.route(
-    /\/rest\/v1\/(profiles|study_preferences|rpc\/(save_account_settings|save_sat_date))(\?|$)/,
+    /\/rest\/v1\/(profiles|study_preferences|rpc\/(save_account_settings|save_sat_date|exam_countdown_settings))(\?|$)/,
     async (route) => {
       const req = route.request(),
         name = new URL(req.url()).pathname.split("/").pop(),
@@ -18,6 +18,12 @@ export async function settingsFixture(page, role = "student") {
       if (req.method() === "OPTIONS")
         return route.fulfill({ status: 204, headers });
       let data;
+      if (name === "exam_countdown_settings")
+        data = {
+          date: store.satDate || null,
+          timezone: "UTC",
+          target: store.satDate ? store.satDate + "T00:00:00Z" : null,
+        };
       if (name === "profiles")
         data = [
           {

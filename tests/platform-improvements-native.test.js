@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { chromium, expect } from "@playwright/test";
+import { chromium, expect as browserExpect } from "@playwright/test";
 import {
   nativeAppEnvironment,
   student,
@@ -8,6 +8,7 @@ import {
   studentB,
 } from "./helpers/native-app-environment.js";
 
+const expect = browserExpect.configure({ timeout: 15000 });
 const enabled = Boolean(
   process.env.SATCHI_TEST_POSTGRES_BIN && process.env.SATCHI_TEST_POSTGREST,
 );
@@ -369,6 +370,13 @@ test(
         await expect(page.locator(".countdown-convention")).toContainText(
           "2099-12-05 · Asia/Tashkent",
         );
+        await expect(
+          page.getByRole("heading", { name: "Continue Studying", exact: true }),
+        ).toBeVisible();
+        await expect(page.locator(".weekly-activity")).toBeVisible();
+        await expect(
+          page.getByText("Loading learning materials…", { exact: true }),
+        ).toHaveCount(0);
         let queries = 0;
         const observe = (r) => {
           if (r.url().includes("/rest/v1/")) queries++;
@@ -413,6 +421,57 @@ test(
         await expect(page.locator(".bank-workspace")).toContainText(
           "Other Math Topics & Strategies",
         );
+      },
+    );
+    await t.test(
+      "book catalog shows real progress and title previews; tiny topics retain deep links without repeated actions",
+      async () => {
+        await page.goto(app.appUrl + "/books");
+        const card = page.locator(".book-card").filter({
+          has: page.getByRole("heading", {
+            name: "SATakror disposable fixture",
+            exact: true,
+          }),
+        });
+        await expect(card.locator(".book-cover-placeholder")).toContainText(
+          "SATakror disposable fixture",
+        );
+        await expect(card).toContainText("eligible questions solved");
+        await expect(card.getByRole("progressbar")).toBeVisible();
+        const tinyBook = await app.json(
+          "with b as(insert into books(title,category,published)values('Tiny topics fixture','Math',true)returning id)select to_jsonb(id)from b",
+        );
+        await app.sql(`insert into book_topics(book_id,title,position)select '${tinyBook}','Original topic '||n,n from generate_series(1,150)n;
+      insert into questions(topic_id,position,question_text,options)select id,0,title||' question','["1","2","3","4"]'from book_topics where book_id='${tinyBook}';
+      insert into question_answers(question_id,correct_answer)select q.id,1 from questions q join book_topics t on t.id=q.topic_id where t.book_id='${tinyBook}';`);
+        await page.goto(app.appUrl + "/books/" + tinyBook);
+        await expect(
+          page.getByRole("button", {
+            name: "Practice Entire Book",
+            exact: true,
+          }),
+        ).toBeEnabled();
+        await expect(
+          page.getByRole("button", { name: "Start practice", exact: true }),
+        ).toHaveCount(0);
+        await page
+          .getByRole("button", {
+            name: "Explore 150 original topics",
+            exact: true,
+          })
+          .click();
+        await expect(
+          page.getByRole("button", { name: "Start practice", exact: true }),
+        ).toHaveCount(0);
+        await page
+          .getByRole("link", { name: "Original topic 1 →", exact: true })
+          .click();
+        await expect(
+          page.getByRole("button", {
+            name: "Start topic practice",
+            exact: true,
+          }),
+        ).toBeVisible();
       },
     );
     assert.deepEqual(errors, [], "no browser exceptions");

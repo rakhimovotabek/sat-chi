@@ -285,6 +285,40 @@ export async function contentFixture(
       topics(body.p_payload.topics);
       return json({ book_id: b.id, question_count: n });
     }
+    if (table === "practice_prior_progress") return json([]);
+    if (table === "admin_student_books")
+      return json({ books: [], progress: [], channels: {}, total: 0 });
+    if (table === "admin_practice_answer_keys")
+      return json(
+        store.items.map((item, i) => ({
+          item_id: item.id,
+          ...store.questions[i]?.question_answers,
+        })),
+      );
+    if (table === "practice_session_statistics")
+      return json({ first_accuracy: null, first_unknown: 0 });
+    if (table === "learning_book_progress")
+      return json(
+        (body.p_books || []).map((id) => ({
+          book_id: id,
+          total: store.questions.filter((q) =>
+            store.topics.some((t) => t.id === q.topic_id && t.book_id === id),
+          ).length,
+          attempted: 0,
+          eventually_correct: 0,
+          first_accuracy: null,
+          first_unknown: 0,
+        })),
+      );
+    if (table === "exam_countdown_settings")
+      return json({ date: null, timezone: "UTC", target: null });
+    if (table === "dashboard_study_activity")
+      return json({
+        days: [],
+        timezone: "UTC",
+        recent_known: 0,
+        previous_known: 0,
+      });
     if (table === "book_practice_progress") {
       return json(
         store.topics

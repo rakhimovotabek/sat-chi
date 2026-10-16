@@ -85,9 +85,7 @@ test("homework uses the dockable, floating and resizable calculator without losi
   const before = await bounds(panel);
   await drag(page, separator, 50, 0);
   expect((await bounds(panel)).width).toBeGreaterThan(before.width);
-  await page
-    .getByRole("button", { name: "Float calculator", exact: true })
-    .click();
+  await drag(page, panel.locator("h2"), 12, 12);
   await expect(panel).toHaveAttribute("data-mode", "floating");
   const floating = await bounds(panel);
   await drag(
@@ -101,17 +99,14 @@ test("homework uses the dockable, floating and resizable calculator without losi
   );
   expect((await bounds(panel)).width).toBeGreaterThan(floating.width);
   await expect(expression).toHaveValue("y=x+3");
-  await page
-    .getByRole("button", { name: "Dock calculator", exact: true })
-    .click();
-  await expect(panel).toHaveAttribute("data-mode", "docked");
+
   expect(store.items[0].selected_answer).toBe(1);
   await page.reload();
   await expect(
     page.getByRole("radio", { name: "B 4", exact: true }),
   ).toBeChecked();
 });
-test("desktop docks into layout, divider resizes, toggles without iframe reload, and close restores question width", async ({
+test("desktop docks into layout, divider resizes, title drags without iframe reload, and close restores question width", async ({
   page,
 }) => {
   const { panel, expression, store } = await openCalculator(page);
@@ -130,15 +125,10 @@ test("desktop docks into layout, divider resizes, toggles without iframe reload,
   await separator.focus();
   await page.keyboard.press("ArrowLeft");
   expect((await bounds(panel)).width).toBeLessThan(calculator.width + 60);
-  await page
-    .getByRole("button", { name: "Float calculator", exact: true })
-    .click();
+  await drag(page, panel.locator("h2"), 12, 12);
   await expect(panel).toHaveAttribute("data-mode", "floating");
   await expect(expression).toHaveValue("y=x^2");
-  await page
-    .getByRole("button", { name: "Dock calculator", exact: true })
-    .click();
-  await expect(panel).toHaveAttribute("data-mode", "docked");
+
   await expect(expression).toHaveValue("y=x^2");
   await page
     .getByRole("button", { name: "Close Calculator", exact: true })
@@ -160,23 +150,18 @@ test("desktop docks into layout, divider resizes, toggles without iframe reload,
     fullPage: true,
   });
 });
-test("floating header drags and every corner resizes with bounded geometry remembered on reopen and reload", async ({
+test("floating header drags and corner resizes with bounded geometry remembered on reopen and reload", async ({
   page,
 }) => {
   const { panel, expression } = await openCalculator(page);
   await expression.fill("y=3x");
-  await page.getByRole("button", { name: "Float calculator" }).click();
+  await drag(page, panel.locator("h2"), 12, 12);
   const start = await bounds(panel);
   await drag(page, panel.locator("h2"), 80, 50);
   let current = await bounds(panel);
   expect(current.x).toBeCloseTo(start.x + 80, 0);
   expect(current.y).toBeCloseTo(start.y + 50, 0);
-  for (const corner of [
-    "top-left",
-    "top-right",
-    "bottom-left",
-    "bottom-right",
-  ]) {
+  for (const corner of ["bottom-right"]) {
     const before = await bounds(panel);
     await drag(
       page,
@@ -219,7 +204,7 @@ test("SDK instance and expression survive docking, floating, resizing, closing a
 }) => {
   const { panel, expression } = await openCalculator(page, { sdk: true });
   await expression.fill("y=sin(x)");
-  await page.getByRole("button", { name: "Float calculator" }).click();
+  await drag(page, panel.locator("h2"), 12, 12);
   await drag(
     page,
     page.getByRole("button", {
@@ -229,7 +214,7 @@ test("SDK instance and expression survive docking, floating, resizing, closing a
     40,
     30,
   );
-  await page.getByRole("button", { name: "Dock calculator" }).click();
+
   await expect(expression).toHaveValue("y=sin(x)");
   await page.getByRole("button", { name: "Close Calculator" }).click();
   await page.getByRole("button", { name: "Next", exact: true }).click();

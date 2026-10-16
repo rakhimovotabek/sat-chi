@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test --test-concurrency=2 tests/*.test.js",
+    "test": "node --expose-gc --import ./scripts/testing/release-memory.js --test --test-concurrency=1 tests/*.test.js",
     "test:e2e": "playwright test",
     "import:inspect": "node scripts/imports/local-books.js",
     "import:apply": "node scripts/imports/apply-local-imports.js",
@@ -23,7 +23,10 @@
     "import:covers": "node scripts/imports/backfill-covers.js",
     "import:vocabook": "node scripts/imports/vocabook-package.js",
     "test:reliability": "node scripts/testing/reliability.js",
-    "dev:isolated": "node scripts/testing/manual-development.js"
+    "dev:isolated": "node scripts/testing/manual-development.js",
+    "test:platform": "node scripts/testing/platform.js",
+    "dev:platform": "node scripts/testing/platform-development.js",
+    "prepare:platform-previews": "node scripts/books/prepare-platform-previews.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

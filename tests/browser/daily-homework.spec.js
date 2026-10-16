@@ -45,7 +45,9 @@ test("admin creates recurring group homework, edits, pauses, resumes, views and 
   await expect(
     updated.getByRole("cell", { name: "active", exact: true }),
   ).toBeVisible();
-  await updated.getByRole("button", { name: "View", exact: true }).click();
+  await updated
+    .getByRole("button", { name: "History summary", exact: true })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Daily Grammar Updated", exact: true }),
   ).toBeVisible();
@@ -322,7 +324,9 @@ test("daily homework desktop and mobile remain usable without document overflow"
   ];
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/admin/homework");
-  await page.getByRole("button", { name: "View", exact: true }).click();
+  await page
+    .getByRole("button", { name: "History summary", exact: true })
+    .click();
   await page.getByRole("tab", { name: "Today", exact: true }).click();
   await expect(
     page.getByRole("cell", { name: "In progress", exact: true }),

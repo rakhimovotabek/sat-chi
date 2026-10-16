@@ -220,7 +220,7 @@ test("real reporting pages handle empty records and remain responsive", async ({
   await learningFixture(page);
   await page.goto("/dashboard");
   await expect(
-    page.getByText("No unfinished homework due today."),
+    page.getByText("No upcoming unfinished homework."),
   ).toBeVisible();
   await page.screenshot({
     path: "/tmp/satchi-dashboard-sprint.png",

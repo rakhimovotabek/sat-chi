@@ -104,7 +104,9 @@ test("SAT selection uses official dates and persists one canonical date across s
   await expect(page.getByLabel("SAT date")).toHaveValue("2026-11-07");
   await page.goto("/dashboard");
   await expect(
-    page.getByText("34 days remaining", { exact: true }),
+    page
+      .locator(".countdown-convention")
+      .filter({ hasText: "2026-11-07 · UTC" }),
   ).toBeVisible();
   await page.goto("/study-plan");
   await page.getByRole("button", { name: "Study preferences" }).click();

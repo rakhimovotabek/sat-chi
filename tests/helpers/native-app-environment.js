@@ -35,7 +35,8 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
     appUrl = `http://127.0.0.1:${vitePort}`;
   const secret = randomBytes(48).toString("hex"),
     processes = [],
-    streams = [];
+    streams = [],
+    localAssetFiles = new Map();
   let running = false,
     gateway,
     authService;
@@ -387,6 +388,14 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
             "/storage/v1/object/local-fixture/" + signed.path
           )
             throw new Error("Invalid signed path");
+          const localFile = localAssetFiles.get(
+            (signed.bucket || "book-package-assets") + "/" + signed.path,
+          );
+          if (localFile) {
+            res.writeHead(200, { "Content-Type": "image/webp" });
+            res.end(await readFile(localFile));
+            return;
+          }
           res.writeHead(200, { "Content-Type": "image/png" });
           res.end(
             Buffer.from(
@@ -399,6 +408,38 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
         const auth = claims(
           req.headers.authorization?.replace(/^Bearer /i, ""),
         );
+        if (url.pathname === "/storage/v1/object/sign/book-covers") {
+          const chunks = [];
+          for await (const chunk of req) chunks.push(chunk);
+          const body = JSON.parse(Buffer.concat(chunks));
+          if (!Array.isArray(body.paths) || body.paths.length > 50)
+            throw new Error("Invalid local cover request");
+          const allowed = await json(
+            as(
+              auth.sub,
+              "select coalesce(jsonb_agg(name),'[]')from storage.objects where bucket_id='book-covers'",
+            ),
+          );
+          send(
+            body.paths.map((asset) =>
+              allowed.includes(asset)
+                ? {
+                    path: asset,
+                    signedURL:
+                      "/object/local-fixture/" +
+                      asset +
+                      "?token=" +
+                      token({
+                        sub: auth.sub,
+                        bucket: "book-covers",
+                        path: asset,
+                      }),
+                  }
+                : { path: asset, error: "Object unavailable" },
+            ),
+          );
+          return;
+        }
         if (url.pathname === "/auth/v1/user") {
           send(user(auth.sub));
           return;
@@ -438,7 +479,9 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
       `db-uri = "postgresql://authenticator@127.0.0.1:${dbPort}/postgres"\ndb-schemas = "public"\ndb-anon-role = "anon"\ndb-max-rows = 1000\njwt-secret = "${secret}"\nserver-host = "127.0.0.1"\nserver-port = ${restPort}\n`,
       { mode: 0o600 },
     );
-    launch("postgrest", process.env.SATCHI_TEST_POSTGREST, [config], { GHCRTS: "-N2" });
+    launch("postgrest", process.env.SATCHI_TEST_POSTGREST, [config], {
+      GHCRTS: "-N2",
+    });
     await waitFor(`http://127.0.0.1:${restPort}/`);
     launch(
       "vite",
@@ -509,6 +552,7 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
       assignment,
       daily,
       authEmails: authService?.messages,
+      localAssetFiles,
       path,
     };
   } catch (e) {
