@@ -22,6 +22,7 @@
   border-radius: 14px;
   overflow: hidden;
   background: white;
+  transition: border-color 180ms ease, background-color 180ms ease;
 }
 .book-card:hover {
   border-color: #a7bee8;
@@ -44,6 +45,15 @@
   height: 100%;
   object-fit: contain;
 }
+.book-cover-placeholder { display: grid; align-content: center; gap: 12px; padding: 20px; max-width: 100%; }
+.book-cover-placeholder strong { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; font-size: 17px; line-height: 1.35; font-weight: 600; }
+.book-cover-placeholder small { font-size: 11px; font-weight: 400; color: var(--text-muted); }
+.book-learning-progress { margin-block: 16px; font-variant-numeric: tabular-nums; }
+.book-card .book-learning-progress p { margin: 0 0 8px; }
+.book-learning-progress progress { display: block; width: 100%; height: 8px; accent-color: var(--accent); margin-block-end: 8px; }
+.book-learning-progress small { display: block; color: var(--text-muted); font-size: 12px; }
+.book-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .book-card { transition: none; } }
 .book-card-copy {
   padding: 23px;
 }

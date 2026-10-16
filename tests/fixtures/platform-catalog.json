@@ -1,0 +1,3380 @@
+{
+  "captured": "2026-10-16",
+  "note": "Catalog metadata only. Questions used with these records are disposable synthetic fixtures; no student data or source question text is included.",
+  "books": [
+    {
+      "id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+      "title": "800 Challenge: Hard Math 150 — Part 1",
+      "category": "Math",
+      "questions": 150,
+      "source_file": "800 Challenge - Hard Math 150 (Part 1) - SAT Math Club.pdf",
+      "slug": "800-challenge-hard-math-150-part-1-sat-math-club",
+      "topics": [
+        {
+          "id": "98799dce-88c3-5356-afcb-e60650cdeee8",
+          "title": "ADVANCED MATH — EXPONENTIAL VS LINEAR",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 1,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "title": "Questions",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "913f47e1-83fd-5b08-a567-90b57b9537a4",
+          "title": "GEOMETRY & TRIGONOMETRY — AREA (RECTANGLES)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 2,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "f298b38c-fb2d-5a50-acfb-477a80b1788e",
+          "title": "ADVANCED MATH — FACTORING QUADRATICS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 3,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "6b9f125c-0186-5c4e-adcb-ffd970935b48",
+          "title": "ADVANCED MATH — QUADRATICS (PARAMETERS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 4,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "758a27d5-fd30-53f3-acb6-ae1776148601",
+          "title": "ADVANCED MATH — ROOTS OF QUADRATICS (VIETA)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 5,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "65f479da-477e-5077-ac4b-8d37ce3b1cf0",
+          "title": "ADVANCED MATH — EXPONENTIAL VS LINEAR",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 6,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "1a40e1f3-09a2-56cf-a142-cc584c440ef1",
+          "title": "ADVANCED MATH — EXPONENTIAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 7,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "9cc8e978-d2de-5c65-a429-f1575844786b",
+          "title": "ADVANCED MATH — FACTORING WITH PARAMETERS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 8,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "5229efdf-2f84-5925-acaa-d5dfa7aaadb6",
+          "title": "ADVANCED MATH — POLYNOMIAL SIGN ANALYSIS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 9,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "1e083807-a3e2-5163-af3a-1aff2bb457c6",
+          "title": "ADVANCED MATH — PRODUCT OF SOLUTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 10,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "d2c051d3-7873-55f1-a595-517bf767ffcd",
+          "title": "ADVANCED MATH — FACTORING TRINOMIALS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 11,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "d0f2c4d8-9e2b-5de3-aa2f-77b7b7c72637",
+          "title": "ADVANCED MATH — SYMMETRY OF FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 12,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "dd664134-960a-5555-a9f6-8107d569032b",
+          "title": "GEOMETRY & TRIGONOMETRY — PARALLEL LINES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 13,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "6a60e61a-2b87-5ca0-ac33-1dddb22147fe",
+          "title": "GEOMETRY & TRIGONOMETRY — AREA & SCALE FACTOR",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 14,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "a48eb575-ba1e-5216-a293-801fb016a13b",
+          "title": "GEOMETRY & TRIGONOMETRY — VOLUME (CONES &",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 15,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "01f0ae25-30df-53b0-ac62-e1fa3b3a51c4",
+          "title": "ADVANCED MATH — RATIONAL EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 16,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "ef04403f-95b0-5ff9-a32e-5c647108543a",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — RATIOS & SCALE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 17,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "c5005482-cea2-5e4f-ad3e-5c269a13dee7",
+          "title": "ADVANCED MATH — ISOLATING A VARIABLE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 18,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "bd770ea5-c40f-5390-af45-d0fc6e256793",
+          "title": "ADVANCED MATH — RATIONAL EXPRESSIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 19,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "7de670dd-331a-50be-a115-00654368f4a7",
+          "title": "ADVANCED MATH — ISOLATING A VARIABLE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 20,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "b4ed93f7-0684-5ceb-af11-9ec5be6eee04",
+          "title": "ALGEBRA — ABSOLUTE VALUE EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 21,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "d16de971-1df7-5a56-aef5-fbe05461e313",
+          "title": "ALGEBRA — LINEAR EQUATIONS (INFINITE SOLUTIONS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 22,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "df5039d9-037f-5aee-a972-9d13778a3f92",
+          "title": "ALGEBRA — LINEAR EQUATIONS IN CONTEXT",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 23,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "a1934b6e-a8c6-50be-a2fa-c7d4cabe88fa",
+          "title": "ALGEBRA — LINEAR EQUATIONS (NO SOLUTION)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 24,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 2
+        },
+        {
+          "id": "e3fb8b21-fea1-5dce-a059-e21ed98cf9af",
+          "title": "ALGEBRA — LINEAR EQUATIONS (INFINITE SOLUTIONS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 25,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "cdeb189e-3bf8-5f7c-a6da-904a69107137",
+          "title": "ALGEBRA — LINEAR INEQUALITIES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 26,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "384384ea-a152-593f-a4a3-4518bf3e5724",
+          "title": "ALGEBRA — LINEAR INEQUALITIES (WORD PROBLEM)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 27,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "1673f0b4-9bcd-549d-a0de-67ea22671fba",
+          "title": "ALGEBRA — SYSTEMS OF LINEAR EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 28,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 2
+        },
+        {
+          "id": "3b43a780-d727-500b-aac7-23565356539c",
+          "title": "ALGEBRA — SYSTEMS (INFINITE SOLUTIONS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 29,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "17e52f18-db45-54f5-a652-a0ca78b64c42",
+          "title": "ALGEBRA — SYSTEMS OF LINEAR EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 30,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 2
+        },
+        {
+          "id": "3de9a028-b4a4-526c-a6a8-05bdaa25e3da",
+          "title": "ALGEBRA — SYSTEMS (NO SOLUTION)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 31,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "91cad8a6-ca75-5729-aead-43e484ea5e82",
+          "title": "ALGEBRA — SYSTEMS OF LINEAR EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 32,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "edff3c4a-67d3-5615-a538-dfdb150e294b",
+          "title": "ALGEBRA — LINEAR FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 33,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "8efaa7c6-6ee6-529c-aba6-041ab065ccd8",
+          "title": "ALGEBRA — LINEAR FUNCTIONS (TRANSFORMATIONS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 34,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "6d1b19d3-ddd1-5420-a142-1541629e9078",
+          "title": "ALGEBRA — LINEAR FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 35,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 3
+        },
+        {
+          "id": "171471a1-1f13-5526-aa7a-faa7605fb0af",
+          "title": "ALGEBRA — LINEAR FUNCTIONS (MODELING)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 36,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "9e0c8ac3-c488-50cc-ac90-1f5c0ecf3c6a",
+          "title": "ADVANCED MATH — POLYNOMIAL EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 37,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 2
+        },
+        {
+          "id": "19d9abf6-0259-5782-a833-c40c321eb9e8",
+          "title": "ADVANCED MATH — FACTORING POLYNOMIALS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 38,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "283bb095-fb26-583a-ae23-7bb4548dd0a9",
+          "title": "ADVANCED MATH — EXPONENT RULES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 39,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "874d1e7b-e661-5a2d-adcf-afbe635c9ff9",
+          "title": "ADVANCED MATH — ISOLATING A VARIABLE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 40,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "6ac0b197-5155-5449-a3e6-ef8d83ede792",
+          "title": "ADVANCED MATH — RADICALS & RATIONAL EXPONENTS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 41,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 3
+        },
+        {
+          "id": "8bcb0385-e5a5-5d9b-a4b4-5b890df98a9c",
+          "title": "ADVANCED MATH — ABSOLUTE VALUE FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 42,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "b767ac8f-ea65-53e0-a2b0-630e3ccb1927",
+          "title": "ADVANCED MATH — RADICAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 43,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "3bb8d8e0-d2ac-5ae2-aaa6-c3d0e433d8db",
+          "title": "ADVANCED MATH — RADICAL EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 44,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "b4286fca-89ea-50a7-a416-1f045a47a6f1",
+          "title": "ADVANCED MATH — ABSOLUTE VALUE FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 45,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "2ba0107a-f7b3-5f3d-a118-3f0d45b3d262",
+          "title": "ADVANCED MATH — QUADRATICS (VIETA)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 46,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "d6594362-a83d-5825-aa99-2e72cf1592e5",
+          "title": "ADVANCED MATH — EXPONENTIAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 47,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 2
+        },
+        {
+          "id": "1b766cc4-b7d8-5e6b-a9ad-e1e3486e2fc2",
+          "title": "ADVANCED MATH — EQUIVALENT EXPONENTIAL FORMS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 48,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "00323961-29bf-5918-abe1-2b717450b985",
+          "title": "ADVANCED MATH — EXPONENTIAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 49,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "590a87ca-a190-56c5-a45e-64509952d94e",
+          "title": "ADVANCED MATH — QUADRATICS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 50,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "2a28ee11-c2be-56bd-ade7-7c164a992b21",
+          "title": "ADVANCED MATH — EXPONENTIAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 51,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "5287baf3-b4ee-58ef-aeea-45da056bb6c2",
+          "title": "ADVANCED MATH — EXPONENTIAL MODELS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 52,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "612c7eb9-1096-5c94-ac31-5d2002a7c8ca",
+          "title": "ADVANCED MATH — EXPONENTIAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 53,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 2
+        },
+        {
+          "id": "c7a73700-f5fe-540e-a8fc-69e97d6ec3dd",
+          "title": "ADVANCED MATH — EXPONENTIAL MODELS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 54,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "21e10d4e-ca3a-5bd0-acbc-36a8c611ee56",
+          "title": "ADVANCED MATH — EXPONENTIAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 55,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "bff7fa7d-49fa-53a4-a168-bffe896bc94d",
+          "title": "ADVANCED MATH — RATIONAL EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 56,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "b6aa8c61-5a42-5cf2-a9d3-c6db5e635f01",
+          "title": "ADVANCED MATH — NONLINEAR SYSTEMS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 57,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "6c61ee7f-0bd0-5656-af39-39243deef71a",
+          "title": "ADVANCED MATH — RADICAL EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 58,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "d1bdc9e0-d04e-5958-aa81-e3c63baf296e",
+          "title": "ADVANCED MATH — EQUIVALENT EXPRESSIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 59,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "ef447bae-70b1-5d45-a3b0-d43e3eccba5a",
+          "title": "ADVANCED MATH — QUADRATIC FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 60,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 2
+        },
+        {
+          "id": "8f8c85f1-0ae1-59dc-a1ef-539ba80fbe4a",
+          "title": "ADVANCED MATH — NONLINEAR SYSTEMS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 61,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "40bce43d-5ce4-5fa4-a43b-94f9ec65803a",
+          "title": "ADVANCED MATH — QUADRATICS (DISCRIMINANT)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 62,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "223b393a-3c8a-5496-a08b-40d141ba5608",
+          "title": "ADVANCED MATH — NONLINEAR SYSTEMS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 63,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "00787257-7fa0-5db6-a785-e52446197fb6",
+          "title": "ADVANCED MATH — RATIONAL EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 64,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "ef9da0f4-c482-5358-ab9d-22b7965e0401",
+          "title": "ADVANCED MATH — QUADRATIC EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 65,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "e1f86b0b-3d6c-5168-ac18-d3aef48b7415",
+          "title": "ADVANCED MATH — RATIONAL EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 66,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "a188331e-bce2-5e91-afa5-7bb452144528",
+          "title": "ADVANCED MATH — NONLINEAR EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 67,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "aee3ccb5-00c1-51cc-ad57-54fbcd26427e",
+          "title": "ADVANCED MATH — QUADRATIC EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 68,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 3
+        },
+        {
+          "id": "5b63f718-e4f8-5cc1-a34f-35412608fa1d",
+          "title": "ADVANCED MATH — NONLINEAR EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 69,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "c8c6d604-7e74-5daa-afb0-88fc60d65b43",
+          "title": "ADVANCED MATH — RADICAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 70,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "1c28b3f1-5bf6-562a-ab94-3d361c938507",
+          "title": "ADVANCED MATH — QUADRATIC FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 71,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 4
+        },
+        {
+          "id": "f80953b6-a493-5bbb-a19b-8e0ad8db8c1e",
+          "title": "ADVANCED MATH — RADICAL EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 72,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "22c5a322-7d0d-5b96-a2e3-6c92986a2bc8",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — PERCENTAGES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 73,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 5
+        },
+        {
+          "id": "6b5313d8-0492-572f-aa8e-5917f67f9382",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — PERCENT CHANGE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 74,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "f08c23e9-cb2f-5a0c-a00b-0f5a790a6e05",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — UNIT CONVERSION",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 75,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "76b12a37-90cd-533c-a40c-d6940059807c",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — CONDITIONAL",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 76,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 2
+        },
+        {
+          "id": "755e8d8c-532d-5326-ac49-ae9b6e06cda6",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — STANDARD",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 77,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "5a53583c-6c34-5888-a273-64805a344ac9",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — MEAN",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 78,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "a9fc4f5c-efa0-5692-a1eb-f18a4e5cca89",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — MEAN & MEDIAN",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 79,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "b4e8dc53-94d6-5da5-a978-e097cb2712be",
+          "title": "GEOMETRY & TRIGONOMETRY — LINES & ANGLES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 80,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "1b4a3fc8-168a-5581-af1a-9ea1a9d8f22e",
+          "title": "GEOMETRY & TRIGONOMETRY — PARALLEL LINES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 81,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "514e5014-5a2a-5342-a346-841c3a5a9e3f",
+          "title": "GEOMETRY & TRIGONOMETRY — TRIANGLES (ANGLES)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 82,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "f1ab5413-05eb-5b64-aa47-4a9c12c9814f",
+          "title": "GEOMETRY & TRIGONOMETRY — SIMILAR TRIANGLES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 83,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "f42ec1de-cc8f-5479-a069-1a49a99881a1",
+          "title": "GEOMETRY & TRIGONOMETRY — CIRCLES & TRIANGLES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 84,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "6273e8a2-097a-5684-a452-1db6725c642b",
+          "title": "GEOMETRY & TRIGONOMETRY — SIMILAR TRIANGLES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 85,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "80390a6b-585c-5160-a090-7226561a45e1",
+          "title": "GEOMETRY & TRIGONOMETRY — TRIGONOMETRIC IDENTITIES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 86,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "5be4b55d-fc3f-5ea8-addb-74275e6a0b15",
+          "title": "GEOMETRY & TRIGONOMETRY — UNIT CIRCLE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 87,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "b420537c-6241-5ca2-a294-d532b7da51a6",
+          "title": "GEOMETRY & TRIGONOMETRY — CIRCLES (TANGENT LINES)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 88,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "eceadc6f-855c-5b16-a828-e8ce9453b5f0",
+          "title": "GEOMETRY & TRIGONOMETRY — CIRCLES (CHORDS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 89,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "7875ccc3-c40b-5f8c-a2d8-9a00954c7f3f",
+          "title": "GEOMETRY & TRIGONOMETRY — CIRCLES (EQUATIONS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 90,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "abf1d9b0-a62d-5db5-af8c-1c50d1bfc317",
+          "title": "GEOMETRY & TRIGONOMETRY — UNIT CIRCLE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 91,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "79a14ba1-09c4-5a6f-a53f-3930b3735be2",
+          "title": "GEOMETRY & TRIGONOMETRY — VOLUME & SURFACE AREA",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 92,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "cee9e730-fda7-567d-a33f-d58a5b98bedf",
+          "title": "GEOMETRY & TRIGONOMETRY — SURFACE AREA (PYRAMIDS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 93,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "78ac3b5f-3f69-5df1-af4d-dcfd820a2792",
+          "title": "GEOMETRY & TRIGONOMETRY — SURFACE AREA",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 94,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "ecd695e1-2f42-5f4a-a408-287628a8a131",
+          "title": "GEOMETRY & TRIGONOMETRY — SURFACE AREA (PYRAMIDS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 95,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "27c9e4b1-c8e5-5476-af3b-78152f9706bf",
+          "title": "ADVANCED MATH — RATIONAL EXPRESSIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 96,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "b32f5438-a7a2-5a36-aaf3-978057e21f61",
+          "title": "ALGEBRA — LINEAR EQUATIONS (NO SOLUTION)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 97,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "4661026e-f914-52e9-ad51-4447cbeaaf52",
+          "title": "ADVANCED MATH — NONLINEAR SYSTEMS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 98,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "f151a7d2-87da-5e76-ac5a-a1c29e6d8c8d",
+          "title": "ALGEBRA — LINEAR FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 99,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "38924c69-21f4-552d-a1ae-f3f0dd28546d",
+          "title": "ADVANCED MATH — FACTORING POLYNOMIALS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 100,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "c2cb2f3a-b870-5aa2-a712-13bb687f1a86",
+          "title": "ADVANCED MATH — POLYNOMIAL & RATIONAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 101,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "56cc5388-2beb-5653-a630-ffcd094bfada",
+          "title": "ADVANCED MATH — ABSOLUTE VALUE FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 102,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "2124f052-eea9-539f-adb9-eb78708825cb",
+          "title": "ADVANCED MATH — EXPONENTIAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 103,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "402ac770-8af8-578c-a44f-f85e7cae7090",
+          "title": "ADVANCED MATH — NONLINEAR SYSTEMS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 104,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "ecbd184e-1409-563e-adad-2bb3a2953d76",
+          "title": "ADVANCED MATH — QUADRATIC MODELS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 105,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "61520f87-3543-5a7c-a868-7e7204e29d1a",
+          "title": "ADVANCED MATH — QUADRATIC EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 106,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "ac5a37f0-f3b3-5ab1-a4dc-d4eb27e57a01",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — PERCENT CHANGE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 107,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "65092b86-8f1f-5c80-a73c-4a59b36cb9e4",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — PERCENTAGES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 108,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 2
+        },
+        {
+          "id": "901deee2-0d81-57fc-a65b-ff472099c286",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — UNIT CONVERSION",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 109,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "7d1b4575-a7a3-56e4-a733-0a9c841d96ed",
+          "title": "GEOMETRY & TRIGONOMETRY — AREA OF TRIANGLES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 110,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "c3083dca-0ae8-552d-ad01-6bb2053cd67a",
+          "title": "GEOMETRY & TRIGONOMETRY — SPECIAL RIGHT TRIANGLES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 111,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "6e31fbbb-6fc5-5417-aa32-23c20d642f60",
+          "title": "GEOMETRY & TRIGONOMETRY — CONGRUENT TRIANGLES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 112,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "8926a524-bba6-5e47-a9dc-02f4023fd0cc",
+          "title": "GEOMETRY & TRIGONOMETRY — CIRCLES (EQUATIONS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 113,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "2ead2ad1-d93c-5788-ab23-040f83ca681d",
+          "title": "GEOMETRY & TRIGONOMETRY — UNIT CIRCLE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 114,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "9147e335-1f8e-5725-a103-3bbf9c07c441",
+          "title": "GEOMETRY & TRIGONOMETRY — VOLUME (CONES)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 115,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "09d6e8da-ef14-5ed6-abe6-12e61c2a077b",
+          "title": "GEOMETRY & TRIGONOMETRY — SURFACE AREA (CYLINDERS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 116,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "46da5e41-a09e-547c-a042-8d03a0310a15",
+          "title": "GEOMETRY & TRIGONOMETRY — VOLUME (COMPOSITE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 117,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "532feb60-c6a6-5adf-a2fc-e2fb0ee2a8f3",
+          "title": "GEOMETRY & TRIGONOMETRY — AREA (CIRCLES & SQUARES)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 118,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "e8e310d7-6710-55c7-a68d-3c6a01506dcb",
+          "title": "GEOMETRY & TRIGONOMETRY — RIGHT TRIANGLE",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 119,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "97f81d02-0820-5624-a192-c7f6fff0a293",
+          "title": "PROBLEM-SOLVING & DATA ANALYSIS — CONDITIONAL",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 120,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "afabc3f9-d703-580f-a6d2-6314838cc7ad",
+          "title": "ALGEBRA — SYSTEMS (NO SOLUTION)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 121,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "37b7148e-a6fe-550f-a312-eaaf7585180a",
+          "title": "ALGEBRA — LINEAR INEQUALITIES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 122,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "ce3ebad6-db30-5c52-aedf-c25c0dcaa07d",
+          "title": "GEOMETRY & TRIGONOMETRY — CIRCLES (ARCS)",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 123,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "cb0db585-ee8c-57af-a578-1b366af84b2b",
+          "title": "ADVANCED MATH — NONLINEAR SYSTEMS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 124,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "3c671df0-38d9-57f6-a2db-9a5e02c88764",
+          "title": "ADVANCED MATH — EXPONENTIAL FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 125,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "0da91081-db78-5ddc-a728-10ee7de2ea25",
+          "title": "ADVANCED MATH — POLYNOMIAL IDENTITIES",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 126,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "bb4e5664-61b8-5c93-aa1c-60bc8c23b9c7",
+          "title": "ALGEBRA — SYSTEMS OF LINEAR EQUATIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 127,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        },
+        {
+          "id": "70cbf690-1085-54ef-a3c1-6b7467c81132",
+          "title": "ALGEBRA — LINEAR FUNCTIONS",
+          "book_id": "9e60e628-9ee8-5097-a1b2-d844f196e30b",
+          "position": 128,
+          "parent_id": "d591a064-a89f-54c6-a6c9-81b2c2170b49",
+          "questions": 1
+        }
+      ]
+    },
+    {
+      "id": "b8173713-19fe-58e9-a9af-62616f035627",
+      "title": "ADVANCED MATH - Official SAT Question Bank",
+      "category": "Math",
+      "questions": 540,
+      "source_file": "ADVANCED MATH - Official SAT Question Bank (SAT Ecosystem).pdf",
+      "slug": "advanced-math-official-sat-question-bank",
+      "topics": [
+        {
+          "id": "4ceab015-21a2-580a-a963-7441223cd825",
+          "title": "Equivalent Expressions",
+          "book_id": "b8173713-19fe-58e9-a9af-62616f035627",
+          "position": 1,
+          "parent_id": null,
+          "questions": 116
+        },
+        {
+          "id": "2e2c54a0-7cf2-55f1-ada9-7eadf90e3c00",
+          "title": "Nonlinear Equations in One Variable and Systems of Equations in Two Variables",
+          "book_id": "b8173713-19fe-58e9-a9af-62616f035627",
+          "position": 2,
+          "parent_id": null,
+          "questions": 165
+        },
+        {
+          "id": "26b0e9aa-64f1-5a54-ac79-88812dfc6d3c",
+          "title": "Nonlinear Functions",
+          "book_id": "b8173713-19fe-58e9-a9af-62616f035627",
+          "position": 3,
+          "parent_id": null,
+          "questions": 259
+        }
+      ]
+    },
+    {
+      "id": "6b70f3f6-f00c-5a9c-ac6f-7d253e78503b",
+      "title": "ALGEBRA - Official SAT Question Bank",
+      "category": "Math",
+      "questions": 616,
+      "source_file": "ALGEBRA - Official SAT Question Bank (SAT Ecosystem).pdf",
+      "slug": "algebra-official-sat-question-bank",
+      "topics": [
+        {
+          "id": "fd88edb7-c1cc-5e0b-a45b-20560d4275c1",
+          "title": "Linear Equations in One Variable",
+          "book_id": "6b70f3f6-f00c-5a9c-ac6f-7d253e78503b",
+          "position": 1,
+          "parent_id": null,
+          "questions": 112
+        },
+        {
+          "id": "6eab95ca-edf0-52c7-a3d7-56c8fb4515b5",
+          "title": "Linear Functions",
+          "book_id": "6b70f3f6-f00c-5a9c-ac6f-7d253e78503b",
+          "position": 2,
+          "parent_id": null,
+          "questions": 170
+        },
+        {
+          "id": "4a444bfd-e729-522b-a34f-ba553652b55c",
+          "title": "Linear Equations in Two Variables",
+          "book_id": "6b70f3f6-f00c-5a9c-ac6f-7d253e78503b",
+          "position": 3,
+          "parent_id": null,
+          "questions": 130
+        },
+        {
+          "id": "d1fba589-709f-5945-a3bc-94195dfbdab1",
+          "title": "Systems of Two Linear Equations in Two Variables",
+          "book_id": "6b70f3f6-f00c-5a9c-ac6f-7d253e78503b",
+          "position": 4,
+          "parent_id": null,
+          "questions": 126
+        },
+        {
+          "id": "fefb0f55-1d6f-5b28-ad2b-9a720817e2c0",
+          "title": "Linear Inequalities in One or Two Variables",
+          "book_id": "6b70f3f6-f00c-5a9c-ac6f-7d253e78503b",
+          "position": 5,
+          "parent_id": null,
+          "questions": 78
+        }
+      ]
+    },
+    {
+      "id": "b7486094-9d19-5554-ad1d-ccd168e58309",
+      "title": "HardBook 2.0 — All SAT Hard Math Questions Collection",
+      "category": "Math",
+      "questions": 487,
+      "source_file": "HardBook 2.0.pdf",
+      "slug": "hardbook-2-by-satashkent",
+      "topics": [
+        {
+          "id": "a720c047-8286-5e78-a0b6-51b1d857e540",
+          "title": "Algebra",
+          "book_id": "b7486094-9d19-5554-ad1d-ccd168e58309",
+          "position": 1,
+          "parent_id": null,
+          "questions": 58
+        },
+        {
+          "id": "bcd5981c-d820-539c-a527-93539fcd7471",
+          "title": "Advanced Math",
+          "book_id": "b7486094-9d19-5554-ad1d-ccd168e58309",
+          "position": 2,
+          "parent_id": null,
+          "questions": 180
+        },
+        {
+          "id": "f63c5392-e67a-56ac-a3ca-44d58e0dd4a3",
+          "title": "Geometry",
+          "book_id": "b7486094-9d19-5554-ad1d-ccd168e58309",
+          "position": 3,
+          "parent_id": null,
+          "questions": 140
+        },
+        {
+          "id": "effa78ab-7762-5f5f-aa0b-34c51c6841eb",
+          "title": "Problem Solving and Data Analysis",
+          "book_id": "b7486094-9d19-5554-ad1d-ccd168e58309",
+          "position": 4,
+          "parent_id": null,
+          "questions": 109
+        }
+      ]
+    },
+    {
+      "id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+      "title": "MathBook 2.0 by SATashkent",
+      "category": "Math",
+      "questions": 1462,
+      "source_file": "MathBook 2.0 Ready.pdf",
+      "slug": "mathbook-2-by-satashkent",
+      "topics": [
+        {
+          "id": "7089a57c-3b8b-5683-a550-f10565a605ff",
+          "title": "Algebra",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "868ba932-aa00-5a43-a5de-d5047bf7244b",
+          "title": "Polynomials",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 1,
+          "parent_id": "90894f1c-20c8-5750-ad04-49fa3932785c",
+          "questions": 28
+        },
+        {
+          "id": "9212fccf-8c04-546a-aeb0-20f57a858ab0",
+          "title": "Expressions",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 1,
+          "parent_id": "7089a57c-3b8b-5683-a550-f10565a605ff",
+          "questions": 94
+        },
+        {
+          "id": "bb7c0be7-3ae7-578a-a071-8ef67d577533",
+          "title": "Percent, Ratio & Proportion",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 1,
+          "parent_id": "98a1ddb1-79ff-58ac-aa50-3212e5ec0d59",
+          "questions": 67
+        },
+        {
+          "id": "f8f158d8-8dcb-5a62-a11f-15f4b1e160a1",
+          "title": "Lines and Angles",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 1,
+          "parent_id": "9ef6179a-7b37-5aa5-a16a-f13287868baa",
+          "questions": 38
+        },
+        {
+          "id": "2880c27f-40a0-5f33-a150-471ccbd9b2ea",
+          "title": "Linear Equations",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 2,
+          "parent_id": "7089a57c-3b8b-5683-a550-f10565a605ff",
+          "questions": 118
+        },
+        {
+          "id": "40ab0563-c5a1-5743-a353-6dc3c7956199",
+          "title": "Exponents & Radicals",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 2,
+          "parent_id": "90894f1c-20c8-5750-ad04-49fa3932785c",
+          "questions": 15
+        },
+        {
+          "id": "76f6eb03-4281-549f-ab59-722d51dc1a18",
+          "title": "Unit Conversion",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 2,
+          "parent_id": "98a1ddb1-79ff-58ac-aa50-3212e5ec0d59",
+          "questions": 25
+        },
+        {
+          "id": "8e7f7597-8ca8-540b-a236-bb5c3e5521d2",
+          "title": "Triangles",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 2,
+          "parent_id": "9ef6179a-7b37-5aa5-a16a-f13287868baa",
+          "questions": 64
+        },
+        {
+          "id": "90894f1c-20c8-5750-ad04-49fa3932785c",
+          "title": "Advanced Math",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 2,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "4590d185-bb40-5563-afd8-c6198f11ca5e",
+          "title": "Trigonometry",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 3,
+          "parent_id": "9ef6179a-7b37-5aa5-a16a-f13287868baa",
+          "questions": 24
+        },
+        {
+          "id": "56514cce-9120-5f3b-a1bd-cce9ac81b0c3",
+          "title": "Probability",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 3,
+          "parent_id": "98a1ddb1-79ff-58ac-aa50-3212e5ec0d59",
+          "questions": 19
+        },
+        {
+          "id": "661e0a8f-a93c-5908-aba1-538ee274ae35",
+          "title": "Linear System of Equations",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 3,
+          "parent_id": "7089a57c-3b8b-5683-a550-f10565a605ff",
+          "questions": 86
+        },
+        {
+          "id": "98a1ddb1-79ff-58ac-aa50-3212e5ec0d59",
+          "title": "Problem Solving and Data Analysis",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 3,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "d8a26312-14ba-554c-a346-ed8acd1ba9e7",
+          "title": "Functions & Function Notation",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 3,
+          "parent_id": "90894f1c-20c8-5750-ad04-49fa3932785c",
+          "questions": 73
+        },
+        {
+          "id": "1d578957-3dea-5453-a8be-d82ec66502f9",
+          "title": "Exponential Functions",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 4,
+          "parent_id": "90894f1c-20c8-5750-ad04-49fa3932785c",
+          "questions": 120
+        },
+        {
+          "id": "23c7191b-583a-5092-a24e-6e7461ae646d",
+          "title": "Mean, Median, Mode, Range",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 4,
+          "parent_id": "98a1ddb1-79ff-58ac-aa50-3212e5ec0d59",
+          "questions": 49
+        },
+        {
+          "id": "3ac9abc5-0033-55d1-ac4a-72b28cdf095f",
+          "title": "Circles",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 4,
+          "parent_id": "9ef6179a-7b37-5aa5-a16a-f13287868baa",
+          "questions": 47
+        },
+        {
+          "id": "9ef6179a-7b37-5aa5-a16a-f13287868baa",
+          "title": "Geometry",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 4,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "abf4565f-b461-5546-ab5d-9008849699bd",
+          "title": "Linear Functions",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 4,
+          "parent_id": "7089a57c-3b8b-5683-a550-f10565a605ff",
+          "questions": 240
+        },
+        {
+          "id": "2eeb4107-f150-5282-a13a-a930062ecfe8",
+          "title": "Areas and Volumes",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 5,
+          "parent_id": "9ef6179a-7b37-5aa5-a16a-f13287868baa",
+          "questions": 72
+        },
+        {
+          "id": "8b5ad78a-a915-5c4d-aa9d-ad17e21234b2",
+          "title": "Linear Inequalities",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 5,
+          "parent_id": "7089a57c-3b8b-5683-a550-f10565a605ff",
+          "questions": 56
+        },
+        {
+          "id": "bae24b7d-1801-51c1-a56d-700193d2c39a",
+          "title": "Scatterplots",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 5,
+          "parent_id": "98a1ddb1-79ff-58ac-aa50-3212e5ec0d59",
+          "questions": 27
+        },
+        {
+          "id": "db1e00ce-82cb-55fc-a2cf-bee760b8edd1",
+          "title": "Quadratics",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 5,
+          "parent_id": "90894f1c-20c8-5750-ad04-49fa3932785c",
+          "questions": 187
+        },
+        {
+          "id": "c7021963-9f84-5654-a710-3759be4b2ef3",
+          "title": "Research Organizing",
+          "book_id": "0ba49182-3e96-55ad-a4fa-48cd34813ffe",
+          "position": 6,
+          "parent_id": "98a1ddb1-79ff-58ac-aa50-3212e5ec0d59",
+          "questions": 13
+        }
+      ]
+    },
+    {
+      "id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+      "title": "MathBook 3.0 by SATashkent",
+      "category": "Math",
+      "questions": 414,
+      "source_file": "Mathbook 3.0.pdf",
+      "slug": "mathbook-3-by-satashkent",
+      "topics": [
+        {
+          "id": "3b17f89d-0fad-5203-aa1a-e429f7320863",
+          "title": "Expressions",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 1,
+          "parent_id": "4c4c302e-557a-56c3-a1a9-d55a3b479fd8",
+          "questions": 24
+        },
+        {
+          "id": "4c4c302e-557a-56c3-a1a9-d55a3b479fd8",
+          "title": "Algebra",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "86f1581a-0bce-538d-af02-d29353e37727",
+          "title": "Lines and Angles",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 1,
+          "parent_id": "7bd78e4d-77b8-5c5a-a588-2d6e9d8fe824",
+          "questions": 18
+        },
+        {
+          "id": "a855ef97-e515-5bb0-a944-a9d1c5c48486",
+          "title": "Polynomials",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 1,
+          "parent_id": "f42dcb6f-07d4-5ff0-a04c-beefb661bc87",
+          "questions": 14
+        },
+        {
+          "id": "e4ac66d0-cc34-5e52-af6a-7a4be893dfd0",
+          "title": "Percent, Ratio & Proportion",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 1,
+          "parent_id": "ac128f3d-73d0-541f-a8bd-317de5e81f3f",
+          "questions": 18
+        },
+        {
+          "id": "63f2672f-275d-5401-ac7e-1f0ca8f886ed",
+          "title": "Unit Conversion",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 2,
+          "parent_id": "ac128f3d-73d0-541f-a8bd-317de5e81f3f",
+          "questions": 9
+        },
+        {
+          "id": "83f4a4a4-9e50-54d3-aa84-447b4754e4ba",
+          "title": "Exponents & Radicals",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 2,
+          "parent_id": "f42dcb6f-07d4-5ff0-a04c-beefb661bc87",
+          "questions": 7
+        },
+        {
+          "id": "a3b07413-0e14-502b-ae22-70556d19e9f0",
+          "title": "Triangles",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 2,
+          "parent_id": "7bd78e4d-77b8-5c5a-a588-2d6e9d8fe824",
+          "questions": 11
+        },
+        {
+          "id": "be995c07-483d-5dea-a470-237ea38cb808",
+          "title": "Linear Equations",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 2,
+          "parent_id": "4c4c302e-557a-56c3-a1a9-d55a3b479fd8",
+          "questions": 48
+        },
+        {
+          "id": "f42dcb6f-07d4-5ff0-a04c-beefb661bc87",
+          "title": "Advanced Math",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 2,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "194000d2-a44e-59c7-a3d7-aa337fae271f",
+          "title": "Linear System of Equations",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 3,
+          "parent_id": "4c4c302e-557a-56c3-a1a9-d55a3b479fd8",
+          "questions": 33
+        },
+        {
+          "id": "4d4bced8-9584-5d7a-a2f4-c2a80c3f8d3a",
+          "title": "Functions & Function Notation",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 3,
+          "parent_id": "f42dcb6f-07d4-5ff0-a04c-beefb661bc87",
+          "questions": 23
+        },
+        {
+          "id": "9b384f06-242b-5793-aef6-fdcf2f3dd535",
+          "title": "Probability",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 3,
+          "parent_id": "ac128f3d-73d0-541f-a8bd-317de5e81f3f",
+          "questions": 6
+        },
+        {
+          "id": "a5fa58ea-14ca-5fc1-af8c-0904c4618071",
+          "title": "Trigonometry",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 3,
+          "parent_id": "7bd78e4d-77b8-5c5a-a588-2d6e9d8fe824",
+          "questions": 9
+        },
+        {
+          "id": "ac128f3d-73d0-541f-a8bd-317de5e81f3f",
+          "title": "Problem Solving and Data Analysis",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 3,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "1a02511e-5610-54a1-a9f4-3c1b0c8c51a5",
+          "title": "Circle",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 4,
+          "parent_id": "7bd78e4d-77b8-5c5a-a588-2d6e9d8fe824",
+          "questions": 15
+        },
+        {
+          "id": "60849e85-9220-5583-ae7c-0a0398f12031",
+          "title": "Mean, Median, Mode, Range",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 4,
+          "parent_id": "ac128f3d-73d0-541f-a8bd-317de5e81f3f",
+          "questions": 11
+        },
+        {
+          "id": "7bd78e4d-77b8-5c5a-a588-2d6e9d8fe824",
+          "title": "Geometry",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 4,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "84899fc9-f8c8-5ad1-a71e-5ce40d509a7a",
+          "title": "Linear Functions",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 4,
+          "parent_id": "4c4c302e-557a-56c3-a1a9-d55a3b479fd8",
+          "questions": 32
+        },
+        {
+          "id": "c21c8926-ba3c-538f-aad1-beb33838d7fd",
+          "title": "Exponential Functions",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 4,
+          "parent_id": "f42dcb6f-07d4-5ff0-a04c-beefb661bc87",
+          "questions": 34
+        },
+        {
+          "id": "30aa99a0-f434-55fb-a585-ee5f226b83ac",
+          "title": "Quadratics",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 5,
+          "parent_id": "f42dcb6f-07d4-5ff0-a04c-beefb661bc87",
+          "questions": 43
+        },
+        {
+          "id": "8529588e-978c-5743-a335-eadcf921f99e",
+          "title": "Scatterplots",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 5,
+          "parent_id": "ac128f3d-73d0-541f-a8bd-317de5e81f3f",
+          "questions": 13
+        },
+        {
+          "id": "856c800e-9b62-50cf-aeb9-3067e695ccce",
+          "title": "Linear Inequalities",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 5,
+          "parent_id": "4c4c302e-557a-56c3-a1a9-d55a3b479fd8",
+          "questions": 18
+        },
+        {
+          "id": "a675d9fa-35ea-59a7-ac49-1662c35c2d47",
+          "title": "Area and Volume",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 5,
+          "parent_id": "7bd78e4d-77b8-5c5a-a588-2d6e9d8fe824",
+          "questions": 22
+        },
+        {
+          "id": "97c25d9e-ca38-5df2-a6bd-0f7ffdedc816",
+          "title": "Research Organizing",
+          "book_id": "cc4382b6-17be-5f18-ac96-3f18b3a7a562",
+          "position": 6,
+          "parent_id": "ac128f3d-73d0-541f-a8bd-317de5e81f3f",
+          "questions": 6
+        }
+      ]
+    },
+    {
+      "id": "5b2eb05c-0cfe-5aea-afd6-f065bc3bbf1e",
+      "title": "PrepPros Advanced Math — 2nd Edition",
+      "category": "Math",
+      "questions": 150,
+      "source_file": "PrepProsAdvanced MATH(2ndEdition).pdf",
+      "slug": "preppros-advanced-math-2nd-edition",
+      "topics": [
+        {
+          "id": "4c94d208-7919-5372-ac90-b967a3d9e9dd",
+          "title": "Advanced Math",
+          "book_id": "5b2eb05c-0cfe-5aea-afd6-f065bc3bbf1e",
+          "position": 1,
+          "parent_id": "a9631f94-1cbe-5b0d-ac5d-b3f8483275b8",
+          "questions": 150
+        },
+        {
+          "id": "a9631f94-1cbe-5b0d-ac5d-b3f8483275b8",
+          "title": "Advanced Math — 150 Hard Questions",
+          "book_id": "5b2eb05c-0cfe-5aea-afd6-f065bc3bbf1e",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        }
+      ]
+    },
+    {
+      "id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+      "title": "PrepPros Presents: The Complete Guide to Digital SAT Math",
+      "category": "Math",
+      "questions": 1263,
+      "source_file": "PrepPros Complete Guide Math.pdf",
+      "slug": "preppros-complete-guide-to-digital-sat-math",
+      "topics": [
+        {
+          "id": "0d2326c5-1f94-5c15-a395-56d285f1895c",
+          "title": "Quadratics Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "4ee83e96-64c8-5a96-a9ec-f21d1631718a",
+          "questions": 66
+        },
+        {
+          "id": "18d048e2-fbad-5b5b-ac4a-7c87cc3ac816",
+          "title": "Desmos Hacks Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "d30770a4-f17f-5c3e-a436-9b1b77fe1547",
+          "questions": 15
+        },
+        {
+          "id": "1a8a1425-eef3-5634-ac9a-c53938a7710f",
+          "title": "Coterminal Angles Practice – Part 1",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "1474a009-677c-586a-ae6b-ec270c6015d9",
+          "questions": 16
+        },
+        {
+          "id": "2226944c-3737-52be-ac43-55bfd3ece5da",
+          "title": "Algebra Skills Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "498dec63-25a5-504a-a7e2-9baa2b7ff54e",
+          "questions": 43
+        },
+        {
+          "id": "28fbd197-a0b3-5567-a0c2-0f04eb051edb",
+          "title": "Systems of Equations with Infinite Solutions or No Solution Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "03a962e2-2f85-5209-a461-ed0efd25545c",
+          "questions": 29
+        },
+        {
+          "id": "32f6a0bd-5134-58aa-aec7-4df40983610a",
+          "title": "Circles Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "69540575-67c0-5a1b-a982-f49a8bb2d197",
+          "questions": 31
+        },
+        {
+          "id": "33c616a3-3d1c-5b05-a24e-44c053d1f618",
+          "title": "Exponential Growth and Decay Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "3162b686-e644-5b9b-a9f7-98481e08dabf",
+          "questions": 47
+        },
+        {
+          "id": "3f392f10-6fbf-55dc-a46d-18ba42c1b9bb",
+          "title": "Shifting and Transforming Functions Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "37e194fc-a380-53fb-a59c-96b93aa9c12e",
+          "questions": 27
+        },
+        {
+          "id": "4cd51190-92e8-59b1-a0d0-53a9866a7265",
+          "title": "Mean, Median, Mode and Range Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "e317539b-5407-5642-a80c-076305ca6cd6",
+          "questions": 35
+        },
+        {
+          "id": "5410e280-c585-5fde-a89b-66997b3c5c19",
+          "title": "Backsolving",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "6636a19a-9634-552b-a865-c6bbe4b2df23",
+          "title": "Simple Percentages Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "06f7eff1-80ce-5e48-ab8e-8ea9c972ba3a",
+          "questions": 24
+        },
+        {
+          "id": "69487ae6-8f2b-55f8-aa34-b4f82f6a9997",
+          "title": "“In Terms of” Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "5ab91d65-487d-541d-a542-d4f15a31d89e",
+          "questions": 25
+        },
+        {
+          "id": "72dd0cdd-0839-5897-a093-bb5a94ad4258",
+          "title": "Special Quadratics Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "5edbe033-0576-5b16-a41b-2257bf5cae54",
+          "questions": 19
+        },
+        {
+          "id": "733e58a5-0690-51c5-a92d-e737be92a6d4",
+          "title": "Ratios and Proportions Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "e4ec5d40-6f9f-5eed-ae58-efad5f722433",
+          "questions": 27
+        },
+        {
+          "id": "7b40b3d9-a009-55bb-afc3-599b5a471a13",
+          "title": "Similar Triangles Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "57fc4709-cfa3-50d6-a6ac-17aa152469e0",
+          "questions": 32
+        },
+        {
+          "id": "7bcaf1da-408d-57f8-a0c4-7279c79ac7c7",
+          "title": "Solving for Constants Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "bc033b97-6918-5b02-afa0-22d82590c46d",
+          "questions": 34
+        },
+        {
+          "id": "7ea22882-48a4-5578-a619-b9de0fd548d8",
+          "title": "Angles Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "f18bc0aa-79a7-5f95-ad71-025215afea30",
+          "questions": 23
+        },
+        {
+          "id": "83992a9a-66e0-53f7-abcc-d4a7e647a78f",
+          "title": "Scatter Plots Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "1e6a3485-4240-531c-a7bd-44a91b229836",
+          "questions": 18
+        },
+        {
+          "id": "8d28291b-348a-5d4a-adb1-767b4833f482",
+          "title": "Interpreting Constants Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "b39646b7-cf2d-592a-a215-f3e78fb03b4e",
+          "questions": 24
+        },
+        {
+          "id": "9e2deebb-8582-5379-ac49-32ccc32b40ac",
+          "title": "Arc and Sectors Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "f40593c6-14d4-583f-a370-5456a6cd19a1",
+          "questions": 20
+        },
+        {
+          "id": "a5191dcf-4b80-5712-abbf-7b71d854eca7",
+          "title": "Fractions Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "28ec40f2-a73e-51e9-aa91-d89236d48594",
+          "questions": 45
+        },
+        {
+          "id": "ac1908a8-2307-5725-afd9-7471532c24f2",
+          "title": "Unit Conversion Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "aa1f69d5-c64c-5163-ad7f-009d774ea126",
+          "questions": 27
+        },
+        {
+          "id": "ac7752b0-23b4-5e3f-a170-661132038f46",
+          "title": "Inequalities Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "af1c68fa-f713-5f44-afc4-91f389d0c279",
+          "questions": 30
+        },
+        {
+          "id": "ad075e10-fd76-5310-a997-85eb316a56b5",
+          "title": "Shapes Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "9e005aa9-27a8-5b5c-af18-17bc916e9e8b",
+          "questions": 45
+        },
+        {
+          "id": "c6a340e6-0f84-5d7e-a5dd-269d47d02608",
+          "title": "System of Equations Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "91e0463a-0a27-5128-ae19-fa2bbcd18016",
+          "questions": 43
+        },
+        {
+          "id": "c9e7fe4f-0b12-5bdc-a08c-ae8ceb01eb1c",
+          "title": "Probability Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "b05b4f3a-4009-5df1-a242-26baf1689f2d",
+          "questions": 36
+        },
+        {
+          "id": "caefb50d-d431-50b2-a3e1-f328532dd550",
+          "title": "Backsolving Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "5410e280-c585-5fde-a89b-66997b3c5c19",
+          "questions": 17
+        },
+        {
+          "id": "cc4cf8ef-946a-5f01-a72a-5c50ea2d9648",
+          "title": "Equivalent Questions Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "5d9f26bc-4e62-59c6-a582-1556aca7f534",
+          "questions": 15
+        },
+        {
+          "id": "cde11235-679e-5803-aac3-98251235981c",
+          "title": "Substitution Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "a07fe80e-aa18-5f66-a026-cfe235f928e0",
+          "questions": 18
+        },
+        {
+          "id": "d30a6e34-d306-5d82-aa5c-edba64af2ff1",
+          "title": "Absolute Value Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "16e897a1-b171-5dd9-a150-108f6dbf8599",
+          "questions": 23
+        },
+        {
+          "id": "da515a2b-a6c9-5ecd-a976-bba535e96864",
+          "title": "Lines Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "3a01159b-f27c-5c47-ac4c-8db43a317332",
+          "questions": 49
+        },
+        {
+          "id": "dde06401-afda-5319-a6fb-d2afcd050475",
+          "title": "Word Problems Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "b6e8fb90-b525-54b8-a99b-d8df9fb59dee",
+          "questions": 25
+        },
+        {
+          "id": "df12958d-e1ca-5eec-a390-b0c7585a01ac",
+          "title": "Statistical Analysis Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "f4ea711a-2a19-54c8-ad8f-d71a73d14eff",
+          "questions": 32
+        },
+        {
+          "id": "e5083ae6-f586-5b5d-a394-2efc916bf2ac",
+          "title": "Exponents Exercise",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "63508d78-94bc-5ca4-ae9d-344e1ed9abdb",
+          "questions": 20
+        },
+        {
+          "id": "ecf61f32-0a38-5ef6-ac88-48aabe5f11da",
+          "title": "Functions Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "f98a1218-361a-55e0-afc0-dc2ee018d790",
+          "questions": 55
+        },
+        {
+          "id": "f604df58-8187-5a91-a19f-a7d1aec3a377",
+          "title": "Interpreting Lines Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "e4494813-c403-573d-acdc-232c1bce4fa8",
+          "questions": 32
+        },
+        {
+          "id": "f8f2de43-afd3-5896-a589-929e576b207c",
+          "title": "Extraneous Solutions Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 1,
+          "parent_id": "09fda97a-d22a-5cf9-ac10-2d04878578d5",
+          "questions": 18
+        },
+        {
+          "id": "53e940f0-0c88-5ed7-a9e7-fdc705feeb21",
+          "title": "Percentage Increase and Decrease Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 2,
+          "parent_id": "06f7eff1-80ce-5e48-ab8e-8ea9c972ba3a",
+          "questions": 37
+        },
+        {
+          "id": "7d28f617-8c3f-5de8-a835-53e3a43de3f6",
+          "title": "Roots Exercise",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 2,
+          "parent_id": "63508d78-94bc-5ca4-ae9d-344e1ed9abdb",
+          "questions": 20
+        },
+        {
+          "id": "a07fe80e-aa18-5f66-a026-cfe235f928e0",
+          "title": "Substitution",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 2,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "efa92a5c-776e-52d5-af02-412a93be8ea9",
+          "title": "Coterminal Angles Practice – Part 2",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 2,
+          "parent_id": "1474a009-677c-586a-ae6b-ec270c6015d9",
+          "questions": 14
+        },
+        {
+          "id": "5d9f26bc-4e62-59c6-a582-1556aca7f534",
+          "title": "Equivalent Questions",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 3,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "b87b0486-ea9e-53e6-ad84-b07ce957a565",
+          "title": "Trigonometry Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 3,
+          "parent_id": "1474a009-677c-586a-ae6b-ec270c6015d9",
+          "questions": 58
+        },
+        {
+          "id": "f6e8b793-8b7d-50a9-a38c-335efc653ba2",
+          "title": "Exponents and Roots Practice",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 3,
+          "parent_id": "63508d78-94bc-5ca4-ae9d-344e1ed9abdb",
+          "questions": 49
+        },
+        {
+          "id": "d30770a4-f17f-5c3e-a436-9b1b77fe1547",
+          "title": "Desmos Hacks",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 4,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "498dec63-25a5-504a-a7e2-9baa2b7ff54e",
+          "title": "Algebra Skills",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 5,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "28ec40f2-a73e-51e9-aa91-d89236d48594",
+          "title": "Fractions",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 6,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "5ab91d65-487d-541d-a542-d4f15a31d89e",
+          "title": "“In Terms of”",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 7,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "af1c68fa-f713-5f44-afc4-91f389d0c279",
+          "title": "Inequalities",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 8,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "06f7eff1-80ce-5e48-ab8e-8ea9c972ba3a",
+          "title": "Percentages",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 9,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "63508d78-94bc-5ca4-ae9d-344e1ed9abdb",
+          "title": "Exponents and Roots",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 10,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "4ee83e96-64c8-5a96-a9ec-f21d1631718a",
+          "title": "Quadratics",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 11,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "91e0463a-0a27-5128-ae19-fa2bbcd18016",
+          "title": "Systems of Equations",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 12,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "f98a1218-361a-55e0-afc0-dc2ee018d790",
+          "title": "Functions",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 13,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "f18bc0aa-79a7-5f95-ad71-025215afea30",
+          "title": "Geometry Part 1 – Angles",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 14,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "9e005aa9-27a8-5b5c-af18-17bc916e9e8b",
+          "title": "Geometry Part 2 – Shapes",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 15,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "57fc4709-cfa3-50d6-a6ac-17aa152469e0",
+          "title": "Geometry Part 3 – Similar Shapes and Congruent Triangles",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 16,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "3a01159b-f27c-5c47-ac4c-8db43a317332",
+          "title": "Lines",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 17,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "e4494813-c403-573d-acdc-232c1bce4fa8",
+          "title": "Interpreting Lines",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 18,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "3162b686-e644-5b9b-a9f7-98481e08dabf",
+          "title": "Exponential Growth and Decay",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 19,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "1474a009-677c-586a-ae6b-ec270c6015d9",
+          "title": "Trigonometry",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 20,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "b05b4f3a-4009-5df1-a242-26baf1689f2d",
+          "title": "Probability",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 21,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "f4ea711a-2a19-54c8-ad8f-d71a73d14eff",
+          "title": "Statistical Analysis",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 22,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "e4ec5d40-6f9f-5eed-ae58-efad5f722433",
+          "title": "Ratios and Proportions",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 23,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "e317539b-5407-5642-a80c-076305ca6cd6",
+          "title": "Mean, Median, Mode, and Range",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 24,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "aa1f69d5-c64c-5163-ad7f-009d774ea126",
+          "title": "Unit Conversion",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 25,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "1e6a3485-4240-531c-a7bd-44a91b229836",
+          "title": "Scatter Plots and Lines of Best Fit",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 26,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "69540575-67c0-5a1b-a982-f49a8bb2d197",
+          "title": "Circles",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 27,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "37e194fc-a380-53fb-a59c-96b93aa9c12e",
+          "title": "Shifting and Transforming Functions",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 28,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "16e897a1-b171-5dd9-a150-108f6dbf8599",
+          "title": "Absolute Value",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 29,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "b6e8fb90-b525-54b8-a99b-d8df9fb59dee",
+          "title": "Word Problems",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 30,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "bc033b97-6918-5b02-afa0-22d82590c46d",
+          "title": "Solving for Constants",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 31,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "03a962e2-2f85-5209-a461-ed0efd25545c",
+          "title": "Systems of Equations with Infinite Solutions, No Solution, and One Solution",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 32,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "f40593c6-14d4-583f-a370-5456a6cd19a1",
+          "title": "Arcs and Sectors",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 33,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "09fda97a-d22a-5cf9-ac10-2d04878578d5",
+          "title": "Extraneous Solutions",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 34,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "b39646b7-cf2d-592a-a215-f3e78fb03b4e",
+          "title": "Interpreting Constants in Linear, Quadratic, and Exponential Functions",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 35,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "5edbe033-0576-5b16-a41b-2257bf5cae54",
+          "title": "Special Quadratics – Perfect Squares and Difference of Squares",
+          "book_id": "8c8266b1-ed7b-54d5-a10c-428189c02b7c",
+          "position": 36,
+          "parent_id": null,
+          "questions": 0
+        }
+      ]
+    },
+    {
+      "id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+      "title": "PrepPros SAT Reading Course",
+      "category": "Reading & Writing",
+      "questions": 151,
+      "source_file": "PrepPro Reading (2).pdf",
+      "slug": "preppros-sat-reading-course",
+      "topics": [
+        {
+          "id": "03765a1b-f9b8-545e-ad76-338570b2811a",
+          "title": "Function Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "d08fb7ec-725a-54b4-a859-db0e44f34de2",
+          "questions": 12
+        },
+        {
+          "id": "29e16c2c-92e6-5eae-a5ca-73967f4eaaf6",
+          "title": "Cross Text Connections Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "e1d14c7d-f6bd-5740-a0a8-9a7f265ac6d7",
+          "questions": 19
+        },
+        {
+          "id": "3d27bad7-b1c3-5dbc-a9cc-90d7946424ca",
+          "title": "Claims Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "fd9a1b24-afd5-5824-a7f4-fecb3b7b57c0",
+          "questions": 16
+        },
+        {
+          "id": "551f20ea-2a89-5136-ad2a-bcfa1b071d1b",
+          "title": "Specific Detail Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "5f9d4358-97b1-5be3-adf2-41417a631caa",
+          "questions": 10
+        },
+        {
+          "id": "55241ba8-7542-56f6-ae51-31b5941c90a6",
+          "title": "Introduction to Reading Comprehension Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "0765c3f8-49b8-53fb-a022-e5c29462d385",
+          "questions": 0
+        },
+        {
+          "id": "56da6c6c-105e-54a4-ae2f-95a761b9e69a",
+          "title": "Core Principles & Strategies for SAT Reading Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "4c0c76b7-2a76-5f5a-a597-9b20d83dcbda",
+          "questions": 0
+        },
+        {
+          "id": "7baf9f6f-37df-5887-aa6e-8b5fe5804c47",
+          "title": "Pacing and Time Management Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "269bfc11-1d7c-5c67-ab39-aa7cd10cbdfe",
+          "questions": 0
+        },
+        {
+          "id": "91a5fed7-ce3d-526a-a9a3-9a7583d7609a",
+          "title": "Words in Context",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "92fbd323-6f7e-5170-a2c6-38a01fc9f8f3",
+          "title": "Words in Context Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "91a5fed7-ce3d-526a-a9a3-9a7583d7609a",
+          "questions": 30
+        },
+        {
+          "id": "94b69486-ab93-5547-adfc-5516d9e783a5",
+          "title": "Structure Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "7ba051c6-499b-58ca-a7c3-0195459cdb0a",
+          "questions": 10
+        },
+        {
+          "id": "a0d9fc9c-5287-512d-acf1-f8f0d35d5949",
+          "title": "Vocabulary Words To Memorize Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "e2f08273-60c6-58be-a4a1-0b4e81ab7d75",
+          "questions": 0
+        },
+        {
+          "id": "a3a819d4-d65e-50bb-ac42-05d9cd619dc4",
+          "title": "Purpose Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "31e25a1a-4fa4-58c2-a0dc-143f8d8ff699",
+          "questions": 10
+        },
+        {
+          "id": "a59c7d17-28fb-5b8d-a600-b4c808082445",
+          "title": "Main Idea Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "2e711680-e5b8-544b-a458-6208eea3a9d9",
+          "questions": 12
+        },
+        {
+          "id": "b0c0e3a2-62e9-5fe8-abf1-fc8ee4bfc6ac",
+          "title": "Correct vs. Incorrect Answer Choices Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "ba6af73d-8b67-5e32-a236-e7e5a7d81f0c",
+          "questions": 10
+        },
+        {
+          "id": "b9043585-be24-5bbb-a0e4-78598374523f",
+          "title": "Advanced Tips and Skills to Maximize Your Score Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "ba0e3eb5-783a-5f0a-a5be-340521335b8c",
+          "questions": 0
+        },
+        {
+          "id": "cf0579c0-a44f-5575-a331-f74ac0c3a8eb",
+          "title": "How To Effectively Approach Each Question Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "f1705efe-d212-57ea-af0d-b9b81918caaa",
+          "questions": 0
+        },
+        {
+          "id": "fb0a459b-0003-5b13-ad41-652012b044c2",
+          "title": "Data Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "ee2b667c-5cdb-5723-afa1-9f462aecaf77",
+          "questions": 12
+        },
+        {
+          "id": "fb99ac9f-6e4e-5839-a463-48b257da3846",
+          "title": "Completes The Text Practice",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 1,
+          "parent_id": "f8c0171e-4c42-53c2-a1ad-406d935a9cba",
+          "questions": 10
+        },
+        {
+          "id": "e2f08273-60c6-58be-a4a1-0b4e81ab7d75",
+          "title": "Vocabulary Words To Memorize",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 2,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "0765c3f8-49b8-53fb-a022-e5c29462d385",
+          "title": "Introduction to Reading Comprehension",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 3,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "4c0c76b7-2a76-5f5a-a597-9b20d83dcbda",
+          "title": "Core Principles & Strategies for SAT Reading",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 4,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "ba6af73d-8b67-5e32-a236-e7e5a7d81f0c",
+          "title": "Correct vs. Incorrect Answer Choices",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 5,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "f1705efe-d212-57ea-af0d-b9b81918caaa",
+          "title": "How To Effectively Approach Each Question",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 6,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "5f9d4358-97b1-5be3-adf2-41417a631caa",
+          "title": "Specific Detail",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 7,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "2e711680-e5b8-544b-a458-6208eea3a9d9",
+          "title": "Main Idea",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 8,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "31e25a1a-4fa4-58c2-a0dc-143f8d8ff699",
+          "title": "Purpose",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 9,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "d08fb7ec-725a-54b4-a859-db0e44f34de2",
+          "title": "Function",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 10,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "fd9a1b24-afd5-5824-a7f4-fecb3b7b57c0",
+          "title": "Claims",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 11,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "ee2b667c-5cdb-5723-afa1-9f462aecaf77",
+          "title": "Data",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 12,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "f8c0171e-4c42-53c2-a1ad-406d935a9cba",
+          "title": "Completes The Text",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 13,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "e1d14c7d-f6bd-5740-a0a8-9a7f265ac6d7",
+          "title": "Cross Text Connections",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 14,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "7ba051c6-499b-58ca-a7c3-0195459cdb0a",
+          "title": "Structure",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 15,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "269bfc11-1d7c-5c67-ab39-aa7cd10cbdfe",
+          "title": "Pacing and Time Management",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 16,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "ba0e3eb5-783a-5f0a-a5be-340521335b8c",
+          "title": "Advanced Tips and Skills to Maximize Your Score",
+          "book_id": "ac6a6deb-e790-5e86-ab5a-7813a63c9b8f",
+          "position": 17,
+          "parent_id": null,
+          "questions": 0
+        }
+      ]
+    },
+    {
+      "id": "f5493c07-6723-5f39-abfc-9b50f9eb0a1d",
+      "title": "PROBLEM-SOLVING AND DATA ANALYSIS - Official SAT Question Bank",
+      "category": "Math",
+      "questions": 421,
+      "source_file": "PROBLEM_SOLVING_AND_DATA_ANALYSIS_Official_SAT_Question_Bank_SAT.pdf",
+      "slug": "problem-solving-and-data-analysis-official-sat-question-bank",
+      "topics": [
+        {
+          "id": "aa790238-daf0-5e3e-a7ea-1e35f4204590",
+          "title": "Ratios, Rates, Proportional Relationships, and Units",
+          "book_id": "f5493c07-6723-5f39-abfc-9b50f9eb0a1d",
+          "position": 1,
+          "parent_id": null,
+          "questions": 93
+        },
+        {
+          "id": "3f2b60f4-791f-5af6-aef7-28aa3f7f17b3",
+          "title": "Percentages",
+          "book_id": "f5493c07-6723-5f39-abfc-9b50f9eb0a1d",
+          "position": 2,
+          "parent_id": null,
+          "questions": 84
+        },
+        {
+          "id": "b9d6339a-02d1-59ac-aefa-f79fbf2e330e",
+          "title": "One-Variable Data: Distributions and Measures of Center and Spread",
+          "book_id": "f5493c07-6723-5f39-abfc-9b50f9eb0a1d",
+          "position": 3,
+          "parent_id": null,
+          "questions": 84
+        },
+        {
+          "id": "0cb404d4-fbbe-5af4-a233-cd489ec9a65d",
+          "title": "Two-Variable Data: Models and Scatterplots",
+          "book_id": "f5493c07-6723-5f39-abfc-9b50f9eb0a1d",
+          "position": 4,
+          "parent_id": null,
+          "questions": 71
+        },
+        {
+          "id": "a7ef3d9a-a37d-5db3-a456-6cba661dce1f",
+          "title": "Probability and Conditional Probability",
+          "book_id": "f5493c07-6723-5f39-abfc-9b50f9eb0a1d",
+          "position": 5,
+          "parent_id": null,
+          "questions": 49
+        },
+        {
+          "id": "1e93ae86-f2eb-52ce-a4de-3b846c114900",
+          "title": "Inference from Sample Statistics and Margin of Error",
+          "book_id": "f5493c07-6723-5f39-abfc-9b50f9eb0a1d",
+          "position": 6,
+          "parent_id": null,
+          "questions": 28
+        },
+        {
+          "id": "9f9b2600-f639-5f5a-a3c9-3c16329ee548",
+          "title": "Evaluating Statistical Claims: Observational Studies and Experiments",
+          "book_id": "f5493c07-6723-5f39-abfc-9b50f9eb0a1d",
+          "position": 7,
+          "parent_id": null,
+          "questions": 12
+        }
+      ]
+    },
+    {
+      "id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+      "title": "SATakror — 101 Most Repetitive Questions",
+      "category": "Reading & Writing",
+      "questions": 101,
+      "source_file": "SATakror.pdf",
+      "slug": "satakror-101-most-repetitive-questions",
+      "topics": [
+        {
+          "id": "08c79774-9021-5595-a294-d10f1884c329",
+          "title": "Lunar Intensity",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 1,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 8
+        },
+        {
+          "id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "title": "SATakror Question Bank",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "281bbe25-aec1-592a-ad6b-f696a9ee32f7",
+          "title": "CMN",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 2,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 4
+        },
+        {
+          "id": "a267ecf8-80ab-5a33-a761-0e5dcef07476",
+          "title": "Sermon",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 3,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "95947e1c-79eb-51a5-a5e9-0d3f12c01f4c",
+          "title": "Arthurian Legends",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 4,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 4
+        },
+        {
+          "id": "27cdc62a-e0c6-5143-aa32-4179878fbbc5",
+          "title": "Chimpanzees and Sunlight",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 5,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "ab5c49e6-850f-5011-a021-97877c7ba73a",
+          "title": "Types of Steel",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 6,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "df20977c-f8a6-5d3f-ac3d-16aedf7a0a65",
+          "title": "Ecology in Indigenous songs",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 7,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 5
+        },
+        {
+          "id": "13ca12c8-6467-54af-a328-5a3161367884",
+          "title": "Brand Extension",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 8,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "4bd3fdf4-8cb4-5ed4-ad08-c2b54ac56737",
+          "title": "Dogs Language Detection",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 9,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "bbdca38a-3432-53cf-ac6d-144a4e0a312c",
+          "title": "Invisible Hand",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 10,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "d88bc7ae-5120-58c4-ab31-46558c87619f",
+          "title": "Horizontal Gene Transfer",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 11,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 7
+        },
+        {
+          "id": "296bc5a7-d925-544d-a896-205a9f46e737",
+          "title": "Liberalization",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 12,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "d0b2d749-003a-549c-ae47-5363738064de",
+          "title": "Time-oriented expressions",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 13,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "37ac420a-7509-5da6-a688-d0eb976d2c1c",
+          "title": "Mice and Genes",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 14,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "466eacab-9f1e-59bf-a85e-4fcf8cb4902d",
+          "title": "Laughter",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 15,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "b3d6f137-8fa8-5f4b-ab0e-692b0a89be7b",
+          "title": "Hosts and Parasites",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 16,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "67a9d74c-8f7a-520a-a480-fa8e519480d3",
+          "title": "Historical DNA",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 17,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 5
+        },
+        {
+          "id": "6285522d-cda1-565d-ace9-1301a8f21733",
+          "title": "Nautilids",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 18,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "5aa9e54f-c6c2-5453-abc8-731c916651e4",
+          "title": "The Seine",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 19,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "20f0845c-790e-5e68-a2e4-c77c1624089e",
+          "title": "Representation of Styles",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 20,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "6537f212-303a-5596-aacf-996b198cb9c7",
+          "title": "Convergent Evolution",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 21,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 5
+        },
+        {
+          "id": "555965bf-c77e-55d4-a203-f4ac740c2410",
+          "title": "Plants vs. Respiration",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 22,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "b409617d-2d13-58b6-ae08-bec9f0f13ec4",
+          "title": "Traceability vs. Consistency",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 23,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "71a49bf8-2020-56e9-a6d9-52f09f63e43c",
+          "title": "Environment and Consumers",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 24,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "cc36ec3c-4e49-5a87-aec7-89623e9ee98b",
+          "title": "Neighborhoods and Languages",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 25,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "5a75012b-481d-5e2f-a963-8efb90e95c23",
+          "title": "In The Name of Salome",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 26,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "9ab17177-6b14-5309-adda-488e0dc90970",
+          "title": "Fish and Low-visibility",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 27,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 4
+        },
+        {
+          "id": "c1c8610d-526d-5c3e-a359-da1a7173aba8",
+          "title": "Household Fuel Usage",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 28,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 4
+        },
+        {
+          "id": "cf53b60e-2512-53eb-aeb6-766b4be433b6",
+          "title": "Bioaccumulation of nanoparticles",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 29,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 2
+        },
+        {
+          "id": "18cd171a-17da-5b71-a212-f03d879cfe12",
+          "title": "Ectotherms and Endotherms",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 30,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        },
+        {
+          "id": "f59ca542-5bb5-5704-a37d-8946da97b565",
+          "title": "Magical Realism",
+          "book_id": "04f1a355-807c-572a-a265-17eaa4271f4b",
+          "position": 31,
+          "parent_id": "8fc5cf2a-bae2-58c4-a787-04f34f722f6c",
+          "questions": 3
+        }
+      ]
+    },
+    {
+      "id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+      "title": "SAToplam 2.0 Reading",
+      "category": "Reading & Writing",
+      "questions": 971,
+      "source_file": "SAToplam Reading Book.pdf",
+      "slug": "satoplam-2-reading",
+      "topics": [
+        {
+          "id": "7138516e-13ff-5a81-a6e4-575eb40d5072",
+          "title": "Information and Ideas",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "f346782f-02b2-51f6-a0a2-8bbb3ee4d5e2",
+          "title": "Main Ideas",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 1,
+          "parent_id": "7138516e-13ff-5a81-a6e4-575eb40d5072",
+          "questions": 38
+        },
+        {
+          "id": "781d0daa-fe4f-5cee-a674-23e442078b65",
+          "title": "Details Question",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 2,
+          "parent_id": "7138516e-13ff-5a81-a6e4-575eb40d5072",
+          "questions": 62
+        },
+        {
+          "id": "c0f8cd19-a7f5-5c42-a1cb-190fcb714681",
+          "title": "Craft and Structure",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 2,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "44a1b78a-b580-5fa1-a675-70f972fd89e6",
+          "title": "Inference",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 3,
+          "parent_id": "7138516e-13ff-5a81-a6e4-575eb40d5072",
+          "questions": 149
+        },
+        {
+          "id": "20baf4d5-afa1-5996-a0d8-ebe4f53f6d94",
+          "title": "Command of Evidence - Support",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 4,
+          "parent_id": "7138516e-13ff-5a81-a6e4-575eb40d5072",
+          "questions": 58
+        },
+        {
+          "id": "45097330-dccf-5a35-a1d7-2115b0f06ea2",
+          "title": "Command of Evidence - Weaken",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 5,
+          "parent_id": "7138516e-13ff-5a81-a6e4-575eb40d5072",
+          "questions": 18
+        },
+        {
+          "id": "4f5d6216-ac86-5642-a6f7-9c0c011315dd",
+          "title": "Quotation",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 6,
+          "parent_id": "7138516e-13ff-5a81-a6e4-575eb40d5072",
+          "questions": 72
+        },
+        {
+          "id": "3483f5e8-0d50-5b6a-a663-b2798a1b27b3",
+          "title": "Command of Evidence - Graphs",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 7,
+          "parent_id": "7138516e-13ff-5a81-a6e4-575eb40d5072",
+          "questions": 108
+        },
+        {
+          "id": "f31ad4e4-73a8-5ec1-ae83-ebb06cb80f6a",
+          "title": "Main Purpose",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 8,
+          "parent_id": "c0f8cd19-a7f5-5c42-a1cb-190fcb714681",
+          "questions": 43
+        },
+        {
+          "id": "50d53635-25db-5545-a9eb-7351fbb324d1",
+          "title": "Overall Structure",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 9,
+          "parent_id": "c0f8cd19-a7f5-5c42-a1cb-190fcb714681",
+          "questions": 38
+        },
+        {
+          "id": "96c70d2c-8c7d-57f8-ac2a-e2946d14ef20",
+          "title": "Underlined Purpose",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 10,
+          "parent_id": "c0f8cd19-a7f5-5c42-a1cb-190fcb714681",
+          "questions": 74
+        },
+        {
+          "id": "75c476db-600b-5e8e-a039-cfdc0184cb18",
+          "title": "Cross-Text Connections",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 11,
+          "parent_id": "c0f8cd19-a7f5-5c42-a1cb-190fcb714681",
+          "questions": 37
+        },
+        {
+          "id": "662aae8f-84eb-5576-a3dd-6d4d98fda9f0",
+          "title": "Words in Context - Gap Filling",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 12,
+          "parent_id": "c0f8cd19-a7f5-5c42-a1cb-190fcb714681",
+          "questions": 248
+        },
+        {
+          "id": "50a87869-bbce-5b68-a66e-07217ec5a541",
+          "title": "Words in Context - Synonyms",
+          "book_id": "f7f296b3-5528-5e80-adaa-4466a6d7ae7f",
+          "position": 13,
+          "parent_id": "c0f8cd19-a7f5-5c42-a1cb-190fcb714681",
+          "questions": 26
+        }
+      ]
+    },
+    {
+      "id": "339eaeab-0dee-55a0-ae7b-341d02e70b96",
+      "title": "SAToplam 2.0 Writing",
+      "category": "Reading & Writing",
+      "questions": 846,
+      "source_file": "SAToplam Writing Book.pdf",
+      "slug": "satoplam-2-writing",
+      "topics": [
+        {
+          "id": "1372e64d-584f-57b7-a709-f3c92a9e3bdc",
+          "title": "Boundaries",
+          "book_id": "339eaeab-0dee-55a0-ae7b-341d02e70b96",
+          "position": 1,
+          "parent_id": "78f72d07-cc35-56c0-a1cb-0478d7b9b428",
+          "questions": 251
+        },
+        {
+          "id": "78f72d07-cc35-56c0-a1cb-0478d7b9b428",
+          "title": "Standard English Conventions",
+          "book_id": "339eaeab-0dee-55a0-ae7b-341d02e70b96",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "19f3b178-86ae-59da-a0be-093508314ffd",
+          "title": "Form, Structure, and Sense",
+          "book_id": "339eaeab-0dee-55a0-ae7b-341d02e70b96",
+          "position": 2,
+          "parent_id": "78f72d07-cc35-56c0-a1cb-0478d7b9b428",
+          "questions": 186
+        },
+        {
+          "id": "465f8e5c-bbea-5a9c-a5ed-256615fc3623",
+          "title": "Expression of Ideas",
+          "book_id": "339eaeab-0dee-55a0-ae7b-341d02e70b96",
+          "position": 2,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "13a2d13c-c586-5622-a36f-0cf42309ad84",
+          "title": "Transitions",
+          "book_id": "339eaeab-0dee-55a0-ae7b-341d02e70b96",
+          "position": 3,
+          "parent_id": "465f8e5c-bbea-5a9c-a5ed-256615fc3623",
+          "questions": 203
+        },
+        {
+          "id": "f4178bdd-dec4-5cf5-ad1c-fac6bd9b317b",
+          "title": "Rhetorical Synthesis",
+          "book_id": "339eaeab-0dee-55a0-ae7b-341d02e70b96",
+          "position": 4,
+          "parent_id": "465f8e5c-bbea-5a9c-a5ed-256615fc3623",
+          "questions": 206
+        }
+      ]
+    },
+    {
+      "id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+      "title": "The Critical Reader: The Complete Guide to SAT Reading — Fifth Edition",
+      "category": "Reading & Writing",
+      "questions": 87,
+      "source_file": "Erica-Reading-Digital-SAT.pdf",
+      "slug": "erica-reading",
+      "topics": [
+        {
+          "id": "1aac7ce2-cea2-5537-ae82-3bc2cc50cb65",
+          "title": "Matching Phrases",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 1,
+          "parent_id": "aefe6ea9-d650-5ae1-a266-59b0c65d4c6a",
+          "questions": 14
+        },
+        {
+          "id": "32fac0ad-f8ee-55e1-afb3-4b7395be8070",
+          "title": "Vocabulary in Context",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "6c487253-0988-540e-a1d2-efcd6ae05d84",
+          "title": "Sentence Completions",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 1,
+          "parent_id": "32fac0ad-f8ee-55e1-afb3-4b7395be8070",
+          "questions": 15
+        },
+        {
+          "id": "a018b3f5-1df3-5294-a0f6-f2ffa21b6191",
+          "title": "Supporting and Undermining",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 1,
+          "parent_id": "5f9568e0-027c-5050-a05b-ffc56a4e6197",
+          "questions": 8
+        },
+        {
+          "id": "f7541833-41bf-50f4-aff6-5c90caa5ab18",
+          "title": "Pronouns and Compression Nouns",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 1,
+          "parent_id": "85dc0477-b964-5dc2-a567-155f78736bc6",
+          "questions": 11
+        },
+        {
+          "id": "7cf3f8ec-d83b-5528-a51d-21d77536975c",
+          "title": "Literal Comprehension",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 2,
+          "parent_id": "aefe6ea9-d650-5ae1-a266-59b0c65d4c6a",
+          "questions": 7
+        },
+        {
+          "id": "85dc0477-b964-5dc2-a567-155f78736bc6",
+          "title": "Making the Leap",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 2,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "9ad2e623-1a69-59e6-a783-9f7a6dc43c15",
+          "title": "Meaning in Context",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 2,
+          "parent_id": "32fac0ad-f8ee-55e1-afb3-4b7395be8070",
+          "questions": 6
+        },
+        {
+          "id": "4ffbb12b-1d2a-567c-ac21-079c9369d6f8",
+          "title": "The Big Picture",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 3,
+          "parent_id": null,
+          "questions": 5
+        },
+        {
+          "id": "aefe6ea9-d650-5ae1-a266-59b0c65d4c6a",
+          "title": "Literal Comprehension",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 4,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "158e9810-adce-5e5d-a2bd-62a59d2200c4",
+          "title": "Reading for Function",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 5,
+          "parent_id": null,
+          "questions": 7
+        },
+        {
+          "id": "88b5c45a-3c84-501d-ab08-39c90c9a3408",
+          "title": "Text Completions",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 6,
+          "parent_id": null,
+          "questions": 6
+        },
+        {
+          "id": "5f9568e0-027c-5050-a05b-ffc56a4e6197",
+          "title": "Supporting & Undermining",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 7,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "99bd7ae0-6b9a-553b-a55a-3c4b772994e2",
+          "title": "Graphs and Charts",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 8,
+          "parent_id": null,
+          "questions": 4
+        },
+        {
+          "id": "2c8c6aeb-df6a-5907-ad1a-030441946eb8",
+          "title": "Paired Passages",
+          "book_id": "d42d1db5-0ce4-592f-a6c2-50ada5fb92fa",
+          "position": 9,
+          "parent_id": null,
+          "questions": 4
+        }
+      ]
+    },
+    {
+      "id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+      "title": "The Ultimate Guide to SAT Grammar — Sixth Edition",
+      "category": "Reading & Writing",
+      "questions": 272,
+      "source_file": "Erica writing book.pdf",
+      "slug": "erica-writing",
+      "topics": [
+        {
+          "id": "05db2f93-f3c2-5971-a63c-a61ea63173d6",
+          "title": "Transitions",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 1,
+          "parent_id": "32e7e72a-1e77-57a3-a3c3-a79ed862cd60",
+          "questions": 20
+        },
+        {
+          "id": "32e7e72a-1e77-57a3-a3c3-a79ed862cd60",
+          "title": "Non-Grammar Questions",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 1,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "624b6a1d-d2ce-5920-a6ef-efe5177423ef",
+          "title": "Verbs: Agreement and Tense",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 1,
+          "parent_id": "b4fcebb9-9b7d-5c41-a729-88cd3d3d23df",
+          "questions": 24
+        },
+        {
+          "id": "a23fb069-1f8d-5b77-ab84-afc8cc13a8f6",
+          "title": "Parts of Speech",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 1,
+          "parent_id": "e892f8d8-5dfc-5c2c-a71d-b87434b3359d",
+          "questions": 8
+        },
+        {
+          "id": "a3488f10-935c-539d-a37a-8829314326e6",
+          "title": "Practice Set 1",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 1,
+          "parent_id": "33de856b-a834-5bf1-ad94-40857b8086f0",
+          "questions": 10
+        },
+        {
+          "id": "0b048763-93a9-5a02-a441-ad14fec9139e",
+          "title": "Sentences and Fragments",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 2,
+          "parent_id": "e892f8d8-5dfc-5c2c-a71d-b87434b3359d",
+          "questions": 33
+        },
+        {
+          "id": "0bf77d5a-bbb7-573c-a584-bcaf080f8ace",
+          "title": "Specific Focus (Student Notes)",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 2,
+          "parent_id": "32e7e72a-1e77-57a3-a3c3-a79ed862cd60",
+          "questions": 5
+        },
+        {
+          "id": "56a39b57-c402-55e5-a780-7100dffbf9a9",
+          "title": "Pronouns",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 2,
+          "parent_id": "b4fcebb9-9b7d-5c41-a729-88cd3d3d23df",
+          "questions": 10
+        },
+        {
+          "id": "d484862c-b952-59d1-a26e-f825d2c7482d",
+          "title": "Practice Set 2",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 2,
+          "parent_id": "33de856b-a834-5bf1-ad94-40857b8086f0",
+          "questions": 10
+        },
+        {
+          "id": "e892f8d8-5dfc-5c2c-a71d-b87434b3359d",
+          "title": "Punctuation",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 2,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "96e724d5-6bb0-5e49-a3e8-561559be87f0",
+          "title": "Apostrophes",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 3,
+          "parent_id": "b4fcebb9-9b7d-5c41-a729-88cd3d3d23df",
+          "questions": 6
+        },
+        {
+          "id": "9f7ceeda-f69e-5284-a15a-b75d0c9040fc",
+          "title": "Practice Set 3",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 3,
+          "parent_id": "33de856b-a834-5bf1-ad94-40857b8086f0",
+          "questions": 10
+        },
+        {
+          "id": "b4fcebb9-9b7d-5c41-a729-88cd3d3d23df",
+          "title": "Grammar",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 3,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "b9b9d99a-67cc-5cba-a6c0-c95840eb6e5e",
+          "title": "Joining and Separating Sentences",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 3,
+          "parent_id": "e892f8d8-5dfc-5c2c-a71d-b87434b3359d",
+          "questions": 15
+        },
+        {
+          "id": "1bf61ab8-3d4d-558f-a5dc-434ebe339f6a",
+          "title": "Modification",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 4,
+          "parent_id": "b4fcebb9-9b7d-5c41-a729-88cd3d3d23df",
+          "questions": 6
+        },
+        {
+          "id": "33de856b-a834-5bf1-ad94-40857b8086f0",
+          "title": "Practice Sets",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 4,
+          "parent_id": null,
+          "questions": 0
+        },
+        {
+          "id": "a0b35770-2d84-5f65-ad64-1d7cebf499f7",
+          "title": "Joining Sentences and Fragments",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 4,
+          "parent_id": "e892f8d8-5dfc-5c2c-a71d-b87434b3359d",
+          "questions": 15
+        },
+        {
+          "id": "c4437758-823c-57e4-af3e-db5d10209ef2",
+          "title": "Practice Set 4",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 4,
+          "parent_id": "33de856b-a834-5bf1-ad94-40857b8086f0",
+          "questions": 10
+        },
+        {
+          "id": "5b1939fe-f495-522a-a8aa-fc360f964293",
+          "title": "Practice Set 5",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 5,
+          "parent_id": "33de856b-a834-5bf1-ad94-40857b8086f0",
+          "questions": 10
+        },
+        {
+          "id": "ab2cc572-0182-5b98-af1e-6b36d6d4b743",
+          "title": "Non-Essential & Essential Clauses",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 5,
+          "parent_id": "e892f8d8-5dfc-5c2c-a71d-b87434b3359d",
+          "questions": 34
+        },
+        {
+          "id": "f0e03b17-563e-5a42-a214-544959f5db8c",
+          "title": "Parallel Structure",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 5,
+          "parent_id": "b4fcebb9-9b7d-5c41-a729-88cd3d3d23df",
+          "questions": 5
+        },
+        {
+          "id": "4836810d-20e3-5339-ac02-5e85fc0c22a8",
+          "title": "Additional Comma Uses and Misuses",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 6,
+          "parent_id": "e892f8d8-5dfc-5c2c-a71d-b87434b3359d",
+          "questions": 6
+        },
+        {
+          "id": "9250e37d-9611-5f7a-a2a4-b2bb8d6ec412",
+          "title": "Cumulative Review: Grammar",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 6,
+          "parent_id": "b4fcebb9-9b7d-5c41-a729-88cd3d3d23df",
+          "questions": 15
+        },
+        {
+          "id": "bc976d6e-bad5-557a-ad9f-035761491f4a",
+          "title": "Cumulative Review: Punctuation and Transitions",
+          "book_id": "a4ff46b8-f3ac-56e1-a3b7-0b44e834c5cb",
+          "position": 7,
+          "parent_id": "e892f8d8-5dfc-5c2c-a71d-b87434b3359d",
+          "questions": 20
+        }
+      ]
+    }
+  ]
+}

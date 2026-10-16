@@ -39,10 +39,19 @@ export async function getBookCatalog(page = 0, search = "") {
     throw new Error(
       "Could not load books. Check your connection and try again.",
     );
+  const progress = data.length
+    ? await checked(
+        supabase.rpc("learning_book_progress", {
+          p_books: data.map((b) => b.id),
+        }),
+      )
+    : [];
+  const progressByBook = new Map(progress.map((p) => [p.book_id, p]));
   return {
     books: await resolveCovers(
       data.map((book) => ({
         ...book,
+        progress: progressByBook.get(book.id) || null,
         ...(Array.isArray(book.book_topics)
           ? {
               topic_count: book.book_topics.length,
@@ -88,20 +97,29 @@ export async function getBook(id) {
 }
 export async function getTopics(book) {
   const [topics, progress] = await Promise.all([
-    checked(
-      supabase
-        .from("book_topics")
-        .select("*,questions(count)")
-        .eq("book_id", book)
-        .order("position")
-        .order("id"),
-    ),
+    getTopicRows(book),
     checked(supabase.rpc("book_practice_progress", { p_book: book })),
   ]);
   return topics.map((t) => ({
     ...t,
     progress: progress.find((p) => p.topic_id === t.id),
   }));
+}
+async function getTopicRows(book) {
+  const rows = [];
+  for (let offset = 0; ; offset += 500) {
+    const page = await checked(
+      supabase
+        .from("book_topics")
+        .select("*,questions(count)")
+        .eq("book_id", book)
+        .order("position")
+        .order("id")
+        .range(offset, offset + 499),
+    );
+    rows.push(...page);
+    if (page.length < 500) return rows;
+  }
 }
 export async function saveBook(values, id) {
   const payload = bookSavePayload(values);
@@ -218,10 +236,12 @@ export async function getPractice(id) {
     );
   }
   let review = [];
+  let statistics = null;
   if (session.submitted_at)
-    review = await checked(
-      supabase.rpc("review_book_practice", { p_session_id: id }),
-    );
+    [review, statistics] = await Promise.all([
+      checked(supabase.rpc("review_book_practice", { p_session_id: id })),
+      checked(supabase.rpc("practice_session_statistics", { p_session: id })),
+    ]);
   if (
     ["book", "bank", "homework"].includes(session.kind) &&
     session.submitted_at &&
@@ -264,6 +284,7 @@ export async function getPractice(id) {
   }
   return {
     session,
+    statistics,
     items: items.map((i) => ({
       ...i,
       attempts: attemptsByItem.get(i.id) || [],
