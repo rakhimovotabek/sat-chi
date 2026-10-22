@@ -1,5 +1,73 @@
 # Netlify and Vercel authentication release
 
+## Follow-up: actual deployed frontend traced
+
+The subsequent unblock investigation captured **the current production frontend's
+own request**, by opening each site's landing page, following its Sign In link,
+clicking Continue with Google and intercepting the outgoing authorize navigation.
+No frontend replacement or simulated application code was used:
+
+| Starting website              | Actual deployed `redirect_to`               | PKCE                    |
+| ----------------------------- | ------------------------------------------- | ----------------------- |
+| `https://satchi.vercel.app`   | `https://satchi.vercel.app/auth/callback`   | S256, challenge present |
+| `https://sat-chi.netlify.app` | `https://sat-chi.netlify.app/auth/callback` | S256, challenge present |
+
+The old deployed frontend therefore already chooses its own origin. The local
+`deaf38e` implementation preserves these callback destinations and adds explicit
+origin restrictions plus the missing Vercel SPA rewrite. Deploying that frontend
+cannot by itself change the callback Supabase has already selected.
+
+A second browser trace forwarded the frontend's **actual** authorize request to
+Supabase, obtained Google's authorization URL, and returned a controlled
+`access_denied` cancellation with its state. It inspected Supabase's 302 **before
+loading either application's callback page**. This is a routing probe, not a
+claim that a Google account authenticated:
+
+| Requested return URL                                          | Supabase's actual 302 destination              |
+| ------------------------------------------------------------- | ---------------------------------------------- |
+| `https://satchi.vercel.app/auth/callback`                     | `https://sat-chi.netlify.app/`                 |
+| `https://sat-chi.netlify.app/auth/callback`                   | `https://sat-chi.netlify.app/auth/callback`    |
+| `https://satchi.vercel.app/login`                             | `https://sat-chi.netlify.app/`                 |
+| `https://sat-chi-rahimov-production.vercel.app/auth/callback` | Same requested older alias and path            |
+| `https://untrusted.example/auth/callback`                     | `https://sat-chi.netlify.app/` (safe fallback) |
+
+Fresh management configuration readbacks contain both requested public-production
+callbacks exactly, with ASCII spelling and no string mismatch. The older alias
+is admitted by its previously existing rule, while the newly saved public Vercel
+URLs are not admitted by the effective Auth behavior. **The observed redirect root
+cause is Supabase's stored/effective allowlist mismatch and Site URL fallback at
+authorization, before frontend callback navigation.** The current frontend's
+request and post-callback navigation do not cause the observed host change.
+
+The management health endpoint reports Auth `ACTIVE_HEALTHY`, GoTrue v2.197.0.
+A targeted two-hour query of Auth configuration/reload logs returned no matching
+records; this does not prove a reload happened. HTTP 544 means a project API
+gateway timeout according to [Supabase's status-code explanation](https://github.com/orgs/supabase/discussions/33288).
+The underlying reason the saved configuration was not made effective remains
+unverified; a healthy service/readback alone cannot establish successful config
+synchronization. No failed synchronization request was repeated in this follow-up.
+
+Publication remains blocked under the user's instruction to stop for an actual
+production-critical authentication issue. No new deployment, GitHub push,
+migration, database backup, service restart, account/session mutation or test
+Homework/practice record was made during this investigation. Existing normal
+access remains `compatible`; signup stays enabled. No provider credentials,
+Site URL, allowlist, security restrictions or copyrighted content were changed.
+
+The bounded evidence is retained privately (no tokens or question content in
+these summary files) under the existing release directory:
+
+- `current-frontend-oauth.json`
+- `browser-oauth-server-trace.json`
+- `effective-allowlist-probes.json`
+
+The previously tested application release remains `deaf38e`, including the
+permission-safe bank selector from `97a429c`. The stored/effective Auth mismatch
+must be resolved before the coordinated frontend publication and actual Google,
+email, recovery, practice, Homework and progress verification can be completed.
+
+## Earlier release preparation and stop
+
 **BLOCKED before GitHub push or hosting publication.** Prepared application commit:
 `deaf38e09c59e05db4e864b99b2174b49a16a728`. The permission-safe source selector is
 included in its ancestor `97a429c`.
