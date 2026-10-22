@@ -24,6 +24,16 @@ Commands:
 
 Components use two-space indentation and PascalCase names. ESLint and Prettier are project-local: run `npm run lint`, `npm run format`, or the scoped `npm run format:check`. Browser verification uses `npm run test:e2e`; the complete unit/database suite uses `npm test`.
 
+The Question Bank has separate **SAT'chi Bank** and **College Board** source controls.
+College Board currently provides public classification filters and an official-site
+link; local practice remains disabled until appropriately authorized content is
+available. No Desktop PDF question content is bundled. See the
+[PDF/source verification report](docs/college-board-integration.md) and
+[authorized-import architecture](docs/authorized-question-bank-architecture.md).
+Run the new preflight tests with `node --test tests/authorized-question-bank.test.js`
+and the source UI tests with
+`npx playwright test tests/browser/question-bank-sources.spec.js --workers=1`.
+
 ## Isolated platform review
 
 `npm run dev:platform` starts disposable PostgreSQL 17, PostgREST and real Supabase Auth, then prints the exact loopback app URL and local recovery-email inbox. It seeds public book hierarchy/counts with labeled synthetic questions and test accounts; it never loads hosted credentials. Reloads and fresh login persist within the running process; restarting recreates the disposable data.

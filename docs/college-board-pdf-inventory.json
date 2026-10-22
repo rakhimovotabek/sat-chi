@@ -1,0 +1,191 @@
+{
+  "method": "Read-only metadata, SHA-256 and sampled structural-label checks; no question content emitted.",
+  "files": [
+    {
+      "requested": "math.pdf",
+      "path": "/home/otabek/Desktop/math.pdf",
+      "status": "FOUND",
+      "bytes": 166524481,
+      "sha256": "cb7f299a9701904f9f1113fe0f90c9d9f1050f915bf0fa8d1474da9790faaeb0",
+      "pdf_signature": true,
+      "valid_pdf": true,
+      "metadata": {
+        "Custom Metadata": "no",
+        "Metadata Stream": "no",
+        "Tagged": "no",
+        "UserProperties": "no",
+        "Suspects": "no",
+        "Form": "none",
+        "JavaScript": "no",
+        "Pages": "2030",
+        "Encrypted": "no",
+        "Page size": "612 x 792 pts (letter)",
+        "Page rot": "0",
+        "File size": "166524481 bytes",
+        "Optimized": "no",
+        "PDF version": "1.4"
+      },
+      "sampled_pages": [
+        {
+          "page": 1,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": true,
+            "Reading and Writing": false,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        },
+        {
+          "page": 2,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": true,
+            "Reading and Writing": false,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        },
+        {
+          "page": 1015,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": true,
+            "Reading and Writing": false,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        },
+        {
+          "page": 2029,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": true,
+            "Reading and Writing": false,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        },
+        {
+          "page": 2030,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": true,
+            "Reading and Writing": false,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        }
+      ],
+      "limitations": "Sampled structural labels only; provenance, unique question totals, completeness and permissions are not established."
+    },
+    {
+      "requested": "english.pdf",
+      "path": "/home/otabek/Desktop/english.pdf",
+      "status": "FOUND",
+      "bytes": 108040852,
+      "sha256": "e4239714f66699afd1458d80657e9d58025ce936e5d8f29443b813ce3779f8f8",
+      "pdf_signature": true,
+      "valid_pdf": true,
+      "metadata": {
+        "Custom Metadata": "no",
+        "Metadata Stream": "no",
+        "Tagged": "no",
+        "UserProperties": "no",
+        "Suspects": "no",
+        "Form": "none",
+        "JavaScript": "no",
+        "Pages": "1977",
+        "Encrypted": "no",
+        "Page size": "612 x 792 pts (letter)",
+        "Page rot": "0",
+        "File size": "108040852 bytes",
+        "Optimized": "no",
+        "PDF version": "1.4"
+      },
+      "sampled_pages": [
+        {
+          "page": 1,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": false,
+            "Reading and Writing": true,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        },
+        {
+          "page": 2,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": false,
+            "Reading and Writing": true,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        },
+        {
+          "page": 988,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": false,
+            "Reading and Writing": true,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        },
+        {
+          "page": 1976,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": false,
+            "Reading and Writing": true,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        },
+        {
+          "page": 1977,
+          "labels": {
+            "Question ID": true,
+            "Assessment": true,
+            "SAT": true,
+            "Math": false,
+            "Reading and Writing": true,
+            "Correct Answer": true,
+            "Rationale": true,
+            "Difficulty": true
+          }
+        }
+      ],
+      "limitations": "Sampled structural labels only; provenance, unique question totals, completeness and permissions are not established."
+    }
+  ]
+}

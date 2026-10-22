@@ -15,6 +15,11 @@ import {
 } from "./bank-selection.js";
 import useAction from "./useAction.js";
 import { bank, bankFacets, startBank } from "./api.js";
+import "./question-bank-sources.css";
+import {
+  COLLEGE_BOARD_TAXONOMY,
+  COLLEGE_BOARD_URL,
+} from "./college-board-taxonomy.js";
 function readConfiguration(key) {
   try {
     const v = JSON.parse(sessionStorage.getItem(key));
@@ -24,14 +29,83 @@ function readConfiguration(key) {
   }
 }
 export default function QuestionBank({ admin = false }) {
+  const { profile } = useAuth();
+  const location = useLocation();
+  const sourceKey = `satchi.bank.${profile.id}.source`;
+  const [source, setSource] = useState(() => {
+    try {
+      return !location.state?.preset &&
+        sessionStorage.getItem(sourceKey) === "college-board"
+        ? "college-board"
+        : "satchi";
+    } catch {
+      return "satchi";
+    }
+  });
+  // Retain each visited workspace, including filters, disclosures and pagination.
+  // College Board never queries the SAT'chi dataset or mounts a practice player.
+  const [visited, setVisited] = useState(() => new Set([source]));
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(sourceKey, source);
+    } catch {
+      /* Source selection still works when storage is unavailable. */
+    }
+  }, [sourceKey, source]);
+  return (
+    <>
+      <PageHeader
+        title="Question Bank"
+        description="Choose what to work on. Build a session around your goals."
+      />
+      <div
+        className="segmented-control bank-source-selector"
+        role="group"
+        aria-label="Question bank source"
+      >
+        {[
+          ["satchi", "SAT'chi Bank"],
+          ["college-board", "College Board"],
+        ].map(([value, label]) => (
+          <button
+            type="button"
+            key={value}
+            aria-pressed={source === value}
+            aria-controls={`bank-source-${value}`}
+            onClick={() => {
+              setVisited((previous) => new Set([...previous, value]));
+              setSource(value);
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {["satchi", "college-board"]
+        .filter((value) => visited.has(value))
+        .map((value) => (
+          <div
+            key={`${profile.id}.${value}`}
+            id={`bank-source-${value}`}
+            hidden={source !== value}
+          >
+            <BankWorkspace admin={admin} source={value} />
+          </div>
+        ))}
+    </>
+  );
+}
+
+function BankWorkspace({ admin, source }) {
+  const collegeBoard = source === "college-board";
   const location = useLocation();
   const { profile } = useAuth(),
-    key = `satchi.bank.${profile.id}`;
+    key = `satchi.bank.${profile.id}${collegeBoard ? ".college-board" : ""}`;
   const [saved] = useState(() => readConfiguration(key));
   const [filters, setFilters] = useState({
       ...saved.filters,
       section: saved.filters?.section || "Math",
-      ...location.state?.preset,
+      ...(!collegeBoard ? location.state?.preset : {}),
     }),
     [page, setPage] = useState(0),
     [expanded, setExpanded] = useState([]),
@@ -52,28 +126,53 @@ export default function QuestionBank({ admin = false }) {
   };
   const field = (name, value) => change({ ...filters, [name]: value });
   const state = useContent(
-    () => bank(filters, page),
+    () =>
+      collegeBoard
+        ? Promise.resolve({ count: null, rows: [] })
+        : bank(filters, page),
     [JSON.stringify(filters), page],
   );
   const facetFilters = { ...filters };
   delete facetFilters.domains;
   delete facetFilters.skills;
   const facets = useContent(
-    () => bankFacets(facetFilters),
+    () => (collegeBoard ? Promise.resolve([]) : bankFacets(facetFilters)),
     [JSON.stringify(facetFilters)],
   );
   const rows = facets.data || [];
-  const standards = filters.section
-    ? [...(DOMAINS[filters.section] || []), OTHER_DOMAINS[filters.section]]
-    : [...Object.values(DOMAINS).flat(), ...Object.values(OTHER_DOMAINS)];
+  const taxonomy = COLLEGE_BOARD_TAXONOMY[filters.section] || {};
+  const standards = collegeBoard
+    ? Object.keys(taxonomy)
+    : filters.section
+      ? [...(DOMAINS[filters.section] || []), OTHER_DOMAINS[filters.section]]
+      : [...Object.values(DOMAINS).flat(), ...Object.values(OTHER_DOMAINS)];
   const domains = [...new Set([...standards, ...rows.map((r) => r.domain)])];
   const matching = state.data?.count ?? 0;
   return (
     <>
-      <PageHeader
-        title="Question Bank"
-        description="Choose what to work on. Build a session around your goals."
-      />
+      {collegeBoard && (
+        <aside
+          className="bank-source-notice"
+          aria-label="College Board availability"
+        >
+          <div>
+            <h2>Practice with College Board</h2>
+            <p>
+              Explore SAT domains and skills below. Local practice will be
+              available when an authorized dataset is ready. Question counts are
+              not available.
+            </p>
+          </div>
+          <a
+            className="button button-secondary"
+            href={COLLEGE_BOARD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open official Question Bank <span aria-hidden="true">↗</span>
+          </a>
+        </aside>
+      )}
       <section className="bank-workspace" aria-label="Practice configuration">
         <div className="bank-columns">
           <section className="bank-domains" aria-label="Domain selection">
@@ -84,7 +183,7 @@ export default function QuestionBank({ admin = false }) {
                 aria-label="Matching question count"
                 aria-busy={state.loading}
               >
-                {state.loading ? "…" : matching}
+                {collegeBoard ? "Unavailable" : state.loading ? "…" : matching}
               </span>
             </div>
             <div
@@ -131,15 +230,15 @@ export default function QuestionBank({ admin = false }) {
               {domains.map((domain, index) => {
                 const items = rows.filter((r) => r.domain === domain);
                 const total = items.reduce((n, r) => n + r.count, 0);
-                const skills = [
-                  ...new Set(items.map((r) => r.skill).filter(Boolean)),
-                ];
+                const skills = collegeBoard
+                  ? taxonomy[domain] || []
+                  : [...new Set(items.map((r) => r.skill).filter(Boolean))];
                 const whole = (filters.domains || []).includes(domain);
                 const partial = (filters.skills || []).some(
                   (s) => s.domain === domain,
                 );
                 const open = expanded.includes(domain),
-                  id = `bank-skills-${index}`;
+                  id = `bank-skills-${source}-${index}`;
                 return (
                   <div
                     key={domain}
@@ -157,7 +256,7 @@ export default function QuestionBank({ admin = false }) {
                         />
                         <span>{domain || "Unclassified domain"}</span>
                         <span className="bank-count">
-                          {facets.loading ? "…" : total}
+                          {collegeBoard ? "—" : facets.loading ? "…" : total}
                         </span>
                       </label>
                       <button
@@ -197,11 +296,13 @@ export default function QuestionBank({ admin = false }) {
                             />
                             <span>{skill}</span>
                             <span className="bank-count">
-                              {facets.loading
-                                ? "…"
-                                : items
-                                    .filter((s) => s.skill === skill)
-                                    .reduce((n, s) => n + s.count, 0)}
+                              {collegeBoard
+                                ? "—"
+                                : facets.loading
+                                  ? "…"
+                                  : items
+                                      .filter((s) => s.skill === skill)
+                                      .reduce((n, s) => n + s.count, 0)}
                             </span>
                           </label>
                         ))
@@ -232,11 +333,11 @@ export default function QuestionBank({ admin = false }) {
               </button>
             </div>
             <div className="difficulty-filter">
-              <span id="difficulty-label">Difficulty</span>
+              <span id={`difficulty-label-${source}`}>Difficulty</span>
               <div
                 className="difficulty-options"
                 role="group"
-                aria-labelledby="difficulty-label"
+                aria-labelledby={`difficulty-label-${source}`}
               >
                 <button
                   type="button"
@@ -253,7 +354,10 @@ export default function QuestionBank({ admin = false }) {
                 >
                   Any difficulty
                 </button>
-                {["easy", "medium", "hard", "unclassified"].map((v) => (
+                {(collegeBoard
+                  ? ["easy", "medium", "hard"]
+                  : ["easy", "medium", "hard", "unclassified"]
+                ).map((v) => (
                   <button
                     type="button"
                     key={v}
@@ -269,15 +373,27 @@ export default function QuestionBank({ admin = false }) {
                 ))}
               </div>
             </div>
-            <BookSelect
-              label="Book / source"
-              emptyLabel="All books"
-              value={filters.book}
-              onChange={(book) => change({ ...filters, book, topic: "" })}
-            />
+            {collegeBoard ? (
+              <div className="bank-source-details">
+                <span>Question source</span>
+                <strong>College Board · SAT</strong>
+                <p className="bank-hint">
+                  Official classification. No questions have been imported into
+                  this source.
+                </p>
+              </div>
+            ) : (
+              <BookSelect
+                label="Book / source"
+                emptyLabel="All books"
+                value={filters.book}
+                onChange={(book) => change({ ...filters, book, topic: "" })}
+              />
+            )}
             <label>
               Previous practice
               <select
+                disabled={collegeBoard}
                 aria-label="Previous practice"
                 value={filters.status || ""}
                 onChange={(e) => field("status", e.target.value)}
@@ -293,6 +409,7 @@ export default function QuestionBank({ admin = false }) {
             <label>
               Marked for review
               <select
+                disabled={collegeBoard}
                 aria-label="Marked for review"
                 value={filters.marked || ""}
                 onChange={(e) => field("marked", e.target.value)}
@@ -303,8 +420,9 @@ export default function QuestionBank({ admin = false }) {
               </select>
             </label>
             <p className="bank-hint">
-              History and review marks come from your own practice. Domain
-              counts follow these filters.
+              {collegeBoard
+                ? "Practice history and review marks will be available with authorized local practice. Your SAT'chi history stays with SAT'chi Bank."
+                : "History and review marks come from your own practice. Domain counts follow these filters."}
             </p>
           </section>
         </div>
@@ -344,9 +462,11 @@ export default function QuestionBank({ admin = false }) {
           </div>
           <div className="bank-start">
             <h2 aria-live="polite">
-              {state.loading
-                ? "Updating matches…"
-                : `${matching} questions match`}
+              {collegeBoard
+                ? "Local practice unavailable"
+                : state.loading
+                  ? "Updating matches…"
+                  : `${matching} questions match`}
             </h2>
             {count === "all" && matching > 500 && (
               <small>500 questions per session</small>
@@ -354,9 +474,17 @@ export default function QuestionBank({ admin = false }) {
             <button
               className="button"
               disabled={
-                action.busy || state.loading || !!state.error || !matching
+                collegeBoard ||
+                action.busy ||
+                state.loading ||
+                !!state.error ||
+                !matching
+              }
+              aria-describedby={
+                collegeBoard ? "college-board-practice-reason" : undefined
               }
               onClick={() =>
+                !collegeBoard &&
                 action.run(async () =>
                   navigate(
                     `${admin ? "/admin" : ""}/practice/${await startBank(filters, Math.min(matching, count === "all" ? 500 : Number(count)), timed)}`,
@@ -366,6 +494,11 @@ export default function QuestionBank({ admin = false }) {
             >
               Start Practice Session
             </button>
+            {collegeBoard && (
+              <small id="college-board-practice-reason">
+                Awaiting authorized question content
+              </small>
+            )}
           </div>
         </footer>
       </section>
@@ -375,77 +508,82 @@ export default function QuestionBank({ admin = false }) {
           {action.error}
         </p>
       )}
-      <section className="bank-preview" aria-busy={state.loading}>
-        <div className="bank-section-heading">
-          <h2>Matching questions</h2>
-          <span className="bank-hint">Preview · answers stay hidden</span>
-        </div>
-        {!state.loading && !state.error && !matching && (
-          <div className="empty-state">
-            <h3>No matching questions</h3>
-            <p>Try broader filters or clear your domain selection.</p>
+      {!collegeBoard && (
+        <section className="bank-preview" aria-busy={state.loading}>
+          <div className="bank-section-heading">
+            <h2>Matching questions</h2>
+            <span className="bank-hint">Preview · answers stay hidden</span>
           </div>
-        )}
-        {!!matching && (
-          <>
-            <div className="table-scroll">
-              <table className="students-table">
-                <thead>
-                  <tr>
-                    <th>Question</th>
-                    <th>Domain / skill</th>
-                    <th>Source</th>
-                    <th>Difficulty</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {state.data?.rows.map((q) => (
-                    <tr key={q.id}>
-                      <td className="bank-question-preview">
-                        {q.question_text}
-                        {!q.question_text?.trim() && q.image_url && (
-                          <QuestionImage src={q.image_url} allowZoom={false} />
-                        )}
-                      </td>
-                      <td>
-                        {q.domain}
-                        <small>{q.skill}</small>
-                      </td>
-                      <td>
-                        {q.book_title}
-                        <small>{q.topic_title}</small>
-                      </td>
-                      <td>{q.difficulty}</td>
+          {!state.loading && !state.error && !matching && (
+            <div className="empty-state">
+              <h3>No matching questions</h3>
+              <p>Try broader filters or clear your domain selection.</p>
+            </div>
+          )}
+          {!!matching && (
+            <>
+              <div className="table-scroll">
+                <table className="students-table">
+                  <thead>
+                    <tr>
+                      <th>Question</th>
+                      <th>Domain / skill</th>
+                      <th>Source</th>
+                      <th>Difficulty</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="pagination">
-              <span>
-                Page {page + 1} · {matching} questions
-              </span>
-              <div className="button-row">
-                <button
-                  className="button button-secondary"
-                  disabled={!page || state.loading}
-                  onClick={() => setPage((p) => p - 1)}
-                >
-                  Previous page
-                </button>
-                <button
-                  className="button button-secondary"
-                  disabled={state.loading || (page + 1) * 25 >= matching}
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Next page
-                </button>
+                  </thead>
+                  <tbody>
+                    {state.data?.rows.map((q) => (
+                      <tr key={q.id}>
+                        <td className="bank-question-preview">
+                          {q.question_text}
+                          {!q.question_text?.trim() && q.image_url && (
+                            <QuestionImage
+                              src={q.image_url}
+                              allowZoom={false}
+                            />
+                          )}
+                        </td>
+                        <td>
+                          {q.domain}
+                          <small>{q.skill}</small>
+                        </td>
+                        <td>
+                          {q.book_title}
+                          <small>{q.topic_title}</small>
+                        </td>
+                        <td>{q.difficulty}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </div>
-          </>
-        )}
-      </section>
-      {admin && (
+              <div className="pagination">
+                <span>
+                  Page {page + 1} · {matching} questions
+                </span>
+                <div className="button-row">
+                  <button
+                    className="button button-secondary"
+                    disabled={!page || state.loading}
+                    onClick={() => setPage((p) => p - 1)}
+                  >
+                    Previous page
+                  </button>
+                  <button
+                    className="button button-secondary"
+                    disabled={state.loading || (page + 1) * 25 >= matching}
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    Next page
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </section>
+      )}
+      {admin && !collegeBoard && (
         <Link className="primary-link" to="/admin/questions">
           Manage questions
         </Link>
