@@ -1,0 +1,139 @@
+{
+  "management_read": {
+    "project_ref": "ileffhbbaomfimwulvpw",
+    "method": "GET",
+    "endpoint": "https://api.supabase.com/v1/projects/ileffhbbaomfimwulvpw/config/auth",
+    "started_at_utc": "2026-10-22T11:59:15.642496Z",
+    "completed_at_utc": "2026-10-22T11:59:17.241348Z",
+    "elapsed_ms": 1632,
+    "status": 200,
+    "response_identifiers": {
+      "date": "Thu, 22 Oct 2026 11:59:17 GMT",
+      "cf-ray": "a4e855bfd9f7098e-WAW"
+    },
+    "stored_configuration": {
+      "site_url": "https://sat-chi.netlify.app",
+      "uri_allow_list": [
+        "https://sat-chi.netlify.app/login",
+        "http://localhost:5173/login",
+        "https://sat-chi.netlify.app/reset-password",
+        "http://localhost:5173/reset-password",
+        "http://127.0.0.1:5173/reset-password",
+        "https://sat-chi-rahimov-production.vercel.app/",
+        "https://sat-chi-rahimov-production.vercel.app/**",
+        "https://sat-*-chi-rahimov-production.vercel.app",
+        "https://sat-*-chi-rahimov-production.vercel.app/**",
+        "https://sat-chi.netlify.app/auth/callback",
+        "https://satchi.vercel.app/auth/callback",
+        "https://satchi.vercel.app/reset-password",
+        "https://satchi.vercel.app/login",
+        "http://localhost:5173/auth/callback",
+        "http://127.0.0.1:5173/auth/callback",
+        "http://127.0.0.1:5173/login"
+      ],
+      "google_enabled": true,
+      "signup_enabled": true,
+      "email_confirmation_required": true,
+      "google_nonce_check_enabled": true
+    },
+    "validation": {
+      "exact_callbacks": {
+        "https://satchi.vercel.app/auth/callback": true,
+        "https://sat-chi.netlify.app/auth/callback": true
+      },
+      "duplicate_entries": [],
+      "malformed_entries": [],
+      "entries_with_trailing_slash": [
+        "https://sat-chi-rahimov-production.vercel.app/"
+      ],
+      "existing_wildcard_entries": [
+        "https://sat-chi-rahimov-production.vercel.app/**",
+        "https://sat-*-chi-rahimov-production.vercel.app",
+        "https://sat-*-chi-rahimov-production.vercel.app/**"
+      ],
+      "site_url_preserved": true,
+      "all_original_entries_preserved": true,
+      "matches_previously_reported_dashboard_configuration": true,
+      "dashboard_comparison_basis": "User-reported dashboard values and prior supported Management API snapshot; dashboard UI was not independently accessed this turn.",
+      "other_auth_settings_unchanged": true
+    }
+  },
+  "live_callbacks": {
+    "project_ref": "ileffhbbaomfimwulvpw",
+    "method_note": "Normal public OAuth authorization followed by controlled cancellation; no Google account authentication, no application callback loaded, no tokens or state retained in this evidence.",
+    "probes": [
+      {
+        "target": "https://satchi.vercel.app/auth/callback",
+        "authorize": {
+          "method": "GET",
+          "endpoint": "https://ileffhbbaomfimwulvpw.supabase.co/auth/v1/authorize",
+          "provider": "google",
+          "redirect_to": "https://satchi.vercel.app/auth/callback",
+          "pkce_method": "s256",
+          "started_at_utc": "2026-10-22T11:59:40.282Z",
+          "completed_at_utc": "2026-10-22T11:59:41.892Z",
+          "status": 302,
+          "response_identifiers": {
+            "date": "Thu, 22 Oct 2026 11:59:41 GMT",
+            "sb-request-id": "01a1637b-346b-7cdd-b393-425cb46283fa",
+            "cf-ray": "a4e8565a1b48ecbb-WAW"
+          }
+        },
+        "provider": {
+          "origin": "https://accounts.google.com",
+          "redirect_uri": "https://ileffhbbaomfimwulvpw.supabase.co/auth/v1/callback"
+        },
+        "cancelled_callback": {
+          "method": "GET",
+          "endpoint": "https://ileffhbbaomfimwulvpw.supabase.co/auth/v1/callback",
+          "started_at_utc": "2026-10-22T11:59:41.963Z",
+          "completed_at_utc": "2026-10-22T11:59:42.600Z",
+          "status": 302,
+          "returned_url": "https://satchi.vercel.app/auth/callback",
+          "response_identifiers": {
+            "date": "Thu, 22 Oct 2026 11:59:42 GMT",
+            "sb-request-id": "01a1637b-382d-7362-9283-031907bd2920",
+            "cf-ray": "a4e856602ea0ecbb-WAW"
+          },
+          "exact_return_match": true
+        }
+      },
+      {
+        "target": "https://sat-chi.netlify.app/auth/callback",
+        "authorize": {
+          "method": "GET",
+          "endpoint": "https://ileffhbbaomfimwulvpw.supabase.co/auth/v1/authorize",
+          "provider": "google",
+          "redirect_to": "https://sat-chi.netlify.app/auth/callback",
+          "pkce_method": "s256",
+          "started_at_utc": "2026-10-22T11:59:42.601Z",
+          "completed_at_utc": "2026-10-22T11:59:43.318Z",
+          "status": 302,
+          "response_identifiers": {
+            "date": "Thu, 22 Oct 2026 11:59:43 GMT",
+            "sb-request-id": "01a1637b-3ac9-71b3-8cd9-b8359042bd36",
+            "cf-ray": "a4e856644d7fecbb-WAW"
+          }
+        },
+        "provider": {
+          "origin": "https://accounts.google.com",
+          "redirect_uri": "https://ileffhbbaomfimwulvpw.supabase.co/auth/v1/callback"
+        },
+        "cancelled_callback": {
+          "method": "GET",
+          "endpoint": "https://ileffhbbaomfimwulvpw.supabase.co/auth/v1/callback",
+          "started_at_utc": "2026-10-22T11:59:43.318Z",
+          "completed_at_utc": "2026-10-22T11:59:43.931Z",
+          "status": 302,
+          "returned_url": "https://sat-chi.netlify.app/auth/callback",
+          "response_identifiers": {
+            "date": "Thu, 22 Oct 2026 11:59:43 GMT",
+            "sb-request-id": "01a1637b-3d93-78b7-89de-e8bf5446b5c4",
+            "cf-ray": "a4e85668bde1ecbb-WAW"
+          },
+          "exact_return_match": true
+        }
+      }
+    ]
+  }
+}

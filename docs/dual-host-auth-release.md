@@ -1,6 +1,32 @@
 # Netlify and Vercel authentication release
 
-## Follow-up: actual deployed frontend traced
+## Current status: callback routing resolved; publication proceeding
+
+At **2026-10-22 11:59 UTC**, a fresh supported Management API read showed
+both exact production callbacks, the original Site URL and every existing valid
+redirect intact. There were no duplicate or malformed entries. Comparison uses
+the previously reported dashboard values and prior API snapshot; the dashboard
+UI was not independently accessed in this follow-up.
+
+Fresh Google authorization/cancellation probes then returned **both** requests
+to their exact starting callbacks. The Vercel callback response was HTTP 302 with
+request ID `01a1637b-382d-7362-9283-031907bd2920`; Netlify's was HTTP 302 with
+request ID `01a1637b-3d93-78b7-89de-e8bf5446b5c4`. Google still uses the Supabase
+provider callback. Sanitized configuration and routing evidence is recorded in
+[dual-host-auth-routing-verification.json](dual-host-auth-routing-verification.json).
+
+No configuration mutation, synchronization retry, service restart, Site URL
+change or migration was needed in this follow-up. The previously saved allowlist
+is now effective. The evidence establishes that the earlier host change occurred
+inside Supabase before frontend navigation, and that it has stopped; the internal
+cause or precise timing of hosted propagation remains unverified.
+
+The previously verified frontend and permission-safe College Board selector may
+now be published to the existing hosting projects. Actual Google-account login
+is a separate user-assisted check after publication. The blocked sections below
+are retained as historical investigation notes, not the current release gate.
+
+## Earlier follow-up: actual deployed frontend traced
 
 The subsequent unblock investigation captured **the current production frontend's
 own request**, by opening each site's landing page, following its Sign In link,
