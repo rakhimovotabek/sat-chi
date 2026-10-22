@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase, googleSignInAvailable } from "../lib/supabase.js";
+import { currentAuthRedirect } from "../auth/trusted-redirects.js";
 export default function GoogleSignIn() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -17,7 +18,7 @@ export default function GoogleSignIn() {
       const result = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: new URL("/auth/callback", window.location.origin).href,
+          redirectTo: currentAuthRedirect("google"),
         },
       });
       if (result.error) {

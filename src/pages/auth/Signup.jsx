@@ -10,6 +10,7 @@ import {
 } from "../../auth/profile-fields.js";
 import { supabase } from "../../lib/supabase.js";
 import usePageTitle from "../../hooks/usePageTitle.js";
+import { currentAuthRedirect } from "../../auth/trusted-redirects.js";
 export default function Signup() {
   const [values, setValues] = useState(() => profileValues());
   const [email, setEmail] = useState("");
@@ -38,7 +39,7 @@ export default function Signup() {
         email: email.trim(),
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/login`,
+          emailRedirectTo: currentAuthRedirect("confirmation"),
           data: {
             display_name: values.display_name.trim(),
             onboarding: profilePayload(values),

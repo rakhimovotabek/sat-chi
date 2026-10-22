@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import AuthFrame from "../../components/AuthFrame.jsx";
 import { supabase } from "../../lib/supabase.js";
 import usePageTitle from "../../hooks/usePageTitle.js";
+import { currentAuthRedirect } from "../../auth/trusted-redirects.js";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState(""),
@@ -17,7 +18,7 @@ export default function ForgotPassword() {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(
         email.trim(),
-        { redirectTo: new URL("/reset-password", window.location.origin).href },
+        { redirectTo: currentAuthRedirect("recovery") },
       );
       // Auth/account-specific errors must not identify whether an address exists.
       if (error && !error.status)

@@ -3,14 +3,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { emailConfirmationNotice } from "../src/auth/email-confirmation.js";
+import { trustedAuthRedirect } from "../src/auth/trusted-redirects.js";
 
 test("signup uses the browser origin and login path in both environments", () => {
   const source = readFileSync(new URL("../src/pages/auth/Signup.jsx", import.meta.url), "utf8");
-  const expression = source.match(/emailRedirectTo:\s*(`[^`]+`)/)?.[1];
-  assert.ok(expression, "signup must explicitly set emailRedirectTo");
-  const resolve = new Function("window", `return ${expression}`);
-  for (const origin of ["https://sat-chi.netlify.app", "http://localhost:5173"])
-    assert.equal(resolve({ location: { origin } }), `${origin}/login`);
+  assert.match(source, /emailRedirectTo:\s*currentAuthRedirect\("confirmation"\)/);
+  for (const origin of ["https://sat-chi.netlify.app", "https://satchi.vercel.app", "http://localhost:5173"])
+    assert.equal(trustedAuthRedirect("confirmation", origin, { development: true }), `${origin}/login`);
 });
 
 test("confirmation notices distinguish successful redirects and expired links", () => {
