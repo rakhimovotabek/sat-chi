@@ -1,5 +1,34 @@
 # Netlify and Vercel authentication release
 
+**BLOCKED before GitHub push or hosting publication.** Prepared application commit:
+`deaf38e09c59e05db4e864b99b2174b49a16a728`. The permission-safe source selector is
+included in its ancestor `97a429c`.
+
+Supabase returned successful configuration readbacks containing all required
+exact redirects, but multiple fresh live Google authorization/cancellation probes
+from `https://satchi.vercel.app` still returned to the Netlify Site URL. A later
+configuration synchronization request returned HTTP **544**. No service restart,
+Site URL replacement, wildcard expansion or insecure redirect workaround was
+attempted. The release stopped under the user's explicit critical-auth-safeguard
+rule. Google account authentication and authenticated production feature tests
+were not run; the user should wait before attempting the final Google test.
+
+Final readback confirmed the original Site URL, enabled signup/Google, every
+original redirect, all intended exact production redirects and all other Auth
+settings unchanged. The existing release gate remains `compatible` with zero
+verification exemptions. Edge CORS probes passed for both production and local
+origins and rejected an untrusted origin. No database migrations, verification
+accounts, test Homework or practice records were created. Existing hosting
+deployments remain active, and GitHub main was not pushed. Private configuration
+snapshots and the final state are retained in the directory documented below.
+
+Resume only when live callbacks demonstrably return to both starting origins;
+configuration readback alone is insufficient. Then push the prepared verified
+source, publish to the existing hosting projects, compare the built assets, run
+the scoped production feature checks and ask the user to complete Google login
+on each domain. Do not assume a successful cancelled flow proves actual Google
+account sign-in or shared-progress loading.
+
 Prepared 2026-10-22 for the existing GitHub `rakhimovotabek/sat-chi` main branch.
 Targets are the existing Netlify site `02da050d-7e57-45c4-bb83-5de0660fbbf6`
 and the existing Vercel project `rahimov-production/sat-chi`. No new hosting
