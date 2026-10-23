@@ -1,6 +1,6 @@
 # Netlify and Vercel authentication release
 
-## Current status: callback routing resolved; publication proceeding
+## Current status: deployed and verified on both hosts
 
 At **2026-10-22 11:59 UTC**, a fresh supported Management API read showed
 both exact production callbacks, the original Site URL and every existing valid
@@ -21,10 +21,16 @@ is now effective. The evidence establishes that the earlier host change occurred
 inside Supabase before frontend navigation, and that it has stopped; the internal
 cause or precise timing of hosted propagation remains unverified.
 
-The previously verified frontend and permission-safe College Board selector may
-now be published to the existing hosting projects. Actual Google-account login
-is a separate user-assisted check after publication. The blocked sections below
-are retained as historical investigation notes, not the current release gate.
+The verified frontend and permission-safe College Board selector were published
+as `2eb75608526b807ee1ea752a8cf4d58f7a524b41` to both existing hosting projects.
+Fresh route/asset comparisons, scoped authenticated production checks, and the
+user's interactive Google tests passed on both domains. Both disposable accounts,
+five practice sessions and one fixture-only Homework were removed. Normal access
+and signup remain enabled; no migration was applied.
+
+See [production verification](dual-host-production-verification.md) for deployment
+IDs, results and the production recovery-email delivery limitation. The blocked
+sections below are historical investigation notes, not the current release gate.
 
 ## Earlier follow-up: actual deployed frontend traced
 
