@@ -86,7 +86,7 @@ begin
  select count(*)into n from public.battle_members where battle_id=b.id;
  if n<2 or exists(select 1 from public.battle_members where battle_id=b.id and not ready)or(b.team_size>0 and n<>b.capacity)then raise exception 'All players must be ready; team games require full teams';end if;
  n:=0;
- for v_question in select qs.*,a.correct_answer,a.explanation,o.accepted_answers from public.bank_candidates(b.filters||case when b.category='Mixed'then'{}'::jsonb else jsonb_build_object('section',b.category)end)qs join public.question_answers a on a.question_id=qs.id left join public.book_open_answers o on o.question_id=qs.id order by random()limit b.question_count loop
+ for v_question in select qs.*,a.correct_answer,a.explanation,o.accepted_answers from public.bank_candidates(b.filters||case when b.category='Mixed'then'{}'::jsonb else jsonb_build_object('section',b.category)end)qs join public.question_answers a on a.question_id=qs.id left join public.book_open_answers o on o.question_id=qs.id where qs.question_type<>'open' or o.answer_format='numeric' order by random()limit b.question_count loop
  n:=n+1;
  insert into public.battle_rounds values(b.id,n,to_jsonb(v_question)-'correct_answer'-'explanation'-'accepted_answers',v_question.correct_answer,v_question.accepted_answers,v_question.explanation);
  end loop;

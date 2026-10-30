@@ -129,3 +129,20 @@
     animation: none;
   }
 }
+.battle-home-grid > .card {
+  margin-block: 0;
+}
+.battles input[type="checkbox"],
+.battles input[type="radio"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  min-height: 0;
+  padding: 0;
+  flex: 0 0 auto;
+  accent-color: var(--accent);
+}
+.battle-home-grid label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}

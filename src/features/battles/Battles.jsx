@@ -98,6 +98,7 @@ export default function Battles() {
     onChange: (e) =>
       setSettings((s) => ({
         ...s,
+        ...(name === "category" ? { filters: {} } : {}),
         [name]: ["capacity", "teamSize", "questionCount", "seconds"].includes(
           name,
         )
@@ -151,11 +152,29 @@ export default function Battles() {
               <label>
                 Category
                 <select {...field("category")}>
+                  <option>Vocabulary</option>
                   <option>Math</option>
                   <option>Reading &amp; Writing</option>
                   <option>Mixed</option>
                 </select>
               </label>
+              {settings.category === "Vocabulary" && (
+                <label>
+                  Vocabulary mode
+                  <select
+                    value={settings.filters?.mode || "meaning-rush"}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        filters: { mode: e.target.value },
+                      }))
+                    }
+                  >
+                    <option value="meaning-rush">Meaning Rush</option>
+                    <option value="reverse-meaning">Reverse Meaning</option>
+                  </select>
+                </label>
+              )}
               <label>
                 Format
                 <select

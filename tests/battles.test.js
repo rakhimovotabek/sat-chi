@@ -123,3 +123,139 @@ test("capacity limits and team sizes are validated, host departure transfers own
   b = await action("state", { id });
   assert.equal(b.state, "EXPIRED");
 });
+test("full 2v2, 3v3 and twenty-player games persist accurate team and individual totals", async (t) => {
+  const { db, role, call } = await learningDatabase();
+  t.after(() => db.close());
+  const action = (a, d = {}) =>
+    call("battle_action", [a, JSON.stringify(d)], ["text", "jsonb"]);
+  const users = Array.from(
+    { length: 20 },
+    (_, i) => `f9000000-0000-0000-0000-${String(i + 1).padStart(12, "0")}`,
+  );
+  await db.exec("reset role");
+  for (const id of users)
+    await db.query("insert into auth.users(id)values($1)", [id]);
+  for (const [capacity, teamSize] of [
+    [4, 2],
+    [6, 3],
+    [20, 0],
+  ]) {
+    await role(users[0]);
+    let b = await action("create", {
+      category: "Math",
+      capacity,
+      teamSize,
+      questionCount: 1,
+      seconds: 60,
+      public: true,
+    });
+    const id = b.id;
+    for (const user of users.slice(0, capacity)) {
+      await role(user);
+      await action("join", { id });
+      await action("ready", { id });
+    }
+    await role(users[0]);
+    await action("start", { id });
+    await db.exec(
+      `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+    );
+    for (let i = 0; i < capacity; i++) {
+      await role(users[i]);
+      b = await action("answer", {
+        id,
+        round: 1,
+        response: i % 2 === 0 ? "1" : "0",
+      });
+    }
+    assert.equal(b.state, "ROUND_RESULTS");
+    assert.equal(
+      b.members.reduce((n, m) => n + m.score, 0),
+      (capacity / 2) * 100,
+    );
+    if (teamSize) {
+      assert.equal(b.members.filter((m) => m.team === 1).length, teamSize);
+      assert.equal(
+        b.members.filter((m) => m.team === 1).reduce((n, m) => n + m.score, 0),
+        teamSize * 100,
+      );
+    }
+    await db.exec(
+      `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+    );
+    await role(users[0]);
+    b = await action("state", { id });
+    assert.equal(b.state, "FINISHED");
+  }
+});
+test("Meaning Rush and Reverse Meaning use actual published word-definition pairs", async (t) => {
+  const { db, role, call } = await learningDatabase();
+  t.after(() => db.close());
+  const action = (a, d = {}) =>
+    call("battle_action", [a, JSON.stringify(d)], ["text", "jsonb"]);
+  await db.exec("reset role");
+  const bid = (
+    await db.query(
+      `insert into vocabulary_books(title,published)values('Original words',false)returning id`,
+    )
+  ).rows[0].id;
+  const sid = (
+    await db.query(
+      `insert into vocabulary_sets(book_id,title)values($1,'Original set')returning id`,
+      [bid],
+    )
+  ).rows[0].id;
+  const pairs = [
+    ["lucid", "clear and easy to understand"],
+    ["brief", "lasting a short time"],
+    ["ample", "more than enough"],
+    ["novel", "new or unusual"],
+  ];
+  for (const [word, definition] of pairs)
+    await db.query(
+      "insert into vocabulary_words(set_id,word,definition)values($1,$2,$3)",
+      [sid, word, definition],
+    );
+  await db.query("update vocabulary_books set published=true where id=$1",[bid]);
+  for (const mode of ["meaning-rush", "reverse-meaning"]) {
+    await role(student);
+    let b = await action("create", {
+      category: "Vocabulary",
+      capacity: 2,
+      questionCount: 1,
+      seconds: 60,
+      public: true,
+      filters: { book: bid, set: sid, mode },
+    });
+    const id = b.id;
+    await action("ready", { id });
+    await role(other);
+    await action("join", { id });
+    await action("ready", { id });
+    await role(student);
+    await action("start", { id });
+    await db.exec(
+      `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+    );
+    await role(student);
+    b = await action("state", { id });
+    const pair = pairs.find(
+      (p) => p[mode === "meaning-rush" ? 0 : 1] === b.question.question_text,
+    );
+    assert.ok(pair);
+    assert.equal(b.question.options.length, 4);
+    assert.equal(new Set(b.question.options).size, 4);
+    const answer = b.question.options.indexOf(
+      pair[mode === "meaning-rush" ? 1 : 0],
+    );
+    assert.ok(answer >= 0);
+    await action("answer", { id, round: 1, response: String(answer) });
+    await role(other);
+    b = await action("answer", { id, round: 1, response: String(answer) });
+    assert.equal(b.state, "ROUND_RESULTS");
+    assert.equal(
+      b.members.reduce((n, m) => n + m.score, 0),
+      200,
+    );
+  }
+});
