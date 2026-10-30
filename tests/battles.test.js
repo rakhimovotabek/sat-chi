@@ -65,11 +65,22 @@ test("two authenticated players complete a synchronized battle with private keys
   assert.ok(!JSON.stringify(b.question).includes("correct_answer"));
   b = await action("answer", { id, round: 1, response: "1" });
   assert.equal(b.submitted, true);
-  assert.equal(b.members.find((m) => m.user_id === student).score, 100);
+  assert.equal(b.members.find((m) => m.user_id === student).score, 0);
   b = await action("answer", { id, round: 1, response: "0" });
-  assert.equal(b.members.find((m) => m.user_id === student).score, 100);
+  assert.equal(b.members.find((m) => m.user_id === student).score, 0);
   await role(other);
+  const hidden = await action("state", { id });
+  assert.equal(hidden.review, null);
+  assert.ok(hidden.members.every((member) => member.score === 0));
+  assert.deepEqual(
+    hidden.members.map((member) => member.seat),
+    [1, 2],
+  );
   b = await action("answer", { id, round: 1, response: "0" });
+  assert.equal(
+    b.members.find((member) => member.user_id === student).score,
+    100,
+  );
   assert.equal(b.state, "ROUND_RESULTS");
   assert.equal(b.review.answer, 1);
   await db.exec(
@@ -280,4 +291,45 @@ test("Meaning Rush and Reverse Meaning use actual published word-definition pair
       200,
     );
   }
+});
+
+test("battle creation rejects impossible canonical pools and never leaves an unusable lobby", async (t) => {
+  const { db, call, role, book } = await learningDatabase();
+  t.after(() => db.close());
+  const create = (extra = {}) =>
+    call(
+      "battle_action",
+      [
+        "create",
+        JSON.stringify({
+          category: "Math",
+          capacity: 2,
+          questionCount: 20,
+          seconds: 60,
+          ...extra,
+        }),
+      ],
+      ["text", "jsonb"],
+    );
+  await assert.rejects(
+    () => create(),
+    /Only 12 eligible published questions; requested 20/,
+  );
+  await assert.rejects(
+    () =>
+      create({ questionCount: 1, filters: { domain: "No matching domain" } }),
+    /Only 0 eligible/,
+  );
+  await assert.rejects(
+    () => create({ questionCount: 1, filters: { status: "incorrect" } }),
+    /Invalid battle filters/,
+  );
+  await db.exec("reset role");
+  assert.equal(
+    (await db.query("select count(*)::int n from battles")).rows[0].n,
+    0,
+  );
+  await db.query("update books set published=false where id=$1", [book]);
+  await role(admin);
+  await assert.rejects(() => create({ questionCount: 1 }), /Only 0 eligible/);
 });
