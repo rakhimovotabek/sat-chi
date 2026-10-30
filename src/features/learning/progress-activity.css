@@ -1,0 +1,84 @@
+.progress-activity {
+  margin-bottom: 24px;
+}
+.progress-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-block: 20px;
+}
+.progress-filters label {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 180px;
+}
+.progress-filters select {
+  width: 100%;
+  min-height: 44px;
+  color: inherit;
+  background: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+}
+.progress-filters select:focus-visible,
+.progress-activity summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+.progress-summary {
+  font-variant-numeric: tabular-nums;
+  line-height: 1.7;
+}
+.progress-chart {
+  display: flex;
+  align-items: end;
+  height: 180px;
+  gap: clamp(1px, 0.5vw, 6px);
+  margin-top: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.progress-column {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: end;
+}
+.progress-column > span {
+  width: 100%;
+  background: var(--accent);
+  border-radius: 3px 3px 0 0;
+  transform-origin: bottom;
+  animation: progress-grow 750ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.progress-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-block: 8px 20px;
+  font-variant-numeric: tabular-nums;
+}
+.progress-activity details {
+  margin-block: 16px;
+}
+.progress-activity summary {
+  cursor: pointer;
+  padding-block: 8px;
+}
+.progress-activity caption {
+  text-align: start;
+  padding-block: 12px;
+}
+@keyframes progress-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress-column > span {
+    animation: none;
+  }
+}

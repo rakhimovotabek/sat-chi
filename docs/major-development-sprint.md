@@ -155,3 +155,29 @@ missing `/home/otabek/.cache/satchi-test-tools/pg17/opt/pgsql-17/bin/postgres`;
 prints `pglite://memory` and rejects hosted targets; `.env.local` is never loaded
 by that harness. Full Auth/Storage/Edge upload remains **BLOCKED**, SQL behavior
 is **VERIFIED BACKEND**, preview/recovery is **BROWSER WITH FIXTURES ONLY**.
+
+## Continued milestones: Math inventory, Battle privacy, Progress
+
+- **Math inventory: PARTIALLY IMPLEMENTED / BLOCKED.** Metadata-only enumeration
+  covers 2367 local package records (1677 composite MCQs, 690 SPR), all rights
+  unverified. HardBook has 140 colliding ID groups/447 occurrences. Zero source
+  conversions. Live corpus total is unknown. See [reconciled local scope and
+  missing sources](math-corpus-conversion.md).
+- **Battles: VERIFIED BACKEND.** Current-round scores and sort order no longer
+  reveal correctness; impossible Math/R&W pools fail at creation with actual
+  counts. Five SQL tests pass including 1v1, 2v2, 3v3, 20-player and two vocabulary
+  modes; no real-network concurrency/Realtime claim. See [acceptance](battles-acceptance.md).
+- **Progress: VERIFIED BACKEND / BROWSER WITH FIXTURES ONLY.** Personal 7/30/90-day
+  canonical first-attempt aggregates, subject/metric filters, exact table,
+  reduced-motion bars and saved scope. Three SQL tests preserve 70% after
+  corrections/repeated contexts; two browser tests exercise chart final values,
+  keyboard, empty state and responsive layouts. See [definitions](analytics-metrics.md)
+  and synthetic [laptop](screenshots/sprint/progress-laptop.png) /
+  [mobile](screenshots/sprint/progress-mobile.png) captures.
+
+New migrations are local pending files only. No production access or remote
+writes occurred. The remainder of the requested sprint is unfinished: crop/editor
+application, native importer acceptance, real-network multiplayer, additional
+Battle modes, complete animated analytics, XP ledger/levels/badges/leaderboards,
+admin heatmaps and broad theme/responsive/performance regression. Resume from
+[the continuation checkpoint](sprint-resume.md); no background execution promised.

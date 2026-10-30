@@ -40,6 +40,34 @@ test("ten canonical questions remain 70% after all mistakes are corrected across
     assert.equal(result.first_accuracy, 70);
     assert.equal(result.eventually_correct, 10);
     assert.equal(result.now_correct, 10);
+    const activity = await call(
+      "progress_activity",
+      [7, "Math"],
+      ["integer", "text"],
+    );
+    assert.equal(activity.questions, 10);
+    assert.equal(activity.correct, 7);
+    assert.equal(activity.corrected, 3);
+    assert.equal(activity.accuracy, 70);
+    assert.equal(activity.days.length, 7);
+    assert.equal(
+      activity.days.reduce((n, day) => n + day.questions, 0),
+      10,
+    );
+    assert.equal(
+      (
+        await call(
+          "progress_activity",
+          [30, "Reading & Writing"],
+          ["integer", "text"],
+        )
+      ).accuracy,
+      null,
+    );
+    await assert.rejects(
+      () => call("progress_activity", [365, "Math"], ["integer", "text"]),
+      /Invalid progress scope/,
+    );
     assert.equal(result.checked, 10);
     assert.equal(result.first_unknown, 0);
     assert.equal(
@@ -75,7 +103,17 @@ test("ten canonical questions remain 70% after all mistakes are corrected across
     assert.equal(result.first_accuracy, 70);
     assert.equal(result.eventually_correct, 10);
     assert.equal(result.now_correct, 9);
+    assert.equal(
+      (await call("progress_activity", [7, "Math"], ["integer", "text"]))
+        .questions,
+      10,
+    );
     await role(other);
+    assert.equal(
+      (await call("progress_activity", [7, "Math"], ["integer", "text"]))
+        .questions,
+      0,
+    );
     await assert.rejects(
       call("learning_metrics", [student], ["uuid"]),
       /unavailable/i,

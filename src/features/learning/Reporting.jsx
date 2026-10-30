@@ -1,3 +1,4 @@
+import ProgressActivity from "./ProgressActivity.jsx";
 import AdminAnswer from "./AdminAnswer.jsx";
 import { rpc } from "./api.js";
 import DailyHomeworkAnalytics from "./DailyHomeworkAnalytics.jsx";
@@ -187,6 +188,7 @@ export function Progress() {
       <ContentState {...state} onRetry={state.reload} />
       {state.data && (
         <>
+          <ProgressActivity />
           <MetricCards data={state.data} />
           <VocabularyOverview />
           <PracticeAnalytics />
