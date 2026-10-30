@@ -1,34 +1,67 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:satchi:book:v1:manifest",
-  "title": "SAT’chi v1 book manifest",
+  "title": "SAT\u2019chi v1 book manifest",
   "type": "object",
   "required": ["format", "book", "rights", "topics", "questionCount"],
   "properties": {
-    "format": { "const": "satchi-book-v1" },
+    "format": {
+      "const": "satchi-book-v1"
+    },
     "book": {
       "type": "object",
       "required": ["id", "title", "section"],
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9-]{1,100}$" },
-        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
-        "section": { "enum": ["Math", "Reading & Writing"] },
-        "author": { "type": "string" },
-        "description": { "type": "string", "maxLength": 10000 },
-        "cover": { "type": "string", "pattern": "^assets/" }
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]{1,100}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "section": {
+          "enum": ["Math", "Reading & Writing"]
+        },
+        "author": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "cover": {
+          "type": "string",
+          "pattern": "^assets/"
+        }
       }
     },
     "rights": {
       "type": "object",
       "required": ["authorized", "owner", "license"],
       "properties": {
-        "authorized": { "const": true },
-        "owner": { "type": "string", "minLength": 1 },
-        "license": { "type": "string", "minLength": 1 },
-        "provenance": { "type": "string" }
+        "authorized": {
+          "const": true
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance": {
+          "type": "string"
+        }
       }
     },
-    "questionCount": { "type": "integer", "minimum": 1, "maximum": 3000 },
+    "questionCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3000
+    },
     "topics": {
       "type": "array",
       "minItems": 1,
@@ -37,10 +70,29 @@
         "type": "object",
         "required": ["id", "title"],
         "properties": {
-          "id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{1,100}$" },
-          "title": { "type": "string", "minLength": 1, "maxLength": 160 },
-          "parent": { "type": "string" }
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]{1,100}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "parent": {
+            "type": "string"
+          }
         }
+      }
+    },
+    "assetDigests": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^assets/[a-zA-Z0-9_/-]+\\.(png|jpg|jpeg|webp)$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
       }
     }
   }

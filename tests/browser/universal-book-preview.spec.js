@@ -45,6 +45,32 @@ test("admin previews an original ZIP with real option images and typeset math at
   });
   await expect(page.getByRole("alert")).toContainText("ZIP must");
 });
+test("admin previews all 30 acceptance records including image-only choices and signed SPR", async ({
+  page,
+}) => {
+  await contentFixture(page, "admin", { empty: true });
+  await page.goto("/admin/books");
+  await page.getByRole("button", { name: "Import Book", exact: true }).click();
+  await page
+    .getByLabel("Choose or drop a satchi-book-v1 ZIP")
+    .setInputFiles("assets/examples/satchi-book-v1/acceptance-math-30.zip");
+  await expect(
+    page.getByRole("heading", { name: "SAT’chi Original Acceptance — Math" }),
+  ).toBeVisible();
+  const select = page.getByRole("combobox", {
+    name: "Preview question",
+    exact: true,
+  });
+  await expect(select.locator("option")).toHaveCount(30);
+  await select.selectOption("1");
+  await expect(page.locator(".preview-question img")).toHaveCount(4);
+  for (const image of await page.locator(".preview-question img").all())
+    await expect(image).toHaveJSProperty("naturalWidth", 120);
+  await select.selectOption("4");
+  await expect(page.locator(".preview-question")).toContainText("-1.5");
+  await select.selectOption("29");
+  await expect(page.locator(".preview-question")).toContainText("Subtract 30");
+});
 test("Battles home renders scoped public empty state and responsive configuration", async ({
   page,
 }) => {
@@ -140,7 +166,9 @@ test("admin reloads durable import history and resumes without a local ZIP", asy
   await page
     .getByRole("button", { name: "Resume import", exact: true })
     .click();
-  await expect(page.getByRole("status")).toContainText("30/30 questions saved");
+  await expect(
+    page.getByRole("status").filter({ hasText: "questions saved" }),
+  ).toContainText("30/30 questions saved");
   expect(resumes).toBe(1);
   await expect(
     page.getByRole("button", { name: "Publish validated book" }),

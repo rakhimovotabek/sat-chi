@@ -29,3 +29,33 @@ Extract content only from authorized sources. Assign stable source IDs, preserve
 Apply additive migration `20261030000100` only to a disposable Supabase instance. Serve `import-book` locally (`supabase functions serve import-book --env-file <local-only-env>`). Configure Vite with that instance's local URL and anonymous key. Never use the repository's hosted `.env` for this test. Service credentials remain inside the Edge runtime. The worker authenticates the JWT and checks the database admin role on every request. It stores the validated ZIP privately, uploads/verifies at most 20 assets, and writes at most 25 questions per step. Durable cursors permit resumption. Repeated question batches are transactionally idempotent.
 
 The SQL-only test harness verifies insertion, draft isolation, publication, Question Bank eligibility, grading and retry identity. Full Edge/Storage/browser acceptance still requires a disposable Supabase stack; a passing SQL test alone does not establish that acceptance.
+
+## Author validation and acceptance content
+
+All JSON/JSONL/CSV/text members use UTF-8. Image-only choices use empty `text`
+plus an individual `image` reference. Source IDs are qualified by the immutable
+book identity when mapped to canonical database UUIDs.
+
+Optional `assetDigests` maps each `assets/` member to its lowercase SHA-256.
+When present, every asset must be inventoried and each digest is checked by the
+same parser in the browser, Edge worker and CLI. Legacy packages without an
+inventory remain supported; the CLI explicitly identifies them.
+
+```bash
+python3 scripts/imports/create-acceptance-example.py
+npm run book:validate -- assets/examples/satchi-book-v1/acceptance-math-30.zip
+```
+
+The deterministic CC0 fixture contains 30 Math questions across four topics,
+including a graph, triangle, passage, image-only options, LaTeX, signed SPR and
+an explanation image. Math and Reading & Writing currently require separate
+packages; this fixture does not establish mixed-section acceptance. The older
+original-practice fixture exercises Reading & Writing. Multiple explanation
+images and paired-passage records remain unsupported in universal v1.
+
+The validator returns JSON with package fingerprint, counts, review totals,
+missing explanations and digest status; failure returns JSON on stderr and exit
+code 1. Conversion chats need no SAT’chi credentials: prepare these four members,
+use the schemas in `docs/schemas`, include original or licensed assets, run this
+validator, and upload the ZIP through Admin. Never guess an answer or mark an
+uncertain record approved.

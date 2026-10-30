@@ -135,3 +135,23 @@ No full Edge/Storage journey is claimed. `npm run test:platform` fails on missin
 `~/.cache/satchi-test-tools/pg17/opt/pgsql-17/bin/postgres`; Docker and Deno are
 absent. Tests print their disposable PGlite target; a reusable fail-closed guard
 rejects hosted/credential-bearing endpoints and never loads `.env.local`.
+
+## Continuation: package author tooling (2026-10-31)
+
+Starting branch/HEAD: `feature/universal-book-import` / `f23032d`. Preserved and
+validated the pre-existing uncommitted importer work. Added deterministic original
+30-question Math ZIP, CLI validation, SHA-256 inventory checks shared by preview
+and server, stricter malformed-record/numerical validation and updated schemas.
+Browser acceptance now previews all 30 records, image-only options and signed SPR.
+Math and Reading & Writing still require separate packages; multiple explanation
+images/paired passages remain open. No mixed-section full acceptance is claimed.
+
+Evidence: 10 focused tests passed (package/CLI, Edge authorization and actual
+PGlite SQL ownership, publication, canonical Bank/practice). Four fixture browser
+tests exercise preview/recovery (see final resume for latest outcome). Lint and
+build passed. Native `npm run test:platform` fails before database startup at
+missing `/home/otabek/.cache/satchi-test-tools/pg17/opt/pgsql-17/bin/postgres`;
+`command -v docker` and `command -v deno` find neither binary. The write preflight
+prints `pglite://memory` and rejects hosted targets; `.env.local` is never loaded
+by that harness. Full Auth/Storage/Edge upload remains **BLOCKED**, SQL behavior
+is **VERIFIED BACKEND**, preview/recovery is **BROWSER WITH FIXTURES ONLY**.

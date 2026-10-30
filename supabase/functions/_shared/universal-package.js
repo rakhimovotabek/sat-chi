@@ -175,7 +175,7 @@ export function validatePackage(manifest, questions) {
   )
     fail("Invalid book identity, title or section.");
   if (
-    !manifest.rights?.authorized ||
+    manifest.rights?.authorized !== true ||
     !manifest.rights.license ||
     !manifest.rights.owner
   )
@@ -189,6 +189,8 @@ export function validatePackage(manifest, questions) {
   const topics = new Map();
   for (const t of manifest.topics) {
     if (
+      !t ||
+      typeof t !== "object" ||
       !/^[a-zA-Z0-9_-]{1,100}$/.test(t.id) ||
       topics.has(t.id) ||
       typeof t.title !== "string" ||
@@ -222,7 +224,21 @@ export function validatePackage(manifest, questions) {
     }
   };
   asset(b.cover);
+  if (manifest.assetDigests != null) {
+    if (
+      typeof manifest.assetDigests !== "object" ||
+      Array.isArray(manifest.assetDigests)
+    )
+      fail("assetDigests must be an asset path to SHA-256 object.");
+    for (const [path, digest] of Object.entries(manifest.assetDigests)) {
+      asset(path);
+      if (!/^[a-f0-9]{64}$/.test(digest))
+        fail(`Invalid SHA-256 digest: ${path}`);
+    }
+  }
   for (const q of questions) {
+    if (!q || typeof q !== "object" || Array.isArray(q))
+      fail("Question record must be an object.");
     if (
       !/^[a-zA-Z0-9_-]{1,100}$/.test(q.id) ||
       ids.has(q.id) ||
@@ -292,6 +308,8 @@ export function validatePackage(manifest, questions) {
         fail(`Invalid choices/key: ${q.id}`);
       q.options.forEach((o, i) => {
         if (
+          !o ||
+          typeof o !== "object" ||
           o.label !== "ABCD"[i] ||
           typeof o.text !== "string" ||
           o.text.length > 4000 ||
@@ -307,7 +325,7 @@ export function validatePackage(manifest, questions) {
       q.acceptedAnswers.some(
         (a) =>
           typeof a !== "string" ||
-          !/^-?(?:\d+(?:\.\d*)?|\.\d+)(?:\/\d+)?$/.test(a) ||
+          !/^-?(?:\d+(?:\.\d*)?|\.\d+|\d+\/\d+)$/.test(a) ||
           /\/0+$/.test(a),
       )
     )
@@ -457,7 +475,27 @@ export async function inspectPackage(input) {
   });
   const summary = validatePackage(manifest, questions);
   for (const path of summary.assets)
-    if (!files.has(path)) fail(`Missing image: ${path}`);
+    if (!files.has(path)) {
+      const owner = questions.find(
+        (q) =>
+          q.image === path ||
+          q.explanationImage === path ||
+          q.options?.some((o) => o.image === path),
+      );
+      const option = owner?.options?.find((o) => o.image === path);
+      fail(
+        `${owner?.id || "book"}${option ? `.options.${option.label}.image` : ""} is missing: ${path}`,
+      );
+    }
+  if (manifest.assetDigests != null) {
+    for (const [path, data] of files)
+      if (path.startsWith("assets/")) {
+        if (!Object.hasOwn(manifest.assetDigests, path))
+          fail(`Asset absent from digest inventory: ${path}`);
+        if ((await sha256(data)) !== manifest.assetDigests[path])
+          fail(`Asset SHA-256 mismatch: ${path}`);
+      }
+  }
   for (const [path, data] of files)
     if (path.startsWith("assets/")) {
       const png =
