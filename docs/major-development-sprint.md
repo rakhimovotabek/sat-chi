@@ -108,3 +108,30 @@ Deployment remains unauthorized. Before any future production release: verify di
 Local review captures: [import laptop](screenshots/sprint/import-laptop.png), [import mobile](screenshots/sprint/import-mobile.png), [Battles laptop](screenshots/sprint/battles-laptop.png), [Battles mobile](screenshots/sprint/battles-mobile.png). These show synthetic fixture accounts and content.
 
 Final follow-up result: four package/import tests passed, two browser tests passed, ESLint passed, production build passed. No test processes are intentionally left running. Run `npm run test:sprint` and `npm run test:sprint:ui` for the documented checks. Complete file changes can be reviewed with `git diff --name-status 780eb95..HEAD`; the commit list above separates functional milestones.
+
+## Follow-up 2026-10-31: importer recovery and ownership
+
+Starting HEAD `c581b12`; clean required branch confirmed. Additive migration
+`20261031000100_import_job_ownership.sql` wraps the existing begin function,
+checks active admin status and blocks cross-admin fingerprint takeover. It adds
+an owner/recent index; existing jobs and canonical IDs are preserved. The previous
+implementation is no longer callable by service_role. Edge requests now check
+active status and job ownership before Storage/continuation/correction operations.
+The handler is extracted for transport regression tests without changing its
+Supabase runtime adapter.
+
+Admin import history now loads 20 recent server records for the signed-in admin,
+shows durable cursors and resumes staged uploads after refresh without a local
+ZIP. Publication requires an explicit content-review checkbox. Navigation stops
+the batch loop after its in-flight request. Interrupted initial upload still
+requires selecting the identical ZIP again.
+
+Evidence: 7 focused tests passed (including actual disposable PostgreSQL role,
+ownership, publication, Bank and persisted practice checks); 3 single-worker
+browser tests passed, including reload/resume/publication against fixtures.
+Lint and build passed. **VERIFIED BACKEND** for ownership SQL; **UNIT TESTED** for
+Edge authorization; **BROWSER WITH FIXTURES ONLY** for recovery/publication UI.
+No full Edge/Storage journey is claimed. `npm run test:platform` fails on missing
+`~/.cache/satchi-test-tools/pg17/opt/pgsql-17/bin/postgres`; Docker and Deno are
+absent. Tests print their disposable PGlite target; a reusable fail-closed guard
+rejects hosted/credential-bearing endpoints and never loads `.env.local`.

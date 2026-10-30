@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { inspectPackage } from "../../../supabase/functions/_shared/universal-package.js";
 import { supabase } from "../../lib/supabase.js";
@@ -11,8 +11,40 @@ export default function UniversalImport({ onImported }) {
     [error, setError] = useState(""),
     [index, setIndex] = useState(0),
     [stage, setStage] = useState("Upload");
+  const [jobs, setJobs] = useState([]),
+    [historyError, setHistoryError] = useState(""),
+    [confirmPublish, setConfirmPublish] = useState(false);
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    loadJobs();
+    return () => {
+      active.current = false;
+    };
+  }, []);
+  async function loadJobs() {
+    setHistoryError("");
+    const { data: auth, error: authError } = await supabase.auth.getUser();
+    if (!active.current) return;
+    if (authError || !auth?.user) {
+      setHistoryError("Sign in again to load your import history.");
+      return;
+    }
+    const { data, error } = await supabase
+      .from("universal_book_jobs")
+      .select(
+        "id,book_id,status,question_cursor,asset_cursor,manifest,created_at,updated_at",
+      )
+      .eq("created_by", auth.user.id)
+      .order("created_at", { ascending: false })
+      .limit(20);
+    if (!active.current) return;
+    if (error) setHistoryError(error.message);
+    else setJobs(data || []);
+  }
   async function inspect(selected) {
     if (!selected) return;
+    setConfirmPublish(false);
     setFile(selected);
     setPkg(null);
     setJob(null);
@@ -46,18 +78,23 @@ export default function UniversalImport({ onImported }) {
     if (data.error) throw new Error(data.error);
     return data;
   }
-  async function run() {
+  async function run(resumeJob = null) {
     setBusy(true);
     setError("");
     setStage("Import");
     try {
-      let current = await invoke(file, { "Content-Type": "application/zip" });
+      let current =
+        resumeJob ||
+        (await invoke(file, { "Content-Type": "application/zip" }));
       setJob(current);
-      while (current.status === "importing") {
+      while (current.status === "importing" && active.current) {
         current = await invoke({ jobId: current.id });
         setJob(current);
       }
+      if (!active.current) return;
+      setConfirmPublish(false);
       setStage("Publish");
+      loadJobs();
       onImported?.(current);
     } catch (e) {
       setError(`${e.message} Retry the same ZIP to resume safely.`);
@@ -75,16 +112,69 @@ export default function UniversalImport({ onImported }) {
     else {
       setJob({ ...job, status: "published" });
       onImported?.(job);
+      setConfirmPublish(false);
+      loadJobs();
     }
     setBusy(false);
   }
   const q = pkg?.questions[index];
+  const questionTotal =
+    job?.manifest?.questionCount || pkg?.questions.length || 0;
   return (
     <section
       className="card import-panel universal-import"
       aria-label="Import Book"
     >
       <h2>Import Book</h2>
+      <details>
+        <summary>Your recent imports</summary>
+        <p>
+          Progress comes from saved server records. Resume an interrupted import
+          without choosing the ZIP again after its upload finished.
+        </p>
+        <button
+          type="button"
+          className="button button-secondary"
+          disabled={busy}
+          onClick={loadJobs}
+        >
+          Refresh import history
+        </button>
+        {historyError && <p role="alert">{historyError}</p>}
+        {!historyError && jobs.length === 0 && (
+          <p>No saved imports available.</p>
+        )}
+        <ul>
+          {jobs.map((saved) => (
+            <li key={saved.id}>
+              <strong>{saved.manifest.book.title}</strong>
+              {" · "}
+              {saved.status}
+              {" · "}
+              {saved.question_cursor}/{saved.manifest.questionCount} questions
+              <p>
+                Job {saved.id} · Updated{" "}
+                {new Date(saved.updated_at).toLocaleString()}
+              </p>
+              {saved.status === "importing" ? (
+                <button
+                  className="button button-secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    setPkg(null);
+                    setFile(null);
+                    run(saved);
+                  }}
+                >
+                  Resume import
+                </button>
+              ) : (
+                <Link to={`/admin/books/${saved.book_id}`}>Review book</Link>
+              )}
+            </li>
+          ))}
+        </ul>
+      </details>
       <ol className="import-stages" aria-label="Import stages">
         {["Upload", "Validate", "Preview", "Import", "Publish"].map((s) => (
           <li key={s} aria-current={stage === s ? "step" : undefined}>
@@ -126,7 +216,7 @@ export default function UniversalImport({ onImported }) {
         <p role="status">
           {stage === "Validate"
             ? "Checking archive and content…"
-            : `Importing verified content: ${job?.question_cursor || 0} / ${pkg?.questions.length || 0} questions`}
+            : `Importing verified content: ${job?.question_cursor || 0} / ${questionTotal} questions`}
         </p>
       )}
       {error && (
@@ -207,33 +297,61 @@ export default function UniversalImport({ onImported }) {
               )}
             </article>
           )}
-          {!job || job.status === "importing" ? (
-            <button className="button" disabled={busy} onClick={run}>
+          {!job && (
+            <button className="button" disabled={busy} onClick={() => run()}>
               Import as draft
             </button>
-          ) : (
+          )}
+        </>
+      )}
+      {job && (
+        <div>
+          <p role="status">
+            Job {job.id} · {job.status} · {job.question_cursor}/{questionTotal}{" "}
+            questions saved · {job.asset_cursor} assets saved
+          </p>
+          {job.status === "importing" && !busy && (
+            <button className="button" onClick={() => run(job)}>
+              Resume import
+            </button>
+          )}
+          {job.status !== "importing" && (
             <>
-              <p role="status">
+              <p>
                 {job.status === "published"
                   ? "Published in Books and Question Bank."
                   : "Draft saved. Review content before publishing."}
               </p>
-              <div className="button-row">
-                <Link
-                  className="button button-secondary"
-                  to={`/admin/books/${job.book_id}`}
-                >
-                  Manage draft
-                </Link>
-                {job.status === "draft" && (
-                  <button className="button" disabled={busy} onClick={publish}>
+              <Link
+                className="button button-secondary"
+                to={`/admin/books/${job.book_id}`}
+              >
+                Manage book
+              </Link>
+              {job.status === "draft" && (
+                <>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={confirmPublish}
+                      disabled={busy}
+                      onChange={(e) => setConfirmPublish(e.target.checked)}
+                    />{" "}
+                    I reviewed the content and authorize publication to
+                    students.
+                  </label>
+                  <button
+                    className="button"
+                    disabled={busy || !confirmPublish}
+                    onClick={publish}
+                  >
                     Publish validated book
                   </button>
-                )}
-              </div>
+                </>
+              )}
             </>
           )}
-        </>
+        </div>
       )}
     </section>
   );

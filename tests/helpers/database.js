@@ -1,3 +1,4 @@
+import { assertIsolatedTarget } from "../../scripts/testing/isolated-target.js";
 import { versionedFixtureArgs } from "./practice-save.js";
 import { readFile, readdir } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
@@ -5,6 +6,7 @@ export const admin = "f1000000-0000-0000-0000-000000000001",
   student = "f1000000-0000-0000-0000-000000000002",
   other = "f1000000-0000-0000-0000-000000000003";
 export async function learningDatabase() {
+  assertIsolatedTarget("pglite://memory", { embedded: true });
   const db = new PGlite();
   await db.exec(
     `create role anon nologin;create role authenticated nologin;create role service_role nologin bypassrls;create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to anon,authenticated,service_role;`,

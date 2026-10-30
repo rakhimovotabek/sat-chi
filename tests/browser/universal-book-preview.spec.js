@@ -81,3 +81,74 @@ test("Battles home renders scoped public empty state and responsive configuratio
     fullPage: true,
   });
 });
+
+test("admin reloads durable import history and resumes without a local ZIP", async ({
+  page,
+}) => {
+  await contentFixture(page, "admin", { empty: true });
+  const saved = {
+    id: "d0000000-0000-0000-0000-000000000080",
+    book_id: "d0000000-0000-0000-0000-000000000081",
+    status: "importing",
+    question_cursor: 25,
+    asset_cursor: 6,
+    created_at: "2026-10-31T00:00:00Z",
+    updated_at: "2026-10-31T00:05:00Z",
+    manifest: {
+      book: { title: "Original interrupted fixture" },
+      questionCount: 30,
+    },
+  };
+  let resumes = 0;
+  await page.route("**/rest/v1/universal_book_jobs?**", (route) =>
+    route.fulfill({ json: [saved] }),
+  );
+  await page.route("**/functions/v1/import-book", (route) => {
+    if (route.request().method() === "OPTIONS")
+      return route.fulfill({
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "*",
+        },
+      });
+    expect(route.request().postDataJSON()).toEqual({ jobId: saved.id });
+    resumes++;
+    saved.status = "draft";
+    saved.question_cursor = 30;
+    return route.fulfill({
+      headers: { "Access-Control-Allow-Origin": "*" },
+      json: saved,
+    });
+  });
+  let publications = 0;
+  await page.route("**/rest/v1/rpc/universal_publish", (route) => {
+    publications++;
+    return route.fulfill({ json: null });
+  });
+  async function open() {
+    await page
+      .getByRole("button", { name: "Import Book", exact: true })
+      .click();
+    await page.getByText("Your recent imports", { exact: true }).click();
+    await expect(page.getByText("Original interrupted fixture")).toBeVisible();
+  }
+  await page.goto("/admin/books");
+  await open();
+  await page.reload();
+  await open();
+  await page
+    .getByRole("button", { name: "Resume import", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText("30/30 questions saved");
+  expect(resumes).toBe(1);
+  await expect(
+    page.getByRole("button", { name: "Publish validated book" }),
+  ).toBeDisabled();
+  await page.getByRole("checkbox", { name: /I reviewed the content/ }).check();
+  await page.getByRole("button", { name: "Publish validated book" }).click();
+  await expect(
+    page.getByText("Published in Books and Question Bank."),
+  ).toBeVisible();
+  expect(publications).toBe(1);
+});
