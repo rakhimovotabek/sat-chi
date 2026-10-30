@@ -17,6 +17,26 @@ test("two authenticated players complete a synchronized battle with private keys
   });
   const id = b.id,
     code = b.code;
+  assert.equal(
+    (
+      await db.query(
+        "select count(*)::int n from battle_signals where battle_id=$1",
+        [id],
+      )
+    ).rows[0].n,
+    1,
+  );
+  await role(other);
+  assert.equal(
+    (
+      await db.query(
+        "select count(*)::int n from battle_signals where battle_id=$1",
+        [id],
+      )
+    ).rows[0].n,
+    0,
+  );
+
   await role(other);
   await assert.rejects(() => action("state", { id }), /Join this battle/);
   await assert.rejects(() => action("join", { id }), /Invitation code/);
@@ -216,7 +236,9 @@ test("Meaning Rush and Reverse Meaning use actual published word-definition pair
       "insert into vocabulary_words(set_id,word,definition)values($1,$2,$3)",
       [sid, word, definition],
     );
-  await db.query("update vocabulary_books set published=true where id=$1",[bid]);
+  await db.query("update vocabulary_books set published=true where id=$1", [
+    bid,
+  ]);
   for (const mode of ["meaning-rush", "reverse-meaning"]) {
     await role(student);
     let b = await action("create", {

@@ -63,10 +63,28 @@ export default function Battles() {
       }
     }
     refresh();
+    const channel = roomId
+      ? supabase
+          .channel(`battle-signals-${roomId}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "battle_signals",
+              filter: `battle_id=eq.${roomId}`,
+            },
+            refresh,
+          )
+          .subscribe((status) => {
+            if (status === "SUBSCRIBED") refresh();
+          })
+      : null;
     const timer = setInterval(refresh, 2000);
     return () => {
       active = false;
       clearInterval(timer);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [roomId]);
   useEffect(() => {

@@ -56,7 +56,8 @@ export async function readZip(input) {
   let cursor = view.getUint32(end + 16, true),
     expanded = 0;
   const directoryEnd = cursor + view.getUint32(end + 12, true),
-    files = new Map();
+    files = new Map(),
+    seen = new Set();
   if (directoryEnd !== end) fail("Invalid ZIP directory length.");
   for (let i = 0; i < count; i++) {
     if (cursor + 46 > end || view.getUint32(cursor, true) !== 0x02014b50)
@@ -74,9 +75,12 @@ export async function readZip(input) {
       bytes.subarray(cursor + 46, cursor + 46 + nameSize),
     );
     cursor += 46 + nameSize + extra + comment;
+    const directory = name.endsWith("/");
     if (
-      !safePath(name) ||
-      files.has(name) ||
+      !safePath(directory ? name.slice(0, -1) : name) ||
+      seen.has(name) ||
+      (directory &&
+        (size !== 0 || (name !== "assets/" && !name.startsWith("assets/")))) ||
       flags & 1 ||
       ![0, 8].includes(method) ||
       ((view.getUint32(cursor - comment - extra - nameSize - 8, true) >>> 16) &
@@ -84,7 +88,9 @@ export async function readZip(input) {
         0xa000
     )
       fail(`Unsafe or duplicate ZIP entry: ${name}`);
+    seen.add(name);
     if (
+      !directory &&
       ![
         "manifest.json",
         "questions.jsonl",
@@ -144,7 +150,7 @@ export async function readZip(input) {
     }
     if (data.length !== size || crc32(data) !== crc)
       fail(`Corrupt ZIP entry: ${name}`);
-    files.set(name, data);
+    if (!directory) files.set(name, data);
   }
   if (cursor !== directoryEnd) fail("ZIP directory entry count mismatch.");
   for (const required of [

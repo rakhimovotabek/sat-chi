@@ -16,5 +16,6 @@ def png(rgb):
 files={'manifest.json':json.dumps(manifest,ensure_ascii=False,indent=2).encode(),'questions.jsonl':('\n'.join(json.dumps(q,ensure_ascii=False)for q in qs)+'\n').encode(),'review-report.csv':b'question_id,status,note\n'+b''.join(f"{q['id']},approved,Original verified fixture\n".encode() for q in qs),'README.md':b'Original CC0 SATchi software fixture. Colored tiles are intentionally synthetic.\n'}
 for i,name in enumerate(['cover','option-a','option-b','option-c','option-d','explanation']):files[f'assets/{name}.png']=png((40+i*20,100,160))
 with zipfile.ZipFile(out/'original-practice.zip','w',zipfile.ZIP_DEFLATED)as z:
+ z.writestr('assets/',b'')
  for name,data in files.items():z.writestr(name,data)
 for name in ['manifest.json','questions.jsonl']: (out/name).write_bytes(files[name])
