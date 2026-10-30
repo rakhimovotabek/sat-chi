@@ -247,7 +247,7 @@ test("package import is atomic and idempotent; book practice securely gates expl
     assert.ok(!("acceptedAnswers" in items[1].question.import_metadata));
     await assert.rejects(
       call("book_practice_explanation", [sid, items[0].id], ["uuid", "uuid"]),
-      /Select an answer/,
+      /Check your answer/,
     );
     assert.equal(
       await call(
@@ -276,7 +276,16 @@ test("package import is atomic and idempotent; book practice securely gates expl
         ],
         ["uuid", "jsonb"],
       );
-    await save(items[0], 0); // Incorrect selection still unlocks explanation.
+    await save(items[0], 0);
+    await assert.rejects(
+      call("book_practice_explanation", [sid, items[0].id], ["uuid", "uuid"]),
+      /Check your answer/,
+    );
+    await call(
+      "check_book_practice_answer",
+      [sid, items[0].id, 0, crypto.randomUUID()],
+      ["uuid", "uuid", "integer", "uuid"],
+    ); // A wrong Check unlocks explanation.
     assert.equal(
       (
         await call(
@@ -297,10 +306,15 @@ test("package import is atomic and idempotent; book practice securely gates expl
     );
     await assert.rejects(
       call("book_practice_explanation", [sid, items[1].id], ["uuid", "uuid"]),
-      /Select an answer/,
+      /Check your answer/,
     );
     await save(items[0], 1);
     await save(items[1], null, "8.60");
+    await call(
+      "check_book_practice_response",
+      [sid, items[1].id, "8.60", crypto.randomUUID()],
+      ["uuid", "uuid", "text", "uuid"],
+    );
     assert.equal(
       (
         await call(
@@ -317,7 +331,7 @@ test("package import is atomic and idempotent; book practice securely gates expl
           "select count(*)::int n from public.question_check_attempts",
         )
       ).rows[0].n,
-      0,
+      2,
     );
     await role(other);
     await assert.rejects(
@@ -662,7 +676,7 @@ test("canonical package questions appear in Bank and image/open checks preserve 
     const mcq = items.find((i) => i.question.question_type === "mcq");
     await assert.rejects(
       call("book_practice_explanation", [sid, mcq.id], ["uuid", "uuid"]),
-      /Select an answer/,
+      /Check your answer/,
     );
     const save = async (i, value) =>
       call(
@@ -684,10 +698,9 @@ test("canonical package questions appear in Bank and image/open checks preserve 
         ["uuid", "jsonb"],
       );
     await save(mcq, 0);
-    assert.match(
-      (await call("book_practice_explanation", [sid, mcq.id], ["uuid", "uuid"]))
-        .explanation,
-      /Official explanation/,
+    await assert.rejects(
+      call("book_practice_explanation", [sid, mcq.id], ["uuid", "uuid"]),
+      /Check your answer/,
     );
     const first = await call(
       "check_bank_answer",
@@ -695,6 +708,11 @@ test("canonical package questions appear in Bank and image/open checks preserve 
       ["uuid", "uuid", "integer", "uuid"],
     );
     assert.equal(first.correct, false);
+    assert.match(
+      (await call("book_practice_explanation", [sid, mcq.id], ["uuid", "uuid"]))
+        .explanation,
+      /Official explanation/,
+    );
     await save(mcq, 1);
     assert.equal(
       (
@@ -707,15 +725,9 @@ test("canonical package questions appear in Bank and image/open checks preserve 
       true,
     );
     await save(response, "wrong");
-    assert.equal(
-      (
-        await call(
-          "book_practice_explanation",
-          [sid, response.id],
-          ["uuid", "uuid"],
-        )
-      ).explanation,
-      null,
+    await assert.rejects(
+      call("book_practice_explanation", [sid, response.id], ["uuid", "uuid"]),
+      /Check your answer/,
     );
     await assert.rejects(
       call(

@@ -1,3 +1,4 @@
+import FormattedText from "../../components/FormattedText.jsx";
 import { useState } from "react";
 import { getBookExplanation } from "../books/api.js";
 import QuestionImage from "../../components/QuestionImage.jsx";
@@ -12,13 +13,15 @@ export function ExplanationContent({ explanation }) {
   // Only package image Markdown is interpreted; all other content stays text.
   const parts = [];
   const pattern =
-    /!\[([^\]]*)\]\((https:\/\/[^\s)]+\/storage\/v1\/object\/authenticated\/book-package-assets\/[a-f0-9]{64}\/[a-f0-9]{64}\.(?:png|jpe?g))\)/g;
+    /!\[([^\]]*)\]\((https:\/\/[^\s)]+\/storage\/v1\/object\/authenticated\/book-package-assets\/[a-f0-9]{64}\/[a-f0-9]{64}\.(?:png|jpe?g|webp))\)/g;
   let position = 0;
   for (const match of explanation.matchAll(pattern)) {
     if (match.index > position)
       parts.push(
         <p className="reading-text" key={`text-${position}`}>
-          {explanation.slice(position, match.index)}
+          <FormattedText>
+            {explanation.slice(position, match.index)}
+          </FormattedText>
         </p>,
       );
     parts.push(
@@ -33,7 +36,7 @@ export function ExplanationContent({ explanation }) {
   if (position < explanation.length)
     parts.push(
       <p className="reading-text" key={`text-${position}`}>
-        {explanation.slice(position)}
+        <FormattedText>{explanation.slice(position)}</FormattedText>
       </p>,
     );
   return parts;
@@ -45,9 +48,9 @@ export default function BookExplanation({ sessionId, item, waitForSave }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const available =
-    item.has_answered ||
-    item.selected_answer != null ||
-    Boolean(item.selected_response?.trim());
+    Boolean(item.attempts?.length) ||
+    item.correct != null ||
+    Boolean(item.solved_at);
   if (!available) return null;
   async function reveal() {
     if (open && !error) {

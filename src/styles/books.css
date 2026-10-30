@@ -577,3 +577,6 @@
 .import-dropzone { padding:1.5rem; border:1px dashed currentColor; border-radius:12px; margin-block:1rem; }
 .universal-import select { max-width:100%; }
 .universal-import .preview-question { padding-block:1rem; overflow-wrap:anywhere; }
+.math-expression { max-width:100%; }
+.math-display { display:block; overflow-x:auto; padding-block:.5rem; }
+.math-expression .katex { font-size:1.12em; }

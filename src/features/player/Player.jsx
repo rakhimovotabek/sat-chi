@@ -1,3 +1,4 @@
+import { numericResponseError } from "./numeric-response.js";
 import { createPortal } from "react-dom";
 import {
   LearningToolsContext,
@@ -198,6 +199,16 @@ export default function Player() {
   async function check() {
     const item = items[index];
     if (item.selected_answer == null || checkPending.current) return;
+    if (
+      item.question.question_type === "open" &&
+      item.question.import_metadata?.universal_review
+    ) {
+      const problem = numericResponseError(item.selected_response);
+      if (problem) {
+        setError(problem);
+        return;
+      }
+    }
     checkPending.current = true;
     const event = (checkEvent.current ||= crypto.randomUUID());
     setChecking(true);
@@ -628,11 +639,14 @@ export default function Player() {
             </h2>
             {openResponse ? (
               <label className="book-open-response">
-                Your answer
+                Your answer (number or fraction; up to five characters, six with
+                a minus sign)
                 <input
                   type="text"
                   inputMode="text"
-                  maxLength={2000}
+                  maxLength={
+                    current.question.import_metadata?.universal_review ? 6 : 200
+                  }
                   value={current.selected_response ?? ""}
                   disabled={
                     submitted ||
