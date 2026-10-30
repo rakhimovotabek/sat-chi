@@ -1,5 +1,6 @@
 // Shared route metadata keeps navigation, page titles, and placeholders aligned.
 export const studentNavigation = [
+  { slug: "battles", label: "Battles", icon: "standings" },
   { slug: "dashboard", label: "Dashboard", icon: "dashboard" },
   {
     slug: "homework",

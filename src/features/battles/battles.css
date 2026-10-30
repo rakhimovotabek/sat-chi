@@ -1,0 +1,131 @@
+.battles {
+  max-width: 1200px;
+  margin-inline: auto;
+}
+.battle-intro {
+  padding-block: 1rem 2rem;
+  max-width: 70ch;
+}
+.battle-intro h2 {
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+.battle-home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.battle-lobby {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  text-align: left;
+  padding: 1rem;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  cursor: pointer;
+}
+.battle-lobby:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+.battle-room-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.battle-room-bar strong {
+  display: block;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+.battle-scoreboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.battle-player {
+  flex: 1 1 150px;
+  padding: 1rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+.battle-player strong {
+  display: block;
+  font-size: 2.5rem;
+  font-variant-numeric: tabular-nums;
+}
+.battle-player small {
+  display: block;
+}
+.battle-player.team-1 {
+  border-top: 3px solid #547deb;
+}
+.battle-player.team-0 {
+  border-top: 3px solid #bd7541;
+}
+.battle-countdown {
+  padding: 3rem 1rem;
+  text-align: center;
+}
+.battle-countdown h3 {
+  font-size: 3rem;
+  animation: battle-ready 0.5s ease-out;
+}
+.battle-options {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.battle-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid currentColor;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.battle-choice:has(input:checked) {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+.battle-choice figure {
+  margin: 0;
+  max-width: 100%;
+}
+.battle-question {
+  max-width: 80ch;
+  overflow-wrap: anywhere;
+}
+@keyframes battle-ready {
+  from {
+    transform: translateY(8px);
+    opacity: 0.6;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@media (max-width: 700px) {
+  .battle-home-grid {
+    grid-template-columns: 1fr;
+  }
+  .battle-lobby {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .battle-countdown h3 {
+    animation: none;
+  }
+}

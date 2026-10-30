@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router";
 import StudentLayout from "./layouts/StudentLayout.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
+const Battles = lazy(() => import("./features/battles/Battles.jsx"));
 const Settings = lazy(() => import("./features/settings/Settings.jsx"));
 const StudyPlan = lazy(() => import("./features/learning/StudyPlan.jsx"));
 const Mistakes = lazy(() => import("./features/learning/Mistakes.jsx"));
@@ -107,6 +108,7 @@ export default function App() {
             />
             <Route path="/practice/:sessionId" element={<Player />} />
             <Route path="/homework" element={<Homework />} />
+            <Route path="/battles" element={<Battles />} />
             <Route path="/question-bank" element={<QuestionBank />} />
             <Route path="/vocabulary" element={<Vocabulary />} />
             <Route path="/vocabulary/study" element={<VocabularyStudy />} />
@@ -128,6 +130,7 @@ export default function App() {
                 (p) =>
                   ![
                     "dashboard",
+                    "battles",
                     "profile",
                     "settings",
                     "books",
@@ -185,6 +188,7 @@ export default function App() {
                   (p) =>
                     ![
                       "dashboard",
+                      "battles",
                       "students",
                       "books",
                       "questions",
