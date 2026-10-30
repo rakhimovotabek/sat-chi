@@ -352,3 +352,14 @@ Use the Node version specified in `package.json`, install Playwright Chromium wi
 Run `npm run test:reliability` before a release, separately from other heavy suites. It requires PostgreSQL17, PostgREST14 and Playwright Chromium; missing tools fail the command instead of silently skipping native coverage. Provide `SATCHI_TEST_POSTGRES_BIN` and `SATCHI_TEST_POSTGREST`, or use the persistent local cache paths documented in [the reliability handoff](docs/codex-reliability-handoff.md).
 
 The suite launches disposable Vite/PostgREST/database fixtures and verifies saved answers through both HTTP acknowledgements and authoritative database rows, including browser restart, stale tabs, network failures, three students, large sessions and recurring Homework. Auth/Storage HTTP transport remains a fixture; this is not hosted verification. See [the audit](docs/real-user-reliability-audit.md), [answer report](docs/answer-persistence-test-report.md), and [Homework report](docs/homework-reliability-report.md) for results, limitations and pending migrations. These local repairs have not been deployed.
+
+### Universal imports and Battles sprint (local verification)
+
+See [the implementation report](docs/major-development-sprint.md) for implemented behavior, outstanding acceptance checks, additive migrations and isolated localhost setup. The [satchi-book-v1 specification](docs/satchi-book-v1.md) includes an original CC0 ZIP fixture and conversion guidance.
+
+```bash
+npm run test:sprint     # Disposable PostgreSQL functions/RLS and package/math regressions, one worker
+npm run test:sprint:ui  # Fixture Auth/REST UI checks; real ZIP parsing, images and math rendering
+```
+
+These commands do not contact the hosted Supabase project. Full import transport and network multiplayer acceptance require disposable Supabase/Edge/Storage services; passing these checks does not establish production readiness. No deployment is authorized by this sprint.
