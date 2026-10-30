@@ -1,8 +1,8 @@
 # SAT’chi book packages, v1
 
-The permanent format identifier is `satchi-book-v1`. Import through Admin → Books → Import Book. Legacy JSON import remains available separately. All new imports create private drafts. Publish is a separate atomic database operation.
+The permanent format identifier is `satchi-book-v1`. Import through Admin → Books → Import Book. Legacy JSON import remains available separately. All new imports create private drafts. Publish is a separate atomic database operation. Admin book details include archive/restore and a validated JSON correction editor; hide a book before correcting it.
 
-Required ZIP members: `manifest.json`, `questions.jsonl`, `review-report.csv`, `README.md`. Optional images live under `assets/` and are referenced by exact case-sensitive relative paths. No directory entries, external URLs, HTML files, SVG, PDF, scripts, encrypted archives, split archives or ZIP64. Use ZIP store or deflate compression. Limits: 32 MiB compressed, 96 MiB expanded, 8 MiB per member, 4000 members, 3000 questions and 200 parent-first topics, nested at most eight levels. Archives are never extracted onto the filesystem. CRC, declared sizes, paths and duplicate member names are checked.
+Required ZIP members: `manifest.json`, `questions.jsonl`, `review-report.csv`, `README.md`. Optional images live under `assets/` and are referenced by exact case-sensitive relative paths. No directory entries, external URLs, HTML files, SVG, PDF, scripts, encrypted archives, split archives or ZIP64. Use ZIP store or deflate compression. Limits: 32 MiB compressed, 96 MiB expanded, 8 MiB per member, 4000 members, 3000 questions and 200 parent-first topics, nested at most eight levels. Archives are never extracted onto the filesystem. CRC, declared sizes, paths and duplicate member names are checked. Images are bounded to 8 million pixels and 12000 pixels per dimension. PNG chunk CRCs and exact non-interlaced pixel expansion are verified; JPEG/WebP headers and dimensions are inspected. JPEG/WebP entropy decoding is not verified server-side.
 
 Manifest fields:
 
@@ -12,7 +12,7 @@ Manifest fields:
 - `topics`: ordered `{id,title,parent?}` records; chapters are root topics.
 - `questionCount`: exact JSONL record count.
 
-Every JSONL record includes `id`, `topic`, `type`, `text`, `domain`, `skill`, `difficulty` (`easy`, `medium`, `hard`, `unclassified`), `reviewStatus` (`approved`, `pending`, `rejected`) and `source: {reference}`. Optional fields: `image`, `passage`, `explanation`, `explanationImage`, `table: {columns,rows}`. Text uses the existing safe formatting renderer; arbitrary HTML is never executed. LaTeX source is retained; full typesetting is not added by this importer.
+Every JSONL record includes `id`, `topic`, `type`, `text`, `domain`, `skill`, `difficulty` (`easy`, `medium`, `hard`, `unclassified`), `reviewStatus` (`approved`, `pending`, `rejected`) and `source: {reference}`. Optional fields: `image`, `passage`, `explanation`, `explanationImage`, `table: {columns,rows}`. Text uses the existing safe formatting renderer; arbitrary HTML is never executed. LaTeX source is retained; inline/display LaTeX is typeset through lazy-loaded KaTeX. Trusted TeX URL/HTML commands are disabled.
 
 MCQ: `options` contains exactly four ordered `{label,text,image?}` records labeled A–D and `answer` is a zero-based integer. Empty choice text requires a separate image. Never place placeholder choices into the package. Open Math response: `acceptedAnswers` contains explicit numerical strings, including alternate fractions/decimals; omit `options` and `answer`. Source-defined precision should be represented by explicit accepted answers in this revision; interval/rounding configuration is not yet part of the universal format.
 

@@ -1,3 +1,5 @@
+import UniversalDraftEditor from "./UniversalDraftEditor.jsx";
+import { supabase } from "../../lib/supabase.js";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import BookCover from "../../components/BookCover.jsx";
@@ -221,6 +223,13 @@ export default function BookDetail({ admin = false }) {
           description={book.description || "Choose a topic to begin."}
         />
       </div>
+      {admin && (
+        <UniversalDraftEditor
+          bookId={book.id}
+          published={book.published}
+          onSaved={() => state.reload()}
+        />
+      )}
       {!admin && (
         <p>
           {progress.solved} / {progress.total} questions solved
@@ -237,6 +246,34 @@ export default function BookDetail({ admin = false }) {
           >
             Edit book
           </button>
+          {["hide", book.archived_at ? "restore" : "archive"].map((action) => (
+            <button
+              key={action}
+              className="button button-secondary"
+              disabled={busy}
+              onClick={() => {
+                if (
+                  window.confirm(
+                    `${action === "hide" ? "Hide" : action === "archive" ? "Archive" : "Restore"} this book? Student history will be preserved.`,
+                  )
+                )
+                  perform(async () => {
+                    const { error } = await supabase.rpc(
+                      "manage_book_lifecycle",
+                      { p_book: book.id, p_action: action },
+                    );
+                    if (error) throw error;
+                    state.reload();
+                  });
+              }}
+            >
+              {action === "hide"
+                ? "Hide / Unpublish"
+                : action === "archive"
+                  ? "Archive"
+                  : "Restore"}
+            </button>
+          ))}
           <button className="button" onClick={() => setTopicForm({})}>
             Create topic
           </button>

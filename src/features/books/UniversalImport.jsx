@@ -115,7 +115,10 @@ export default function UniversalImport({ onImported }) {
         </p>
         {file && (
           <strong>
-            {file.name} · {(file.size / 1048576).toFixed(2)} MB
+            {file.name} ·{" "}
+            {file.size >= 1048576
+              ? `${(file.size / 1048576).toFixed(2)} MB`
+              : `${(file.size / 1024).toFixed(1)} KB`}
           </strong>
         )}
       </div>

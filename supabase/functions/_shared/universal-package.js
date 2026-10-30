@@ -251,6 +251,28 @@ export function validatePackage(manifest, questions) {
       q.source.reference.length > 500
     )
       fail(`Missing source reference: ${q.id}`);
+    if (q.table != null) {
+      const table = q.table;
+      if (
+        !Array.isArray(table.columns) ||
+        !table.columns.length ||
+        table.columns.length > 12 ||
+        table.columns.some((c) => typeof c !== "string" || c.length > 4000) ||
+        !Array.isArray(table.rows) ||
+        table.rows.length > 100 ||
+        table.rows.some(
+          (row) =>
+            !Array.isArray(row) ||
+            row.length !== table.columns.length ||
+            row.some(
+              (cell) =>
+                !["string", "number"].includes(typeof cell) ||
+                String(cell).length > 4000,
+            ),
+        )
+      )
+        fail(`Invalid table: ${q.id}`);
+    }
     asset(q.image);
     asset(q.explanationImage);
     if (q.type === "mcq") {
@@ -291,6 +313,129 @@ export function validatePackage(manifest, questions) {
     questions: questions.length,
   };
 }
+async function checkRaster(path, data) {
+  const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+  const dimensions = (width, height) => {
+    if (
+      !width ||
+      !height ||
+      width > 12000 ||
+      height > 12000 ||
+      width * height > 8000000
+    )
+      fail(`Image dimensions exceed limits: ${path}`);
+  };
+  if (path.endsWith(".png")) {
+    if (
+      data.length < 45 ||
+      view.getUint32(8) !== 13 ||
+      new TextDecoder().decode(data.subarray(12, 16)) !== "IHDR"
+    )
+      fail(`Invalid PNG header: ${path}`);
+    const width = view.getUint32(16),
+      height = view.getUint32(20);
+    dimensions(width, height);
+    const bits = data[24],
+      color = data[25],
+      channels = { 0: 1, 2: 3, 3: 1, 4: 2, 6: 4 }[color];
+    if (
+      !channels ||
+      ![1, 2, 4, 8, 16].includes(bits) ||
+      ((color === 2 || color === 4 || color === 6) && bits < 8) ||
+      (color === 3 && bits === 16) ||
+      data[26] ||
+      data[27] ||
+      data[28]
+    )
+      fail(`Unsupported PNG encoding (use non-interlaced PNG): ${path}`);
+    const idat = [];
+    let offset = 8,
+      ended = false;
+    while (offset + 12 <= data.length) {
+      const size = view.getUint32(offset),
+        type = new TextDecoder().decode(data.subarray(offset + 4, offset + 8));
+      if (
+        offset + size + 12 > data.length ||
+        crc32(data.subarray(offset + 4, offset + 8 + size)) !==
+          view.getUint32(offset + 8 + size)
+      )
+        fail(`Corrupt PNG chunk: ${path}`);
+      if (type === "IDAT")
+        idat.push(data.subarray(offset + 8, offset + 8 + size));
+      offset += size + 12;
+      if (type === "IEND") {
+        ended = true;
+        break;
+      }
+    }
+    if (!ended || offset !== data.length || !idat.length)
+      fail(`Incomplete PNG: ${path}`);
+    const expected = (Math.ceil((width * channels * bits) / 8) + 1) * height;
+    const reader = new Blob(idat)
+      .stream()
+      .pipeThrough(new DecompressionStream("deflate"))
+      .getReader();
+    let size = 0;
+    for (;;) {
+      const next = await reader.read();
+      if (next.done) break;
+      size += next.value.length;
+      if (size > expected) {
+        await reader.cancel();
+        fail(`PNG pixel expansion exceeds dimensions: ${path}`);
+      }
+    }
+    if (size !== expected)
+      fail(`PNG pixel data does not match dimensions: ${path}`);
+  } else if (/\.jpe?g$/.test(path)) {
+    let offset = 2,
+      found = false;
+    while (offset + 4 < data.length) {
+      if (data[offset] !== 255) fail(`Invalid JPEG marker: ${path}`);
+      while (data[offset] === 255) offset++;
+      const marker = data[offset++];
+      if (marker === 0xd9 || marker === 0xda) break;
+      if (marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) continue;
+      const length = view.getUint16(offset);
+      if (length < 2 || offset + length > data.length)
+        fail(`Invalid JPEG segment: ${path}`);
+      if ([0xc0, 0xc1, 0xc2].includes(marker)) {
+        if (length < 8) fail(`Invalid JPEG frame: ${path}`);
+        dimensions(view.getUint16(offset + 5), view.getUint16(offset + 3));
+        found = true;
+      }
+      offset += length;
+    }
+    if (
+      !found ||
+      data[data.length - 2] !== 255 ||
+      data[data.length - 1] !== 217
+    )
+      fail(`Incomplete JPEG: ${path}`);
+  } else {
+    if (data.length < 30 || view.getUint32(4, true) + 8 !== data.length)
+      fail(`Invalid WebP size: ${path}`);
+    const type = new TextDecoder().decode(data.subarray(12, 16));
+    const u24 = (i) => data[i] | (data[i + 1] << 8) | (data[i + 2] << 16);
+    if (type === "VP8X") {
+      if (data[20] & 2) fail(`Animated WebP is unsupported: ${path}`);
+      dimensions(u24(24) + 1, u24(27) + 1);
+    } else if (type === "VP8L" && data[20] === 47) {
+      const packed = view.getUint32(21, true);
+      dimensions((packed & 16383) + 1, ((packed >>> 14) & 16383) + 1);
+    } else if (
+      type === "VP8 " &&
+      data[23] === 157 &&
+      data[24] === 1 &&
+      data[25] === 42
+    )
+      dimensions(
+        view.getUint16(26, true) & 16383,
+        view.getUint16(28, true) & 16383,
+      );
+    else fail(`Unsupported WebP frame: ${path}`);
+  }
+}
 export async function inspectPackage(input) {
   const files = await readZip(input),
     decode = (name) =>
@@ -322,6 +467,7 @@ export async function inspectPackage(input) {
         new TextDecoder().decode(data.subarray(0, 4)) === "RIFF" &&
         new TextDecoder().decode(data.subarray(8, 12)) === "WEBP";
       if (!png && !jpeg && !webp) fail(`Invalid image signature: ${path}`);
+      await checkRaster(path, data);
     }
   return {
     manifest,

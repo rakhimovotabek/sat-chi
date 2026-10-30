@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:satchi:book:v1:question",
+  "title": "SAT\u2019chi v1 question JSONL record",
+  "type": "object",
+  "required": [
+    "id",
+    "topic",
+    "type",
+    "text",
+    "domain",
+    "skill",
+    "difficulty",
+    "reviewStatus",
+    "source"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]{1,100}$"
+    },
+    "topic": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]{1,100}$"
+    },
+    "text": {
+      "type": "string",
+      "maxLength": 20000
+    },
+    "passage": {
+      "type": "string",
+      "maxLength": 60000
+    },
+    "explanation": {
+      "type": "string",
+      "maxLength": 60000
+    },
+    "domain": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "skill": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "type": {
+      "enum": ["mcq", "open"]
+    },
+    "difficulty": {
+      "enum": ["easy", "medium", "hard", "unclassified"]
+    },
+    "reviewStatus": {
+      "enum": ["approved", "pending", "rejected"]
+    },
+    "image": {
+      "type": ["string", "null"],
+      "pattern": "^assets/[a-zA-Z0-9_/-]+\\.(png|jpg|jpeg|webp)$"
+    },
+    "explanationImage": {
+      "type": ["string", "null"],
+      "pattern": "^assets/[a-zA-Z0-9_/-]+\\.(png|jpg|jpeg|webp)$"
+    },
+    "source": {
+      "type": "object",
+      "required": ["reference"],
+      "properties": {
+        "reference": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    },
+    "options": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["label", "text"],
+        "properties": {
+          "label": {
+            "enum": ["A", "B", "C", "D"]
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "image": {
+            "type": ["string", "null"],
+            "pattern": "^assets/[a-zA-Z0-9_/-]+\\.(png|jpg|jpeg|webp)$"
+          }
+        }
+      }
+    },
+    "answer": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "acceptedAnswers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^-?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:/[0-9]+)?$"
+      }
+    },
+    "table": {
+      "type": ["object", "null"],
+      "required": ["columns", "rows"],
+      "properties": {
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "string"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "array",
+            "items": {
+              "type": ["string", "number"]
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "mcq"
+          }
+        }
+      },
+      "then": {
+        "required": ["options", "answer"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "open"
+          }
+        }
+      },
+      "then": {
+        "required": ["acceptedAnswers"]
+      }
+    }
+  ]
+}

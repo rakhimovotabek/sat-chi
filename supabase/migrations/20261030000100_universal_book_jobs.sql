@@ -94,7 +94,7 @@ create function public.guard_universal_publication()returns trigger language plp
 create trigger universal_publication before insert or update of published on public.books for each row execute function public.guard_universal_publication();
 -- Prevent cascading deletion from erasing canonical identities referenced in saved JSON snapshots.
 create function public.guard_book_history_delete()returns trigger language plpgsql security definer set search_path='' as $$begin
- if exists(select 1 from public.book_practice_items i join public.questions q on q.id=(i.question->>'id')::uuid join public.book_topics t on t.id=q.topic_id where t.book_id=old.id)then raise exception 'This book has saved practice or Homework history. Hide or archive it instead.';end if;return old;end;$$;
+ if exists(select 1 from public.book_practice_items i join public.questions q on q.id::text=i.question->>'id' join public.book_topics t on t.id=q.topic_id where t.book_id=old.id)then raise exception 'This book has saved practice or Homework history. Hide or archive it instead.';end if;return old;end;$$;
 create trigger preserve_book_history before delete on public.books for each row execute function public.guard_book_history_delete();
 revoke all on function public.universal_begin(text,jsonb,uuid),public.universal_append(uuid,integer,jsonb)from public,anon,authenticated;
 grant execute on function public.universal_begin(text,jsonb,uuid),public.universal_append(uuid,integer,jsonb)to service_role;

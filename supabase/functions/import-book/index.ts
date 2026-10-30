@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2.117.2";
 import {
+  validatePackage,
   inspectPackage,
   sha256,
   LIMITS,
@@ -79,10 +80,45 @@ Deno.serve(async (request) => {
       );
       return reply(job);
     }
-    const { jobId } = await request.json();
+    const { jobId, correction } = await request.json();
     job = await checked(
       admin.from("universal_book_jobs").select("*").eq("id", jobId).single(),
     );
+    if (correction) {
+      validatePackage({ ...job.manifest, questionCount: 1 }, [correction]);
+      const assets = await checked(
+        admin
+          .from("book_package_assets")
+          .select("path,source_path")
+          .eq("book_id", job.book_id),
+      );
+      const assetUrl = (path?: string) => {
+        if (!path) return null;
+        const found = assets.find((a: any) => a.source_path === path);
+        if (!found) throw new Error(`Missing uploaded asset: ${path}`);
+        return `https://satchi.invalid/storage/v1/object/authenticated/book-package-assets/${found.path}`;
+      };
+      const fixed = {
+        ...correction,
+        imageUrl: assetUrl(correction.image),
+        options: correction.options?.map((o: any) => ({
+          ...o,
+          imageUrl: assetUrl(o.image),
+        })),
+      };
+      // Existing explanation image Markdown is preserved. New image references must already belong to this package.
+      if (
+        correction.explanationImage &&
+        !fixed.explanation?.includes("/storage/v1/object/authenticated/")
+      )
+        fixed.explanation =
+          (fixed.explanation || "") +
+          `\n![Explanation](${assetUrl(correction.explanationImage)})`;
+      await checked(
+        admin.rpc("universal_correct", { p_job: job.id, p_record: fixed }),
+      );
+      return reply({ saved: true });
+    }
     if (job.status !== "importing") return reply(job);
     const blob = await checked(
       admin.storage.from("universal-book-staging").download(`${job.id}.zip`),
@@ -120,16 +156,14 @@ Deno.serve(async (request) => {
       if ((await sha256(await verify.arrayBuffer())) !== (await sha256(bytes)))
         throw new Error(`Asset verification failed: ${path}`);
       await checked(
-        admin
-          .from("book_package_assets")
-          .upsert({
-            path: storagePath,
-            book_id: job.book_id,
-            question_id: null,
-            kind: "archive",
-            source_path: path,
-            sha256: await sha256(bytes),
-          }),
+        admin.from("book_package_assets").upsert({
+          path: storagePath,
+          book_id: job.book_id,
+          question_id: null,
+          kind: "archive",
+          source_path: path,
+          sha256: await sha256(bytes),
+        }),
       );
     }
     job.asset_cursor = Math.min(assets.length, job.asset_cursor + 20);

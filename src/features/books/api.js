@@ -132,7 +132,7 @@ export async function saveBook(values, id) {
 export const deleteBook = (id) =>
   checked(
     supabase.from("books").delete().eq("id", id),
-    "Could not delete this book.",
+    "This book could not be deleted. Imported records or saved student history may still reference it. Hide or archive it to preserve progress and Homework grades.",
   );
 export const saveTopic = (values, id) =>
   checked(

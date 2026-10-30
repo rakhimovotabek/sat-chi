@@ -62,6 +62,9 @@ test("universal package rejects missing keys, invalid options, wrong counts and 
     mutate(m);
     assert.throws(() => validatePackage(m, questions));
   }
+  const invalidTable = structuredClone(questions);
+  invalidTable[0].table = { columns: ["x"], rows: [["a", "b"]] };
+  assert.throws(() => validatePackage(manifest, invalidTable), /Invalid table/);
   const qs = structuredClone(questions);
   qs[0].options[1].label = "D";
   assert.throws(() => validatePackage(manifest, qs));
@@ -108,6 +111,60 @@ test("universal import resumes batches, protects drafts, publishes canonical Ban
   await assert.rejects(
     () => call("universal_publish", [job, true], ["uuid", "boolean"]),
     /Admin required/,
+  );
+  await role(admin);
+  await call("universal_publish", [job, true], ["uuid", "boolean"]);
+  await call(
+    "manage_book_lifecycle",
+    [
+      (
+        await db.query("select book_id from universal_book_jobs where id=$1", [
+          job,
+        ])
+      ).rows[0].book_id,
+      "archive",
+    ],
+    ["uuid", "text"],
+  );
+  await assert.rejects(
+    () => call("universal_publish", [job, true], ["uuid", "boolean"]),
+    /Restore/,
+  );
+  await call(
+    "manage_book_lifecycle",
+    [
+      (
+        await db.query("select book_id from universal_book_jobs where id=$1", [
+          job,
+        ])
+      ).rows[0].book_id,
+      "restore",
+    ],
+    ["uuid", "text"],
+  );
+  await db.exec("reset role");
+  await call(
+    "universal_correct",
+    [
+      job,
+      JSON.stringify({
+        ...questions[0],
+        text: "Corrected original stem",
+        reviewStatus: "pending",
+      }),
+    ],
+    ["uuid", "jsonb"],
+  );
+  await role(admin);
+  await assert.rejects(
+    () => call("universal_publish", [job, true], ["uuid", "boolean"]),
+    /approve all/,
+  );
+  await db.exec("reset role");
+  await call(
+    "universal_correct",
+    [job, JSON.stringify(questions[0])],
+    ["uuid", "jsonb"],
   );
   await role(admin);
   await call("universal_publish", [job, true], ["uuid", "boolean"]);
@@ -158,4 +215,22 @@ test("original ZIP validates actual compressed archive, image options, passages 
   await assert.rejects(() =>
     inspectPackage(bytes.subarray(0, bytes.length - 5)),
   );
+});
+test("hostile ZIP structures and valid-signature PNGs with invalid pixel data fail safely", async () => {
+  const { readFile } = await import("node:fs/promises");
+  for (const [name, message] of [
+    ["unsafe-path.zip", /Unsafe/],
+    ["unsafe-type.zip", /Unsupported file/],
+    ["excessive-ratio.zip", /expansion limit/],
+    ["duplicate-entry.zip", /duplicate/],
+    ["invalid-pixels.zip", /pixel data/],
+  ]) {
+    await assert.rejects(
+      () =>
+        readFile(`tests/fixtures/universal-book/${name}`).then((bytes) =>
+          inspectPackage(bytes),
+        ),
+      message,
+    );
+  }
 });
