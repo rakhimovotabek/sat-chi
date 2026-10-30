@@ -18,7 +18,7 @@ const cache = createQuestionImageCache(async (src, owner) => {
   if (
     !(
       packageAsset
-        ? /^[a-f0-9]{64}\/[a-f0-9]{64}\.(?:png|jpe?g)$/
+        ? /^[a-f0-9]{64}\/[a-f0-9]{64}\.(?:png|jpe?g|webp)$/
         : /^[a-f0-9]{64}\/[a-f0-9]{64}\.webp$/
     ).test(path)
   )

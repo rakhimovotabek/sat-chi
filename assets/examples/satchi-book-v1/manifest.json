@@ -1,0 +1,38 @@
+{
+  "format": "satchi-book-v1",
+  "book": {
+    "id": "satchi-original-example",
+    "title": "SAT’chi Original Practice",
+    "author": "SAT’chi",
+    "description": "Original import acceptance fixture",
+    "section": "Math",
+    "cover": "assets/cover.png"
+  },
+  "rights": {
+    "authorized": true,
+    "owner": "SAT’chi",
+    "license": "CC0-1.0",
+    "provenance": "Created specifically for software testing"
+  },
+  "topics": [
+    {
+      "id": "chapter-one",
+      "title": "Foundations"
+    },
+    {
+      "id": "algebra",
+      "title": "Linear equations",
+      "parent": "chapter-one"
+    },
+    {
+      "id": "chapter-two",
+      "title": "Data and geometry"
+    },
+    {
+      "id": "data",
+      "title": "Working with data",
+      "parent": "chapter-two"
+    }
+  ],
+  "questionCount": 6
+}

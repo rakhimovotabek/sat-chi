@@ -7,6 +7,7 @@ import ContentState from "./ContentState.jsx";
 import { getBookCatalog } from "./api.js";
 import BookForm from "./BookForm.jsx";
 import ImportPanel from "./ImportPanel.jsx";
+import UniversalImport from "./UniversalImport.jsx";
 export default function Books({ admin = false }) {
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -63,7 +64,7 @@ export default function Books({ admin = false }) {
               className="button button-secondary"
               onClick={() => setImporting((v) => !v)}
             >
-              JSON import
+              Import Book
             </button>
           </div>
         )}
@@ -77,7 +78,15 @@ export default function Books({ admin = false }) {
           }}
         />
       )}
-      {importing && <ImportPanel onImported={() => state.reload()} />}
+      {importing && (
+        <>
+          <UniversalImport onImported={() => state.reload()} />
+          <details>
+            <summary>Legacy JSON import</summary>
+            <ImportPanel onImported={() => state.reload()} />
+          </details>
+        </>
+      )}
       <ContentState {...state} onRetry={state.reload} />
       {!state.loading &&
         !state.error &&

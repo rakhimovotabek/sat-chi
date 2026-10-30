@@ -571,3 +571,9 @@
 }
 
 .correct-choice .choice-letter, .incorrect-choice .choice-letter { color: inherit; }
+.import-stages { display:flex; flex-wrap:wrap; gap:1rem; list-style:none; padding:0; margin:1.5rem 0; }
+.import-stages li { padding:.5rem .75rem; border-bottom:2px solid transparent; }
+.import-stages [aria-current] { border-color:currentColor; font-weight:700; }
+.import-dropzone { padding:1.5rem; border:1px dashed currentColor; border-radius:12px; margin-block:1rem; }
+.universal-import select { max-width:100%; }
+.universal-import .preview-question { padding-block:1rem; overflow-wrap:anywhere; }

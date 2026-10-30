@@ -10,3 +10,7 @@ additional_redirect_urls = ["http://localhost:5173/login", "http://127.0.0.1:517
 # using newer signing keys. Disabling the gateway check does not bypass the handler.
 verify_jwt = false
 entrypoint = "./functions/manage-student/index.js"
+
+[functions.import-book]
+verify_jwt = false
+entrypoint = "./functions/import-book/index.ts"
