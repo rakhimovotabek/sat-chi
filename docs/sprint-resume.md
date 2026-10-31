@@ -1,26 +1,63 @@
-# Paused at the user’s request — 2026-10-31
+# UI redesign checkpoint — 2026-10-31
 
-User asked to pause because their usage limit was nearly exhausted. Stop work
-until they explicitly resume. No redesign implementation has started yet.
+Resumed from `ba996ca` on `feature/universal-book-import`. User changed priority to
+visual redesign, then imposed a battery/time limit. No hosted changes, push or deployment.
 
-Latest implementation: `65bb8ac`, following `429c81e` (safe Homework deletion)
-and `26498bd` (database recovery). Branch `feature/universal-book-import`.
-Database recovery, Homework deletion and SBank are locally committed and verified;
-hosted production remains untouched and still lacks the pending migrations.
+Implemented a rounded academic design system, persistent Light/Dark/System themes,
+local licensed Manrope font, shared controls/cards/navigation/dialog/table/skeleton
+surfaces, responsive student/admin workspaces and short navigation transitions.
+Dashboard composition, Progress overview/activity/heatmap, book completion rings,
+Question Bank filter framing, vocabulary counters, solving states, admin quick
+links and Battle landing/lobby/team/readiness/round/result presentation now use it.
+AnimatedValue and ActivityChart animate actual saved values with stable accessible
+values, visibility/hidden-tab suspension and reduced-motion support. No backend,
+scoring or grading policy changed; SBank IDs and Homework deletion are preserved.
 
-Next on resume: premium redesign and additional animated saved-data analytics.
-Confirmed user direction: combine the four supplied references cohesively, never
-literally; clean blue/white light theme, sophisticated navy/electric-blue dark;
-energetic Battles, elegant readable Progress/Books/Admin; meaningful counters,
-charts, hover and navigation; no repetitive animation, unnecessary blur or heavy
-graphics. User explicitly chose **build directly in the working app, then review
-working pages**. Do not ask those preferences again. Persist the confirmed
-code-first workflow when starting design; no PRODUCT.md/DESIGN.md/theme or new
-Admin Analytics aggregate has been implemented yet. Read existing feature evidence
-below, inspect current HEAD/status and continue without rerunning service setup.
+Commits: `67e2a02` establishes shared themes/design system; `138c9b0` refines
+learning/analytics/Battles.
 
-No push, deployment, production migration or real student-data write occurred.
-All completed acceptance results are recorded below and in focused evidence docs.
+Verification this continuation:
+- Final lint and production build pass (logs `/tmp/satchi-redesign-final-*.log`).
+- Theme storage/system/restricted-storage unit: **1/1**.
+- Focused Progress/performance/SBank browsers: **11/11**.
+- Broader Books/practice/tools/motion/Settings run: **24/30 initially passed**.
+  Five stale tests expected earlier explanation policy, old input labels or the
+  former JSON-import button. Updated tests reflect behavior already present at
+  `ba996ca`; no grading/explanation business logic was changed. The sixth failed
+  during initial account loading. All **six targeted reruns passed**. Entire
+  30-case batch was not rerun after those test updates.
+- Real local Auth/Postgres/PostgREST walkthrough: **1/1**, repeated successfully
+  after fixes. Covers 23 student/admin routes × two themes ×390/768/1366 widths
+  (**138 combinations**), plus Battle creation/readiness at all widths/themes,
+  refresh/login and exact equality of saved answer/Check history before/after.
+  Actual fixture metrics: two distinct questions, 50% first accuracy, two eventually
+  correct; no invented student values. Found/fixed a768px Homework overflow caused
+  by an absolutely positioned hidden assignment label escaping the table.
+- Final native evidence: `.impeccable/review/redesign/manifest.json` and54 PNGs.
+  Earlier captures under test-results were removed by Playwright's normal cleanup;
+  native captures now live outside that cleaned directory.
+- Manual detector ran once: thick result border and width animation warnings;
+  both mechanical issues corrected. No new raster illustration assets.
+
+Finish status / next steps:
+1. Fresh finish review found input contrast issues: light Question Bank “Search
+   book titles” appears charcoal with a dark placeholder; dark Battle invitation
+   input looks gray. Diagnose theme/control state, fix, recapture and get the
+   reviewer verdict. Review coverage is partial; see its report when available.
+   Do not claim whole-surface visual acceptance.
+2. DESIGN.md and .impeccable/design.json now document implemented tokens and
+   motion. JSON parses; documentation explicitly records pending visual review.
+3. Live multiplayer/countdown/round/final-result browser regression, Homework
+   deletion regression and extended lower-page visual coverage were not rerun in
+   this UI continuation. Previous verified functional milestones remain documented
+   below; do not label these additional checks complete.
+4. Inspect git status/log before editing. Code-first style decisions remain pinned;
+   no further style interview is needed. Run memory-heavy suites serially.
+
+Review locally with `npm run dev:isolated` (disposable PG/PostgREST, fixture Auth
+and Storage); `npm run dev:platform` exercises the fuller local platform. Ordinary
+`npm run dev` still uses hosted credentials from .env.local and hosted schema drift
+remains untouched. Never apply hosted migrations merely to make that command work.
 
 ---
 
