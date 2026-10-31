@@ -4,6 +4,24 @@ Branch: `feature/universal-book-import`. Baseline: `780eb95`. All implementation
 
 **Status: substantial implementation delivered; full sprint acceptance is not yet established.** The disposable SQL integration tests exercise actual PostgreSQL functions and RLS, but the complete Edge/Storage upload and real network multiplayer flows still need a disposable Supabase environment.
 
+## Current recovery checkpoint (2026-10-31)
+
+The absent tool cache has been restored locally: PostgreSQL 17.11, PostgREST 14.1,
+Auth v2.197.0. Native browser/HTTP acceptance now verifies original ZIP import,
+actual assets, durable draft/correction/publication, student solving/Bank/history,
+real network 1v1/2v2, full Typed Word match, R&W passage round, persisted Progress
+and admin Homework heatmap. Actual replacement option upload/preview/grade and
+attributed correction audits preserve IDs and old grades. A reviewed lossless
+crop tool runs on two original synthetic layouts; existing corpus conversions
+remain zero pending rights/canonical reconciliation.
+
+Final focused checks pass: 10 unit, 8 SQL, 10 native (parent plus nine scenarios),
+6 browser fixtures; lint/build. Storage HTTP/Node Edge transport are explicitly
+substituted; full Storage/Edge/Realtime is not verified. Actual native screenshots
+and exact commands/limitations are linked in [the current resume](sprint-resume.md).
+The detailed sections below record earlier milestones and their evidence; their
+missing-native-tool statements are superseded by this recovery checkpoint.
+
 ## Universal Import System
 
 Implemented in the existing Admin → Books workspace:
