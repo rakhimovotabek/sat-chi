@@ -206,18 +206,34 @@ test(
           await expect(img).toHaveJSProperty("naturalWidth", 120);
         await page.getByRole("radio").nth(1).check();
         await page.getByRole("button", { name: "Check", exact: true }).click();
+        await expect(page.locator(".attempt-feedback strong")).toHaveText(
+          "Correct",
+        );
         await page.reload();
         await expect(page.getByRole("radio").nth(1)).toBeChecked();
         await page.getByRole("button", { name: "Next", exact: true }).click();
         await page.getByRole("button", { name: "Next", exact: true }).click();
         await page.getByRole("textbox", { name: /Your answer/ }).fill("1/2");
         await page.getByRole("button", { name: "Check", exact: true }).click();
-        await expect(page.getByRole("button", { name: "Explanation", exact: true })).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "Explanation", exact: true }),
+        ).toBeVisible();
         const bank = await rpc(learner, "question_bank", {
           p_filters: { book },
           p_page: 0,
         });
-        assert.ok(JSON.stringify(bank).includes(firstId));
+        const bankPage2 = await rpc(learner, "question_bank", {
+          p_filters: { book },
+          p_page: 1,
+        });
+        assert.ok(JSON.stringify([bank, bankPage2]).includes(firstId));
+        await expect
+          .poll(() =>
+            app.json(
+              `select count(*) from question_check_attempts a join book_practice_items i on i.id=a.item_id where i.session_id='${session}'`,
+            ),
+          )
+          .toBe(3);
         const before = await app.json(
           `select jsonb_agg(to_jsonb(a) order by a.id)from question_check_attempts a join book_practice_items i on i.id=a.item_id where i.session_id='${session}'`,
         );
@@ -228,6 +244,37 @@ test(
         });
         assert.equal(
           (await learner.from("books").select("id").eq("id", book)).data.length,
+          0,
+        );
+        const draft = await rpc(teacher, "universal_draft_records", {
+          p_book: book,
+        });
+        const correction = draft.records.find(
+          (r) => r.questionId === firstId,
+        ).record;
+        correction.answer = 2;
+        assert.ifError(
+          (
+            await teacher.functions.invoke("import-book", {
+              body: { jobId: job, correction },
+            })
+          ).error,
+        );
+        const audit = await teacher
+          .from("universal_book_corrections")
+          .select("actor,previous_record,corrected_record")
+          .eq("question_id", firstId)
+          .order("created_at", { ascending: false });
+        assert.ifError(audit.error);
+        assert.equal(
+          audit.data[0].actor,
+          (await teacher.auth.getUser()).data.user.id,
+        );
+        assert.equal(audit.data[0].previous_record.answer, 1);
+        assert.equal(audit.data[0].corrected_record.answer, 2);
+        assert.equal(
+          (await learner.from("universal_book_corrections").select("id")).data
+            .length,
           0,
         );
         await rpc(teacher, "manage_book_lifecycle", {

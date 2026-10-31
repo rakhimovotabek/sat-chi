@@ -123,7 +123,11 @@ export function createImportHandler({ createClient, env }) {
             (fixed.explanation || "") +
             `\n![Explanation](${assetUrl(correction.explanationImage)})`;
         await checked(
-          admin.rpc("universal_correct", { p_job: job.id, p_record: fixed }),
+          admin.rpc("universal_correct", {
+            p_job: job.id,
+            p_record: fixed,
+            p_actor: auth.user.id,
+          }),
         );
         return reply({ saved: true });
       }

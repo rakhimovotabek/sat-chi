@@ -58,3 +58,15 @@ First diagnostic failed on the editor's accessible field name and an assertion
 racing the SPR save. Added explicit field aria-label and awaited post-Check UI
 acknowledgment. Final rerun passed all six. Lint/build passed. No production,
 GitHub or deployment operation occurred.
+
+## Attributed corrections
+
+Migration `20261031000400_universal_correction_audit.sql` records canonical ID,
+job, active owner/editor, before/after record and timestamp transactionally.
+The old unattributed service entrypoint is revoked. Audit rows are admin-readable;
+students cannot enumerate them and neither browser role can write/delete them.
+No historic attempts or snapshots are rewritten. The actual HTTP/native test
+changes an answer key after hide and proves all prior Check rows remain identical
+through archive/restore/publication. Seven focused package/authorization tests and
+all six native tests pass. This additive migration depends on prior universal
+job/ownership/correction migrations. No backfill fabricates past editor identity.

@@ -152,8 +152,9 @@ test("universal import resumes batches, protects drafts, publishes canonical Ban
         text: "Corrected original stem",
         reviewStatus: "pending",
       }),
+      admin,
     ],
-    ["uuid", "jsonb"],
+    ["uuid", "jsonb", "uuid"],
   );
   await role(admin);
   await assert.rejects(
@@ -163,12 +164,29 @@ test("universal import resumes batches, protects drafts, publishes canonical Ban
   await db.exec("reset role");
   await call(
     "universal_correct",
-    [job, JSON.stringify(questions[0])],
-    ["uuid", "jsonb"],
+    [job, JSON.stringify(questions[0]), admin],
+    ["uuid", "jsonb", "uuid"],
   );
   await role(admin);
   await call("universal_publish", [job, true], ["uuid", "boolean"]);
+  const audit = (
+    await db.query(
+      "select * from universal_book_corrections order by created_at",
+    )
+  ).rows;
+  assert.equal(audit.length, 2);
+  assert.equal(audit[0].actor, admin);
+  assert.equal(audit[0].corrected_record.text, "Corrected original stem");
   await role(student);
+  assert.equal(
+    (await db.query("select count(*)::int n from universal_book_corrections"))
+      .rows[0].n,
+    0,
+  );
+  await assert.rejects(
+    () => db.exec("delete from universal_book_corrections"),
+    /permission denied/,
+  );
   const rows = (
     await db.query(
       `select q.* from questions q join book_topics t on t.id=q.topic_id join books b on b.id=t.book_id where b.title='Original sprint practice'`,
