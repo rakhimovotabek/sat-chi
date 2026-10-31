@@ -128,6 +128,9 @@ test(
           page.getByText("Loading learning materials…", { exact: true }),
         ).toHaveCount(0, { timeout: 15000 });
         await expect(page.getByRole("alert")).toHaveCount(0);
+        await expect(
+          page.getByRole("banner").getByText("Page not found", { exact: true }),
+        ).toHaveCount(0);
         await page.evaluate(() => document.fonts.ready);
       }
       async function capture(name) {
@@ -172,6 +175,14 @@ test(
       )) {
         await page.goto(app.appUrl + path);
         await ready();
+        if (path === "/admin/imports") {
+          await expect(
+            page
+              .getByRole("banner")
+              .getByText("Import status", { exact: true }),
+          ).toBeVisible();
+          await expect(page).toHaveTitle("Import status | SAT'chi");
+        }
         for (const theme of ["light", "dark"]) {
           await page
             .getByLabel("Color theme", { exact: true })
@@ -182,6 +193,94 @@ test(
           );
           for (const width of [1366, 768, 390]) {
             await page.setViewportSize({ width, height: 844 });
+            if (path === "/progress") {
+              const chart = page
+                .locator(".progress-activity .progress-chart")
+                .first();
+              await expect(chart).toBeVisible();
+              const bottom = await chart.evaluate(
+                (node) => node.getBoundingClientRect().bottom,
+              );
+              assert.ok(
+                bottom <= 844,
+                `Progress baseline at ${bottom}px, ${width}px viewport`,
+              );
+            }
+            if (path.startsWith("/practice/")) {
+              const header = page.getByRole("banner");
+              await expect(
+                page.getByRole("button", {
+                  name: "Back to practice",
+                  exact: true,
+                }),
+              ).toBeVisible();
+              const gap = await page.evaluate(
+                () =>
+                  document
+                    .querySelector(".practice-page")
+                    .getBoundingClientRect().top -
+                  document.querySelector(".topbar").getBoundingClientRect()
+                    .bottom,
+              );
+              assert.ok(
+                gap >= 0 && gap <= 48,
+                `Practice content gap ${gap}px at ${width}px`,
+              );
+              assert.ok(
+                await header.evaluate((node) => {
+                  const bounds = node.getBoundingClientRect();
+                  return [...node.querySelectorAll("button,select")]
+                    .filter((el) => el.getClientRects().length)
+                    .every((el) => {
+                      const rect = el.getBoundingClientRect();
+                      return (
+                        rect.top >= bounds.top - 1 &&
+                        rect.bottom <= bounds.bottom + 1
+                      );
+                    });
+                }),
+                `Practice header controls must fit their header at ${width}px`,
+              );
+              await expect(
+                page.locator(".answer-choice.correct-choice"),
+              ).toHaveCSS(
+                "background-color",
+                theme === "light" ? "rgb(229, 246, 239)" : "rgb(20, 59, 52)",
+              );
+              await expect(
+                page.locator(".answer-choice.correct-choice label"),
+              ).toHaveCSS(
+                "color",
+                theme === "light" ? "rgb(23, 43, 77)" : "rgb(230, 237, 252)",
+              );
+              await expect(
+                page.locator(".attempt-feedback.correct-choice"),
+              ).toHaveCSS(
+                "background-color",
+                theme === "light" ? "rgb(229, 246, 239)" : "rgb(20, 59, 52)",
+              );
+            }
+            const themedInputs =
+              path === "/question-bank"
+                ? page.getByPlaceholder("Search book titles")
+                : path === "/battles"
+                  ? page.getByLabel("Invitation code", { exact: true })
+                  : path === "/admin/homework"
+                    ? page.getByRole("searchbox")
+                    : null;
+            if (themedInputs) {
+              for (const input of await themedInputs.all()) {
+                await expect(input).toHaveCSS(
+                  "background-color",
+                  theme === "light" ? "rgb(255, 255, 255)" : "rgb(18, 31, 51)",
+                );
+                await expect(input).toHaveCSS(
+                  "color",
+                  theme === "light" ? "rgb(23, 43, 77)" : "rgb(230, 237, 252)",
+                );
+                await expect(input).toHaveCSS("transition-duration", "0s");
+              }
+            }
             const overflow = await page.evaluate(
               () => document.documentElement.scrollWidth > innerWidth,
             );
@@ -233,11 +332,32 @@ test(
                 "/admin/dashboard",
                 "/admin/homework",
                 `/practice/${session}`,
-              ].includes(path)
+              ].includes(path) ||
+              (width === 1366 && theme === "light") ||
+              (width === 390 && theme === "dark")
             ) {
               await capture(
-                `${who}-${path.startsWith("/practice/") ? "practice" : path.split("/").at(-1)}-${theme}-${width}`,
+                `${who}-${path.startsWith("/practice/") ? "practice" : /\/books\//.test(path) ? "book-detail" : /\/students\//.test(path) ? "student-detail" : path.split("/").at(-1)}-${theme}-${width}`,
               );
+            }
+            if (path === "/progress") {
+              const activity = page.getByRole("region", {
+                name: "First-attempt activity",
+                exact: true,
+              });
+              const activityPath = `.impeccable/review/redesign/progress-activity-${theme}-${width}.png`;
+              await activity.screenshot({ path: activityPath });
+              screenshots.push(activityPath);
+              if (width !== 768) {
+                const breakdown = page.getByRole("region", {
+                  name: "Performance breakdown",
+                  exact: true,
+                });
+                const breakdownPath = `.impeccable/review/redesign/progress-breakdown-${theme}-${width}.png`;
+                await breakdown.screenshot({ path: breakdownPath });
+                screenshots.push(breakdownPath);
+              }
+              await page.evaluate(() => window.scrollTo(0, 0));
             }
             checks.push({ path, theme, width });
           }
@@ -267,6 +387,7 @@ test(
         await page.reload();
         await ready();
         const ring = overview.locator(".progress-ring");
+        await ring.scrollIntoViewIfNeeded();
         await expect(ring).toHaveAttribute("data-motion", "complete");
         await expect(ring.locator(".ring-value")).toHaveAttribute(
           "stroke-dashoffset",
@@ -295,6 +416,7 @@ test(
         await expect(
           page.getByLabel("Color theme", { exact: true }),
         ).toHaveValue("dark");
+        await ring.scrollIntoViewIfNeeded();
         await expect(ring).toHaveAttribute("data-motion", "complete");
         assert.equal(
           await ring.evaluate(

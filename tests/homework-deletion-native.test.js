@@ -148,9 +148,9 @@ test(
     await expect(
       dialog.getByRole("button", { name: "Delete homework", exact: true }),
     ).toBeDisabled();
-    await mkdir("test-results", { recursive: true });
+    await mkdir(".impeccable/review/homework-deletion", { recursive: true });
     await dialog.screenshot({
-      path: "test-results/homework-delete-desktop.png",
+      path: ".impeccable/review/homework-deletion/homework-delete-light-desktop.png",
     });
     for (const width of [768, 390]) {
       await page.setViewportSize({ width, height: 844 });
@@ -159,7 +159,26 @@ test(
         false,
       );
       await dialog.screenshot({
-        path: `test-results/homework-delete-${width}.png`,
+        path: `.impeccable/review/homework-deletion/homework-delete-light-${width}.png`,
+      });
+    }
+    await dialog
+      .getByRole("button", { name: "Close Delete homework", exact: true })
+      .click();
+    await page.getByLabel("Color theme", { exact: true }).selectOption("dark");
+    await row.getByRole("button", { name: "Delete", exact: true }).click();
+    await expect(dialog).toContainText("grades will be retained");
+    await expect(
+      dialog.getByRole("button", { name: "Delete homework", exact: true }),
+    ).toBeDisabled();
+    for (const width of [1366, 768, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      assert.equal(
+        await dialog.evaluate((node) => node.scrollWidth > node.clientWidth),
+        false,
+      );
+      await dialog.screenshot({
+        path: `.impeccable/review/homework-deletion/homework-delete-dark-${width}.png`,
       });
     }
     await dialog

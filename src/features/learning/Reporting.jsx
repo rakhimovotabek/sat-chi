@@ -188,6 +188,7 @@ export function Progress() {
       <ContentState {...state} onRetry={state.reload} />
       {state.data && (
         <>
+          <ProgressActivity />
           <section
             className="progress-overview card"
             aria-label="All-time learning overview"
@@ -220,7 +221,6 @@ export function Progress() {
               </div>
             </div>
           </section>
-          <ProgressActivity />
           <h2 className="metrics-heading">Your all-time snapshot</h2>
           <MetricCards data={state.data} />
           <VocabularyOverview />

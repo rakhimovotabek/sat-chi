@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { mkdir } from "node:fs/promises";
 import { expect } from "@playwright/test";
 
 export async function verifyBattleBrowser({
@@ -8,6 +9,7 @@ export async function verifyBattleBrowser({
   clients,
   rpc,
 }) {
+  await mkdir(".impeccable/review/battles", { recursive: true });
   const action = (client, action, data = {}) =>
     rpc(client, "battle_action", { p_action: action, p_data: data });
   const host = clients[1],
@@ -38,6 +40,9 @@ export async function verifyBattleBrowser({
       .click();
     await login(guestPage, "studentB");
     await guestPage.goto(`${app.appUrl}/battles`);
+    await guestPage
+      .getByLabel("Color theme", { exact: true })
+      .selectOption("dark");
     await guestPage.getByLabel("Invitation code").fill(room.code);
     await guestPage
       .getByRole("button", { name: "Join lobby", exact: true })
@@ -107,11 +112,11 @@ export async function verifyBattleBrowser({
     ).toContainText("Team 2");
     await hostPage.bringToFront();
     await hostPage.screenshot({
-      path: "test-results/native-battle-host-laptop.png",
+      path: ".impeccable/review/battles/native-battle-host-laptop.png",
       fullPage: true,
     });
     await guestPage.screenshot({
-      path: "test-results/native-battle-lobby-mobile.png",
+      path: ".impeccable/review/battles/native-battle-lobby-mobile.png",
       fullPage: true,
     });
     for (const client of [clients[3], clients[5]])
@@ -128,6 +133,14 @@ export async function verifyBattleBrowser({
     await expect(
       hostPage.getByRole("button", { name: "Submit answer", exact: true }),
     ).toBeVisible({ timeout: 15000 });
+    await hostPage.screenshot({
+      path: ".impeccable/review/battles/live-host-light-1366.png",
+      fullPage: true,
+    });
+    await guestPage.screenshot({
+      path: ".impeccable/review/battles/live-guest-dark-390.png",
+      fullPage: true,
+    });
     room = await action(host, "state", { id: room.id });
     const timer = hostPage.getByRole("timer", {
       name: "Match time remaining",
@@ -190,6 +203,30 @@ export async function verifyBattleBrowser({
     assert.equal(finished.state, "FINISHED");
     assert.ok(finished.members.every((member) => member.score === 100));
     assert.equal(finished.history[0].points, 100);
+    for (const page of [hostPage, guestPage]) {
+      await expect(page.locator(".battle-player strong")).toHaveText([
+        "100",
+        "100",
+        "100",
+        "100",
+      ]);
+      await expect(
+        page.getByText("Team 1: 200 points · Team 2: 200 points", {
+          exact: true,
+        }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("progressbar", { name: "Completed battle rounds" }),
+      ).toHaveAttribute("value", "1");
+    }
+    await hostPage.screenshot({
+      path: ".impeccable/review/battles/final-host-light-1366.png",
+      fullPage: true,
+    });
+    await guestPage.screenshot({
+      path: ".impeccable/review/battles/final-guest-dark-390.png",
+      fullPage: true,
+    });
     assert.ok(
       await guestPage.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -197,11 +234,11 @@ export async function verifyBattleBrowser({
     );
   } catch (error) {
     await hostPage.screenshot({
-      path: "test-results/native-battle-host-failure.png",
+      path: ".impeccable/review/battles/native-battle-host-failure.png",
       fullPage: true,
     });
     await guestPage.screenshot({
-      path: "test-results/native-battle-guest-failure.png",
+      path: ".impeccable/review/battles/native-battle-guest-failure.png",
       fullPage: true,
     });
     throw error;

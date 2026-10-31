@@ -1913,5 +1913,75 @@ html[data-theme="dark"].night-light
   margin-bottom: 22px;
 }
 @media (prefers-reduced-motion: reduce) {
-  input,select,textarea { transition: none; }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    transition: none;
+  }
+}
+/* Keep the activity chart and its scope controls together on narrow screens. */
+@media (max-width: 720px) {
+  .progress-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px;
+    gap: 12px;
+    margin-block: 16px;
+  }
+  .progress-filters label {
+    min-width: 0;
+    font-size: 11px;
+  }
+  .progress-filters label:last-child {
+    grid-column: 1 / -1;
+  }
+  .progress-filters select {
+    padding-inline: 9px;
+    font-size: 13px;
+  }
+  .progress-activity .progress-chart {
+    height: 160px;
+  }
+  .progress-activity > h2 {
+    margin-bottom: 8px;
+  }
+}
+.progress-activity {
+  container-type: inline-size;
+}
+@container (max-width: 600px) {
+  .progress-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px;
+    gap: 12px;
+    margin-block: 16px;
+  }
+  .progress-filters label {
+    min-width: 0;
+    font-size: 11px;
+  }
+  .progress-filters label:last-child {
+    grid-column: 1 / -1;
+  }
+  .progress-filters select {
+    padding-inline: 9px;
+    font-size: 13px;
+  }
+  .progress-chart {
+    height: 160px;
+  }
+}
+/* Practice heading and tools may wrap independently of the question subtree. */
+.app-shell[data-page="practice"] {
+  grid-template-rows: auto minmax(calc(100dvh - 72px), auto);
+}
+.app-shell[data-page="practice"] .topbar {
+  min-height: 72px;
+  padding-block: 12px;
+}
+@media (max-width: 720px) {
+  .app-shell[data-page="practice"] {
+    grid-template-rows: auto auto minmax(calc(100dvh - 72px), auto);
+  }
 }

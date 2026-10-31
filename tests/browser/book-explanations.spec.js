@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { mkdir } from "node:fs/promises";
 import { contentFixture, bookId, topicId } from "./helpers/content.js";
 
 test("book explanations require a recorded Check, survive answer changes and navigation, and never add checks", async ({
@@ -86,8 +87,10 @@ test("Book Practice checks text answers, marks wrong and correct choices, and re
       body: JSON.stringify(attempt),
     });
   });
+  await page.setViewportSize({ width: 768, height: 844 });
   await page.goto(`/books/${bookId}/topics/${topicId}`);
   await page.getByRole("button", { name: "Start topic practice" }).click();
+  await page.getByLabel("Color theme", { exact: true }).selectOption("dark");
   const check = page.getByRole("button", { name: "Check", exact: true });
   const explanation = page.getByRole("button", {
     name: "Explanation",
@@ -104,6 +107,20 @@ test("Book Practice checks text answers, marks wrong and correct choices, and re
     /incorrect-choice/,
   );
   await expect(page.locator(".answer-choice.correct-choice")).toHaveCount(0);
+  const wrong = page.locator(".answer-choice").nth(0);
+  await expect(wrong).toHaveCSS("background-color", "rgb(66, 38, 54)");
+  await expect(wrong.locator("label")).toHaveCSS("color", "rgb(230, 237, 252)");
+  await mkdir(".impeccable/review/practice", { recursive: true });
+  await page.screenshot({
+    path: ".impeccable/review/practice/incorrect-dark-768.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: ".impeccable/review/practice/incorrect-dark-390.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 768, height: 844 });
   await page.getByRole("radio").nth(1).check();
   await check.click();
   await expect(page.locator(".answer-choice").nth(1)).toHaveClass(

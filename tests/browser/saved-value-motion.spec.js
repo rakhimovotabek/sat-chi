@@ -35,6 +35,7 @@ for (const reducedMotion of ["reduce", "no-preference"]) {
       name: "All-time first-attempt accuracy: 75%",
       exact: true,
     });
+    await ring.scrollIntoViewIfNeeded();
     await expect(ring).toBeVisible();
     if (reducedMotion === "no-preference") {
       await expect(ring).toHaveAttribute("data-motion", "running");

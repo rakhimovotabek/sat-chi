@@ -14,7 +14,7 @@ test("bank Check shows only attempted choices, retries and preserves overview/re
   await expect(page.locator(".answer-choice.incorrect-choice")).toHaveCount(1);
   await expect(page.locator(".answer-choice.incorrect-choice")).toHaveCSS(
     "background-color",
-    "rgb(255, 245, 245)",
+    "rgb(255, 240, 242)",
   );
   await expect(page.locator(".answer-choice.correct-choice")).toHaveCount(0);
   await page
@@ -48,7 +48,7 @@ test("bank Check shows only attempted choices, retries and preserves overview/re
   await expect(page.getByText(/Attempt 1: A/)).toBeVisible();
   await expect(page.locator(".answer-choice.correct-choice")).toHaveCSS(
     "background-color",
-    "rgb(240, 253, 244)",
+    "rgb(229, 246, 239)",
   );
   await page
     .getByRole("button", { name: "Question 1 of 3", exact: true })
