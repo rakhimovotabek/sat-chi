@@ -3,8 +3,8 @@ export function resultStatus(row) {
   if (row.active === false) return "Withdrawn";
   return row.session_id ? "In progress" : "Not started";
 }
-export function resultTotals(rows) {
-  const eligible = rows.filter((r) => r.active !== false);
+export function resultTotals(rows, { includeWithdrawn = false } = {}) {
+  const eligible = rows.filter((r) => includeWithdrawn || r.active !== false);
   const graded = rows.reduce(
     (n, r) => n + Number(r.correct) + Number(r.incorrect),
     0,

@@ -38,6 +38,7 @@
     "test:battles:timer": "node scripts/testing/sprint-native.js --services --battle-timer",
     "test:battles:matching": "node scripts/testing/sprint-native.js --services --battle-matching",
     "test:battles:quick": "node scripts/testing/sprint-native.js --services --quick-match",
+    "test:homework:delete": "node scripts/testing/sprint-native.js --homework-delete",
     "test:critical:native": "node scripts/testing/sprint-native.js --services --critical",
     "test:analytics:native": "node scripts/testing/sprint-native.js --services --analytics",
     "test:battles:reading": "node scripts/testing/sprint-native.js --services --reading",

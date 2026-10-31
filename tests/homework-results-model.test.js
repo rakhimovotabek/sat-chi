@@ -75,3 +75,25 @@ test("Night Light persists preference, toggles root only and tolerates unavailab
   assert.equal(readNightLight(undefined), false);
   assert.doesNotThrow(() => applyNightLight(true, root, undefined));
 });
+
+test("deleted assignment reporting counts retained submissions while separating canceled work", () => {
+  const rows = [
+    {
+      active: false,
+      session_id: "kept",
+      completed_at: "2026-10-31",
+      correct: 1,
+      incorrect: 1,
+    },
+    { active: false, correct: 0, incorrect: 0 },
+  ];
+  assert.deepEqual(resultTotals(rows, { includeWithdrawn: true }), {
+    eligible: 2,
+    started: 1,
+    completed: 1,
+    pending: 1,
+    accuracy: 50,
+  });
+  assert.equal(resultStatus(rows[0]), "Completed");
+  assert.equal(resultTotals(rows).completed, 0);
+});

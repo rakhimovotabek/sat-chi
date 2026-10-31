@@ -53,21 +53,23 @@ const selectedTests = process.argv.includes("--quick-match")
   : [
       process.argv.includes("--realtime")
         ? "tests/supabase-realtime.test.js"
-        : process.argv.includes("--critical")
-          ? "tests/critical-pages-native.test.js"
-          : process.argv.includes("--analytics")
-            ? "tests/analytics-native.test.js"
-            : process.argv.includes("--reading")
-              ? "tests/battle-reading-vocabulary-native.test.js"
-              : process.argv.includes("--battle-browser")
-                ? "tests/battle-browser-native.test.js"
-                : process.argv.includes("--battle-timer")
-                  ? "tests/battle-timer-native.test.js"
-                  : process.argv.includes("--battle-matching")
-                    ? "tests/battle-matching-native.test.js"
-                    : process.argv.includes("--battle-network")
-                      ? "tests/battle-network-native.test.js"
-                      : "tests/sprint-native.test.js",
+        : process.argv.includes("--homework-delete")
+          ? "tests/homework-deletion-native.test.js"
+          : process.argv.includes("--critical")
+            ? "tests/critical-pages-native.test.js"
+            : process.argv.includes("--analytics")
+              ? "tests/analytics-native.test.js"
+              : process.argv.includes("--reading")
+                ? "tests/battle-reading-vocabulary-native.test.js"
+                : process.argv.includes("--battle-browser")
+                  ? "tests/battle-browser-native.test.js"
+                  : process.argv.includes("--battle-timer")
+                    ? "tests/battle-timer-native.test.js"
+                    : process.argv.includes("--battle-matching")
+                      ? "tests/battle-matching-native.test.js"
+                      : process.argv.includes("--battle-network")
+                        ? "tests/battle-network-native.test.js"
+                        : "tests/sprint-native.test.js",
     ];
 const result = spawnSync(
   process.execPath,

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-export default function Modal({ title, onClose, children }) {
+export default function Modal({ title, onClose, children, className = "" }) {
   const ref = useRef(null),
     outside = useRef(false);
   const isOutside = (e) => {
@@ -22,7 +22,7 @@ export default function Modal({ title, onClose, children }) {
   }, []);
   return (
     <dialog
-      className="learning-modal"
+      className={`learning-modal ${className}`}
       ref={ref}
       aria-label={title}
       onCancel={(e) => {

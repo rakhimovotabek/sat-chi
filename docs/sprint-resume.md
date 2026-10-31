@@ -27,31 +27,40 @@ not rerun. Logs `/tmp/satchi-critical-services-verified.log`,
 `/tmp/satchi-critical-native.log`, `/tmp/satchi-query-final.log`,
 `/tmp/satchi-backend-error-browser.log`. Lint/build final logs use recovery prefix.
 
-Next: finish Homework deletion. Draft SQL is in ignored
-`local-imports/development/homework-deletion.sql` (**not applied/tested/committed**).
-It must be reviewed, moved to a new migration and tested before integration.
-`src/features/learning/HomeworkActions.jsx` is a new **unused/unverified** draft
-confirmation/actions component; keep it out of verified milestone commits until
-wired and tested. It uses server preview counts, explicit checkbox, idempotent
-Delete RPC and distinguishes permanent/retained results. Full draft coverage:
-soft-delete/safe hard-delete, audit snapshot, pending access/session guards,
-parent locks, recurring cutoffs/current counters, no shared-question deletion.
+Homework deletion is now implemented and verified in isolation. See
+[homework-deletion.md](homework-deletion.md). Pending migration014 adds safe
+permanent removal for unused definitions, tombstones for work/history, private
+audit snapshots, roster/recurrence/current-count/session guards and canceled study
+tasks. Admin managers include search/pages and Actions; Delete has server preview,
+explicit checkbox and retained-history link. Submitted inputs, grade events and
+canonical metrics remain equal. Real refresh/fresh-login, recurring UI deletion,
+three start/delete races, submission/delete and duplicate requests pass.
 
-Known draft issues to resolve before tests:
-- Daily directory currently filters tombstones in ordered/page CTE but **total
-  count also needs filtering before pagination**. Rewrite the scheduled CTE union
-  as a narrow joined candidate scope with t.deleted_at null for directory only.
-  Historical reporting retains due past/submitted data; it stops future canceled
-  obligations and daily stats read the retained historical projection.
-- `homework_management_directory` draft lists latest200 one-time definitions;
-  add bounded paging/search, plus recurring support if replacing its100-template
-  UI cap. Must show unassigned/draft and paused/archived eligible definitions.
-- Wire shared Actions into one-time and recurring manager; preserve per-student
-  results links and original edit/history workflows. Add deletion outcome status.
-- Test all requested deletion cases, permissions, purge rejection for any history,
-  exact progress/grade invariance, raw pending access, fresh login/reload and actual
-  concurrent start/submission/deletion. Parent lock order: definition → assignment
-  → session; daily save/Check/finish locks must also lock its template.
+Deletion checks: focused database/model/daily regressions **26/26**, real Auth/
+PostgreSQL/PostgREST browser/network **1/1**, zero skips; lint/build/detector pass.
+Native dialog screenshots at1366/768/390 are in `docs/screenshots/homework-deletion/`.
+Logs `/tmp/satchi-homework-delete-regressions-final.log`,
+`/tmp/satchi-homework-delete-native-final.log`,
+`/tmp/satchi-homework-delete-lint-final.log`, `/tmp/satchi-homework-delete-build.log`.
+The native deletion suite uses fixture Storage/Edge transport, which deletion does
+not call. No full historical suite claim. Direct archived-recurring resume remains
+rejected until explicit Restore to paused, preserving the old safety contract.
+
+**Next:** SBank rename. Current source key/DOM IDs/storage suffix `college-board`
+must stay intact. `QuestionBank.jsx` has a separate licensed-content-unavailable
+workspace with public classification labels, unavailable counts and optional
+College Board official link; it never queries SAT'chi rows or enables practice.
+Rename its visible source/category/headings to SBank without inventing licensed
+content or merging collections. Update `tests/browser/question-bank-sources.spec.js`
+and current README/docs. Preserve actual College Board attribution for external
+resources and taxonomy, rather than claiming third-party content is original.
+
+Then implement the user's premium full UI/analytics request: primary option3,
+cohesive four-reference interpretation, clean blue/white light and navy/electric-
+blue dark, distinctive energetic Battles, readable elegant other routes; measured
+counters/rings/charts/microinteractions, reduced-motion, no generic repeated
+entrance effects or heavy blur/graphics. User repeated priority order: database,
+delete, SBank **before** redesign. No additional style clarification is needed.
 
 Prior continuation evidence remains below for orientation; do not repeat successful
 service setup investigations. Existing tool cache is intact. Run heavy suites

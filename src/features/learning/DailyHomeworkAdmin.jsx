@@ -1,3 +1,5 @@
+import HomeworkActions from "./HomeworkActions.jsx";
+import { rpc } from "./api.js";
 import { useState } from "react";
 import { Link } from "react-router";
 import useContent from "../books/useContent.js";
@@ -6,7 +8,6 @@ import HomeworkForm from "./HomeworkForm.jsx";
 import Modal from "../../components/Modal.jsx";
 import useAction from "./useAction.js";
 import {
-  dailyTemplates,
   dailyDirectory,
   dailyReport,
   setDailyState,
@@ -304,15 +305,23 @@ function DailyDetail({ template, onClose }) {
   );
 }
 export default function DailyHomeworkAdmin() {
+  const [archived, setArchived] = useState(false),
+    [page, setPage] = useState(0),
+    [search, setSearch] = useState(""),
+    [notice, setNotice] = useState(null);
   const state = useContent(async () => {
-    const [templates, report] = await Promise.all([
-      dailyTemplates(),
+    const [directory, report] = await Promise.all([
+      rpc("homework_management_directory", {
+        p_kind: "recurring",
+        p_page: page,
+        p_search: search,
+        p_archived: archived,
+      }),
       dailyReport(),
     ]);
-    return { templates, report };
-  });
+    return { templates: directory.rows, total: directory.total, report };
+  }, [page, search, archived]);
   const action = useAction(),
-    [archived, setArchived] = useState(false),
     [detail, setDetail] = useState(null),
     [editing, setEditing] = useState(null),
     [archiveTarget, setArchiveTarget] = useState(null);
@@ -332,11 +341,41 @@ export default function DailyHomeworkAdmin() {
             <input
               type="checkbox"
               checked={archived}
-              onChange={(e) => setArchived(e.target.checked)}
+              onChange={(e) => {
+                setArchived(e.target.checked);
+                setPage(0);
+              }}
             />
             Show archived
           </label>
         </div>
+        <label className="learning-field">
+          Search recurring assignments
+          <input
+            type="search"
+            maxLength={160}
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(0);
+            }}
+          />
+        </label>
+        {notice && (
+          <p role="status">
+            {notice.mode === "retained"
+              ? "Recurring homework deleted. Student history is retained."
+              : "Unused recurring homework permanently deleted."}
+            {notice.mode === "retained" && (
+              <>
+                {" "}
+                <Link to={`/admin/homework/${notice.id}?recurring=true`}>
+                  View retained history
+                </Link>
+              </>
+            )}
+          </p>
+        )}
         <ContentState {...state} onRetry={state.reload} />
         {action.error && (
           <p className="form-error" role="alert">
@@ -396,36 +435,18 @@ export default function DailyHomeworkAdmin() {
                             >
                               History summary
                             </button>
-                            {t.state !== "archived" && (
-                              <>
-                                <button
-                                  className="button button-secondary"
-                                  onClick={() => setEditing(t)}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  className="button button-secondary"
-                                  disabled={action.busy}
-                                  onClick={() =>
-                                    change(
-                                      t,
-                                      t.state === "active"
-                                        ? "paused"
-                                        : "active",
-                                    )
-                                  }
-                                >
-                                  {t.state === "active" ? "Pause" : "Resume"}
-                                </button>
-                                <button
-                                  className="button button-secondary"
-                                  onClick={() => setArchiveTarget(t)}
-                                >
-                                  Archive
-                                </button>
-                              </>
-                            )}
+                            <HomeworkActions
+                              assignment={t}
+                              kind="recurring"
+                              onEdit={() => setEditing(t)}
+                              onArchive={() => setArchiveTarget(t)}
+                              onChanged={state.reload}
+                              onDeleted={(result) => {
+                                setNotice(result);
+                                setDetail(null);
+                                state.reload();
+                              }}
+                            />
                           </div>
                         </td>
                       </tr>
@@ -441,9 +462,17 @@ export default function DailyHomeworkAdmin() {
                 to create one.
               </p>
             )}
+            {state.data.total > 25 && (
+              <Pagination
+                page={page}
+                setPage={setPage}
+                total={state.data.total}
+                label="assignments"
+              />
+            )}
             <p className="empty-copy">
-              Latest 100 recurring assignments. Pause and archive stop
-              tomorrow’s work and preserve today and history.
+              Pause and archive stop tomorrow’s work and preserve today and
+              history. Restore returns an archive to paused status.
             </p>
           </div>
         )}
@@ -455,7 +484,7 @@ export default function DailyHomeworkAdmin() {
           >
             <p>
               Archive “{archiveTarget.data.title}”? This preserves history and
-              stops future days. Archived assignments cannot resume.
+              stops future days. You can restore it to paused status.
             </p>
             <div className="button-row">
               <button

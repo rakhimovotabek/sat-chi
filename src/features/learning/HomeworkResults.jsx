@@ -23,7 +23,11 @@ export default function HomeworkResults() {
   );
   const data = state.data,
     meta = data?.assignment,
-    totals = data && resultTotals(data.rows);
+    totals =
+      data &&
+      resultTotals(data.rows, {
+        includeWithdrawn: !!data.assignment.deleted_at,
+      });
   return (
     <>
       <PageHeader
@@ -32,6 +36,12 @@ export default function HomeworkResults() {
         description="Persisted student results; each recurring date is reported separately."
       />
       <Link to="/admin/homework">Back to Homework</Link>
+      {meta?.deleted_at && (
+        <p className="card learning-panel" role="status">
+          This homework was deleted. Saved attempts and grades are retained
+          here. Unsubmitted work is canceled.
+        </p>
+      )}
       {recurring && (
         <label className="learning-field">
           Occurrence date
@@ -54,7 +64,7 @@ export default function HomeworkResults() {
                 [
                   "Assigned students",
                   data.rows
-                    .filter((r) => r.active !== false)
+                    .filter((r) => meta.deleted_at || r.active !== false)
                     .map((r) => r.display_name || r.username || "Student")
                     .join(", ") || "None for this occurrence",
                 ],
@@ -85,7 +95,10 @@ export default function HomeworkResults() {
                 ["Eligible students", totals.eligible],
                 ["Started", totals.started],
                 ["Completed", totals.completed],
-                ["Pending", totals.pending],
+                [
+                  meta.deleted_at ? "Canceled without submission" : "Pending",
+                  totals.pending,
+                ],
                 [
                   "Current grading accuracy",
                   totals.accuracy == null

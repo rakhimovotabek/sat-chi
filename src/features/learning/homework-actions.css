@@ -1,0 +1,43 @@
+.homework-delete-dialog {
+  width: min(620px, 94vw);
+  white-space: normal;
+  font-size: 1rem;
+  text-align: start;
+}
+.homework-delete-dialog form {
+  display: grid;
+  gap: 20px;
+}
+.homework-delete-dialog form p,
+.homework-delete-dialog form h3,
+.homework-delete-dialog form dl {
+  margin: 0;
+}
+.homework-delete-dialog form p {
+  line-height: 1.6;
+}
+.homework-delete-dialog .checkbox-row {
+  align-items: start;
+  line-height: 1.5;
+  font-size: 14px;
+}
+.homework-delete-dialog .checkbox-row input {
+  margin-top: 3px;
+}
+.homework-actions summary {
+  cursor: pointer;
+  padding-block: 10px;
+  min-height: 36px;
+}
+.homework-actions summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+.homework-actions .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
