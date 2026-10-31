@@ -1,6 +1,6 @@
-## Production release continuation — 2026-10-31
+## Production release — 2026-10-31
 
-The latest authorization supersedes historical no-deployment instructions. Recovery verification and all 20 production migrations are complete. Protected application/Auth/Storage metadata fingerprints match; write access is restored to compatible mode. Netlify login now owns the correct Git-connected site. Continue frontend publishing and focused live acceptance; do not repeat the backup, restore or migrations. See [production release checkpoint](production-release-20261031.md) for authoritative current state; older pending-migration statements below are historical.
+Production release is authorized and its focused live acceptance passed. The existing archive is restore-verified; all20 pending migrations were applied to `ileffhbbaomfimwulvpw` (102 total, latest `20261031001400`). Original protected application/Auth/Storage metadata fingerprints match. Both live hosts passed20 authenticated browser checks, Homework Delete retained fixture grades/answers, private1v1 scores persisted, SBank and real-value chart motion/themes passed. The new import-book function is ACTIVE; the tiny CORS fix is `ae10586`. Both test profiles are inactive and sessions revoked, with history retained. No real student data was edited for verification. See [production release report](production-release-20261031.md); final publication/provider evidence is outside Git and in the release response. Do not repeat backup, migrations or completed tests. Historical no-deployment/pending statements below are superseded.
 
 # Production release resume point — 2026-10-31
 

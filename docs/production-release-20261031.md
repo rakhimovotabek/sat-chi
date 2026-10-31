@@ -1,6 +1,6 @@
-# Production release checkpoint — backend applied; frontend publishing
+# Production release — verified live acceptance
 
-The coordinated production release is authorized. The existing backup was restored successfully, all 20 pending migrations were rehearsed and applied to production, and protected data checks passed. Frontend publishing and live authenticated acceptance are the remaining steps at this checkpoint.
+The coordinated production release is authorized. The existing backup was restored successfully, all 20 pending migrations were rehearsed and applied to production, and protected data checks passed. Both production hosts have passed focused authenticated acceptance. The final publication includes the small import-function CORS fix and this report; its provider commit metadata and live artifact hashes must match before closing the release.
 
 ## Recovery and production database verification
 
@@ -42,10 +42,41 @@ The coordinated production release is authorized. The existing backup was restor
 
 All versions above were applied through the official linked-project migration command after checking that their hashes matched the successful rehearsal. No destructive reset, seed, role replacement, Vault mutation or history repair was used.
 
-## Frontend release state
+## Published frontend and live acceptance
 
-- Application source remains the previously verified `d4b6791` lineage; changes since then are release documentation only.
-- Netlify account access and ownership of site `02da050d-7e57-45c4-bb83-5de0660fbbf6` confirmed. Its Git source is `rakhimovotabek/sat-chi`, branch `main`.
-- Targets: https://sat-chi.netlify.app and https://satchi.vercel.app.
-- Before publishing, both still served the older `780eb95` release. Do not interpret backend readiness as proof that the new frontend is live.
-- Remaining: fast-forward integration/push, production build/deployment checks on both hosts, focused authenticated Books/Progress/Homework/Battles/SBank checks, fixture-only deletion/history verification, theme and saved-progress checks. Use only newly created, tagged verification accounts; preserve all existing student records.
+- Application/design source is the previously verified `d4b6791` lineage. First production frontend revision: `e72758e55219834b19d9c3a1b548c7323a18d75e`, fast-forwarded and pushed to both branches.
+- Netlify site: `02da050d-7e57-45c4-bb83-5de0660fbbf6`, https://sat-chi.netlify.app. First release deployment `6ae60b34c458b64fef18bfde` is ready with commit `e72758e`.
+- Vercel: https://satchi.vercel.app, project `rahimov-production/sat-chi`. First release deployment `BLpEwjRHwX2Mxx4AKCPoUK988QnS` completed successfully for exact commit `e72758e`.
+- Both production aliases serve `/assets/index-COh2wim3.js`, SHA256 `fbefd0a0c251c09701439d4a2a8e30c36c73da1f3562d2749f79cb02fce4660b`. Entry, runtime and CSS bytes match the clean local production build. The follow-up function and documentation commits do not change frontend artifacts.
+- Final application/function source includes `ae10586` (version-header CORS fix). The final report commit is published to both hosting projects; its exact SHA/deployment IDs are recorded in the final operator evidence and release response after provider confirmation. Do not confuse the first release deployment above with the final publication.
+
+Twenty focused browser checks passed across both actual production aliases, with **zero page errors and zero failed API/asset requests**:
+
+- Books catalog, published book details/chapters, saved practice player; two existing private question images were signed and fetched successfully without object writes.
+- Progress, real saved 100% accuracy, chart-animation completion and reduced motion. Light/dark themes and Progress layouts at390/768/1366px passed. No fabricated statistics or mocked requests were used.
+- Homework, Battles and both SAT'chi Bank/SBank source controls; SBank selection persists after refresh and remains separate under the legacy collection identifier.
+- Refresh and fresh student login on both hosts; admin Homework management and retained historical results on both hosts.
+
+New disposable authenticated student/admin accounts also passed direct production requests. Fifteen published books and their progress loaded. Representative RPC timings: book progress582ms, Progress518ms, daily Homework430ms, Homework management512/725ms, daily report514ms, Battles405ms. These are observations, not performance guarantees. No `57014`, `PGRST202` or missing-function failure occurred.
+
+## Homework deletion and saved data
+
+- Created Homework assigned only to the new verification student, saved an answer and submitted it through the real RPCs.
+- Actual admin Delete on Netlify required explicit confirmation, explained retained grades and removed the fixture assignment. The row stayed absent after refresh on both hosts; retained results opened on both.
+- Exact before/after fixture answer rows and grade-event rows match. First-known, first-correct, first-incorrect, attempted and eventually-correct totals remain unchanged. The same question in Books and Homework counted once.
+- Student Delete returned `42501`. Starting the deleted assignment was denied, it was absent from the pending directory, and two concurrent repeat Delete requests both completed idempotently.
+- All original production records matched across migration cutover (54 protected table fingerprints). Production workflow writes were limited to the two new tagged verification accounts and their own practice/Homework/Battle records; no existing student answers or grades were edited for testing.
+- Both verification profiles are now inactive, their sessions revoked, and their accounts/results retained. No accounts, grades or attempts were deleted as cleanup.
+
+## Battles and Edge Function
+
+- A private live Math1v1 completed with two distinct authenticated verification clients. Both scores were100, matched persisted server records, recovered on fresh login, and appeared in saved Battle history. This production check does not replace the earlier isolated team/reconnect tests or claim fresh production2v2/3v3 coverage.
+- The new `import-book` function was absent in production and is now deployed ACTIVE version1. Existing `manage-student` remains version5. Only the import function was deployed; Auth configuration was not deployed from the local development config.
+- A narrow CORS fix accepts the shared `x-satchi-client-version` header. Two focused preflight/authorization tests and lint passed. Handler token verification and active-admin authorization remain mandatory.
+- Actual browser fetches from both production origins passed CORS: missing token401, student403, admin invalid-job400. The last request performs no content mutation. No new package was published in production merely for testing; ZIP/asset/publication acceptance remains the earlier isolated-service evidence.
+
+## Final safety state and limits
+
+Production migration history:102 applied, latest `20261031001400`; gate `compatible`, client version `20261008`, zero verification exemptions. Google provider remains enabled. Existing Google login/auth configuration was unchanged; interactive Google OAuth login was not performed with a real account.
+
+Private evidence outside Git includes `live-deployment-assets.json`, `live-browser-results.json`, `live-final-verification.json`, private fixture snapshots and screenshots. Final provider/alias confirmation is recorded after the report commit publishes. The original backup remains the recovery artifact; no redundant backup or broad test suite was run. Lint, the production build, two targeted handler tests,20 live browser checks, authenticated RPC probes, deletion-history comparisons and a completed private Battle passed.
