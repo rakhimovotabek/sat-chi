@@ -658,7 +658,9 @@ test(
         await battlePage
           .getByRole("checkbox", { name: "Original topic", exact: true })
           .check();
-        await battlePage.getByLabel("Questions", { exact: false }).fill("1");
+        await battlePage
+          .getByRole("spinbutton", { name: /^Questions/ })
+          .fill("1");
         await battlePage
           .getByRole("button", { name: "Create Battle", exact: true })
           .click();

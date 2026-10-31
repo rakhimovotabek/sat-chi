@@ -23,7 +23,10 @@ export default function Books({ admin = false }) {
     }, 250);
     return () => clearTimeout(timer);
   }, [search, query]);
-  const state = useContent(() => getBookCatalog(page, query), [page, query]);
+  const state = useContent(
+    () => getBookCatalog(page, query, { includeProgress: !admin }),
+    [page, query, admin],
+  );
   const books = state.data?.books || [];
   return (
     <>
@@ -88,6 +91,15 @@ export default function Books({ admin = false }) {
         </>
       )}
       <ContentState {...state} onRetry={state.reload} />
+      {state.data?.progressError && (
+        <div className="form-error" role="alert">
+          <p>{state.data.progressError}</p>
+          <p>Your library is available. Saved progress could not be loaded.</p>
+          <button className="button button-secondary" onClick={state.reload}>
+            Retry book progress
+          </button>
+        </div>
+      )}
       {!state.loading &&
         !state.error &&
         (books.length ? (

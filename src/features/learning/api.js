@@ -1,22 +1,23 @@
 import { resolveCovers } from "../books/cover-assets.js";
 import { supabase } from "../../lib/supabase.js";
+import { backendError } from "../../lib/backend-error.js";
 export async function checked(
   request,
   message = "Could not load learning data. Check your connection and try again.",
 ) {
   const { data, error } = await request;
   if (error)
-    throw new Error(
-      error.code === "23505" ? "This entry already exists." : message,
+    throw backendError(
+      error.code === "23505"
+        ? { ...error, message: "This entry already exists." }
+        : error,
+      message,
     );
   return data;
 }
 export const rpc = async (name, args = {}) => {
   const { data, error } = await supabase.rpc(name, args);
-  if (error)
-    throw new Error(
-      error.message || "Could not load learning data. Try again.",
-    );
+  if (error) throw backendError(error, name);
   return data;
 };
 export const groups = () =>

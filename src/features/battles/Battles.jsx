@@ -6,6 +6,7 @@ import BattleMatchLimit from "./BattleMatchLimit.jsx";
 import MatchingChoices, { MatchingPairs } from "./MatchingChoices.jsx";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../lib/supabase.js";
+import { backendError, isConnectionError } from "../../lib/backend-error.js";
 import PageHeader from "../../components/PageHeader.jsx";
 import FormattedText from "../../components/FormattedText.jsx";
 import QuestionImage from "../../components/QuestionImage.jsx";
@@ -26,12 +27,13 @@ async function rpc(action, data = {}) {
     quick ? "battle_quick_match" : "battle_action",
     quick ? { p_data: payload } : { p_action: action, p_data: data },
   );
-  if (error) throw new Error(error.message);
+  if (error) throw backendError(error, "Battles");
   return result;
 }
 export default function Battles() {
   const actionPending = useRef(false),
-    requestVersion = useRef(0);
+    requestVersion = useRef(0),
+    retrySync = useRef(null);
   const [room, setRoom] = useState(null),
     [roomId, setRoomId] = useState(storedId),
     [catalog, setCatalog] = useState(null),
@@ -52,11 +54,13 @@ export default function Battles() {
   });
   useEffect(() => {
     let active = true,
-      inFlight = false;
+      inFlight = false,
+      fatal = false;
     async function refresh(force = false) {
       if (
         inFlight ||
         actionPending.current ||
+        (fatal && !force) ||
         (document.hidden && force !== true)
       )
         return;
@@ -71,11 +75,14 @@ export default function Battles() {
           if (roomId) setRoom(result);
           else setCatalog(result);
           setOnline(true);
+          fatal = false;
           setSyncError("");
         }
       } catch (e) {
         if (active && version === requestVersion.current) {
-          setOnline(false);
+          const connection = isConnectionError(e);
+          setOnline(!connection);
+          fatal = !connection;
           setSyncError(e.message);
         }
       } finally {
@@ -83,8 +90,9 @@ export default function Battles() {
       }
     }
     refresh(true);
+    retrySync.current = () => refresh(true);
     const wake = () => {
-      if (!document.hidden) refresh(true);
+      if (!document.hidden && !fatal) refresh(true);
     };
     const offline = () => setOnline(false);
     document.addEventListener("visibilitychange", wake);
@@ -101,7 +109,7 @@ export default function Battles() {
               table: "battle_signals",
               filter: `battle_id=eq.${roomId}`,
             },
-            refresh,
+            () => refresh(),
           )
           .subscribe((status) => {
             if (status === "SUBSCRIBED") refresh();
@@ -110,6 +118,7 @@ export default function Battles() {
     const timer = setInterval(() => refresh(), 2000);
     return () => {
       active = false;
+      retrySync.current = null;
       clearInterval(timer);
       document.removeEventListener("visibilitychange", wake);
       window.removeEventListener("online", wake);
@@ -133,7 +142,7 @@ export default function Battles() {
           p_action: action,
           p_data: { id: roomId, ...data },
         });
-        if (result.error) throw new Error(result.error.message);
+        if (result.error) throw backendError(result.error, "Battle settings");
         next = result.data;
       } else next = await rpc(action, { id: roomId, ...data });
       if (next.left) {
@@ -191,6 +200,21 @@ export default function Battles() {
         <p className="form-error" role="alert">
           {error || syncError}
         </p>
+      )}
+      {syncError && online && (
+        <div className="button-row">
+          <button
+            className="button button-secondary"
+            onClick={() => retrySync.current?.()}
+          >
+            Retry Battles
+          </button>
+          {roomId && (
+            <button className="button button-secondary" onClick={leaveView}>
+              Back to Battles
+            </button>
+          )}
+        </div>
       )}
       {!online && (
         <div role="status">

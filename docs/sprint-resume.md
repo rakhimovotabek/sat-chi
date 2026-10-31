@@ -1,3 +1,67 @@
+# Active recovery/deletion/redesign sprint — 2026-10-31
+
+New user scope begins at clean `d7041b2`, branch `feature/universal-book-import`.
+Priority order: missing RPC/Books/Daily Homework fixes → actual safe Homework
+Delete → College Board selector rename to **SBank** without changing IDs →
+comprehensive UI/animated analytics, then full responsive/history acceptance.
+User chose **follow the four references closely, balancing light/dark styles**.
+Do not push/deploy/apply hosted migrations/modify real student records.
+
+First milestone is implemented and verified; [database-recovery.md](database-recovery.md)
+has exact actual hosted metadata, plans, commands/results and release boundary.
+Hosted project `ileffhbbaomfimwulvpw` has82 migrations through20261015000800;
+Battle/Progress RPCs are genuinely absent. Existing Book/Daily RPC grants/signatures
+are present. Production was queried read-only for schema/statistics/plans only.
+No real user was signed in or student result returned/modified.
+
+Implemented: typed backend errors, fatal Battle refresh-stop/explicit retry with
+saved seat retained, Books catalog survives explicitly diagnosed progress failure,
+admin skips unused progress request; additive migrations012/013 bound Daily
+projection/paging and privately cache exact Book readiness independently of approval.
+All actual import/publication/grading/Realtime/multiplayer regressions pass.
+
+Checks: actual-service combined **12/12**; real-service native pages/reload/fresh
+login at390/768/1366 **1/1**; actual PG17 query/cache comparisons **2/2**; diagnostic
+unit **1/1**, failure-fixture browsers **2/2**, zero skips. Full historical suite
+not rerun. Logs `/tmp/satchi-critical-services-verified.log`,
+`/tmp/satchi-critical-native.log`, `/tmp/satchi-query-final.log`,
+`/tmp/satchi-backend-error-browser.log`. Lint/build final logs use recovery prefix.
+
+Next: finish Homework deletion. Draft SQL is in ignored
+`local-imports/development/homework-deletion.sql` (**not applied/tested/committed**).
+It must be reviewed, moved to a new migration and tested before integration.
+`src/features/learning/HomeworkActions.jsx` is a new **unused/unverified** draft
+confirmation/actions component; keep it out of verified milestone commits until
+wired and tested. It uses server preview counts, explicit checkbox, idempotent
+Delete RPC and distinguishes permanent/retained results. Full draft coverage:
+soft-delete/safe hard-delete, audit snapshot, pending access/session guards,
+parent locks, recurring cutoffs/current counters, no shared-question deletion.
+
+Known draft issues to resolve before tests:
+- Daily directory currently filters tombstones in ordered/page CTE but **total
+  count also needs filtering before pagination**. Rewrite the scheduled CTE union
+  as a narrow joined candidate scope with t.deleted_at null for directory only.
+  Historical reporting retains due past/submitted data; it stops future canceled
+  obligations and daily stats read the retained historical projection.
+- `homework_management_directory` draft lists latest200 one-time definitions;
+  add bounded paging/search, plus recurring support if replacing its100-template
+  UI cap. Must show unassigned/draft and paused/archived eligible definitions.
+- Wire shared Actions into one-time and recurring manager; preserve per-student
+  results links and original edit/history workflows. Add deletion outcome status.
+- Test all requested deletion cases, permissions, purge rejection for any history,
+  exact progress/grade invariance, raw pending access, fresh login/reload and actual
+  concurrent start/submission/deletion. Parent lock order: definition → assignment
+  → session; daily save/Check/finish locks must also lock its template.
+
+Prior continuation evidence remains below for orientation; do not repeat successful
+service setup investigations. Existing tool cache is intact. Run heavy suites
+serially on3816MiB laptop. One redundant just-started test was interrupted after a
+selector replacement failed to match; its own stopped PostgreSQL/temp directory
+was cleaned up before the successful full rerun. No service is intentionally left
+running after the verified first milestone.
+
+---
+
 # SAT’chi recovery checkpoint — 2026-10-31
 
 Branch: `feature/universal-book-import`. Continuation began clean at `b0c4072`.

@@ -1,0 +1,71 @@
+{
+  "project_ref": "ileffhbbaomfimwulvpw",
+  "read_only": true,
+  "audit_date": "2026-10-31",
+  "applied_count": 82,
+  "latest_applied": "20261015000800",
+  "pending_at_audit": [
+    "20261030000100_universal_book_jobs.sql",
+    "20261030000200_battles.sql",
+    "20261030000300_sat_numeric_responses.sql",
+    "20261030000400_book_lifecycle_and_corrections.sql",
+    "20261030000500_vocabulary_battles.sql",
+    "20261030000600_battle_realtime_signals.sql",
+    "20261031000100_import_job_ownership.sql",
+    "20261031000200_battle_answer_privacy_and_pool.sql",
+    "20261031000300_progress_activity.sql",
+    "20261031000400_universal_correction_audit.sql",
+    "20261031000500_battle_typed_vocabulary.sql",
+    "20261031000600_homework_question_performance.sql",
+    "20261031000700_battle_lobby_controls.sql",
+    "20261031000800_battle_match_timers.sql",
+    "20261031000900_battle_pool_parity.sql",
+    "20261031001000_battle_word_matching.sql",
+    "20261031001100_battle_quick_match.sql",
+    "20261031001200_daily_homework_query_bounds.sql",
+    "20261031001300_book_progress_readability_cache.sql"
+  ],
+  "functions": [
+    {
+      "anonymous": false,
+      "arguments": "p_book uuid",
+      "authenticated": true,
+      "name": "book_practice_progress"
+    },
+    {
+      "anonymous": false,
+      "arguments": "p_student uuid DEFAULT NULL::uuid, p_template uuid DEFAULT NULL::uuid, p_from date DEFAULT NULL::date, p_until date DEFAULT NULL::date, p_page integer DEFAULT 0",
+      "authenticated": true,
+      "name": "daily_homework_directory"
+    },
+    {
+      "anonymous": false,
+      "arguments": "p_student uuid DEFAULT NULL::uuid, p_template uuid DEFAULT NULL::uuid, p_from date DEFAULT NULL::date, p_until date DEFAULT NULL::date, p_page integer DEFAULT 0",
+      "authenticated": true,
+      "name": "daily_homework_report"
+    },
+    {
+      "anonymous": false,
+      "arguments": "",
+      "authenticated": true,
+      "name": "daily_homework_templates"
+    },
+    {
+      "anonymous": false,
+      "arguments": "p_books uuid[], p_student uuid DEFAULT NULL::uuid",
+      "authenticated": true,
+      "name": "learning_book_progress"
+    }
+  ],
+  "book_columns": [
+    "id",
+    "title",
+    "description",
+    "category",
+    "cover_url",
+    "published",
+    "created_at",
+    "cover_path",
+    "cover_metadata"
+  ]
+}

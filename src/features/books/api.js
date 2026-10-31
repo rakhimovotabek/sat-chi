@@ -1,27 +1,26 @@
 import { bookSavePayload, bookSaveError } from "./book-save.js";
 import { resolveCovers } from "./cover-assets.js";
 import { supabase } from "../../lib/supabase.js";
+import { backendError } from "../../lib/backend-error.js";
 async function checked(
   request,
   message = "Could not load content. Check your connection and try again.",
 ) {
   const { data, error } = await request;
   if (error)
-    throw Object.assign(
-      new Error(
-        error.code === "PGRST202"
-          ? "Saving is unavailable on this server. Your answers have not been saved to the server. Ask an administrator to update it, then retry saving."
-          : error.code === "PT409" || error.code === "40001"
-            ? error.message
-            : error.code === "23505"
-              ? "This content has already been imported."
-              : message,
-      ),
-      { code: error.code },
+    throw backendError(
+      error.code === "23505"
+        ? { ...error, message: "This content has already been imported." }
+        : error,
+      message,
     );
   return data;
 }
-export async function getBookCatalog(page = 0, search = "") {
+export async function getBookCatalog(
+  page = 0,
+  search = "",
+  { includeProgress = true } = {},
+) {
   const title = search.replace(/[%_\\]/g, "").trim();
   const { data, count, error } = await supabase
     .from("books")
@@ -35,19 +34,24 @@ export async function getBookCatalog(page = 0, search = "") {
     .order("created_at", { ascending: false })
     .order("id")
     .range(page * 50, page * 50 + 49);
-  if (error)
-    throw new Error(
-      "Could not load books. Check your connection and try again.",
-    );
-  const progress = data.length
-    ? await checked(
+  if (error) throw backendError(error, "Books catalog");
+  let progress = [],
+    progressError = "";
+  if (includeProgress && data.length) {
+    try {
+      progress = await checked(
         supabase.rpc("learning_book_progress", {
           p_books: data.map((b) => b.id),
         }),
-      )
-    : [];
+        "Book progress",
+      );
+    } catch (error) {
+      progressError = error.message;
+    }
+  }
   const progressByBook = new Map(progress.map((p) => [p.book_id, p]));
   return {
+    progressError,
     books: await resolveCovers(
       data.map((book) => ({
         ...book,

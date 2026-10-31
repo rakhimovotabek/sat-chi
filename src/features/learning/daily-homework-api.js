@@ -1,11 +1,9 @@
 import { supabase } from "../../lib/supabase.js";
+import { backendError } from "../../lib/backend-error.js";
 // These admin/student RPCs return actionable validation errors, without private keys.
 export async function dailyRpc(name, args = {}) {
   const { data, error } = await supabase.rpc(name, args);
-  if (error)
-    throw new Error(
-      error.message || "Could not load daily homework. Try again.",
-    );
+  if (error) throw backendError(error, name);
   return data;
 }
 export const dailyTemplates = () => dailyRpc("daily_homework_templates");
