@@ -1,30 +1,21 @@
-# Production release checkpoint — blocked before cutover
+# Production release checkpoint — backend applied; frontend publishing
 
-The coordinated production release is authorized, but its backup/recovery gate has not passed. No production migration, Git push/main integration or deployment was performed. Earlier no-deployment instructions in historical sprint notes are superseded by the release authorization; data-protection restrictions remain.
+The coordinated production release is authorized. The existing backup was restored successfully, all 20 pending migrations were rehearsed and applied to production, and protected data checks passed. Frontend publishing and live authenticated acceptance are the remaining steps at this checkpoint.
 
-## Verified current state
+## Recovery and production database verification
 
-- Candidate: `d4b6791f739a6b5b6dec3e50a5ba6b14e402151d`, branch `feature/universal-book-import`; checkout initially clean.
-- Remote `main`: `780eb954fce79150a1538a0b994b9f72b5db621a`. Read-only remote inspection found no published feature branch.
-- Correct Supabase: `ileffhbbaomfimwulvpw` (Satchi), PostgreSQL17.11, healthy. Fresh migration listing:82 applied, latest `20261015000800`;20 pending.
-- Netlify: https://sat-chi.netlify.app — HTTP200.
-- Vercel: https://satchi.vercel.app — HTTP200.
-- Both currently serve `/assets/index-CNX8Hupg.js`, SHA256 `6b34e1b923a56b1b7780e8ce7ec61f4ffc4a27394f86fd0ace642dcc77f58cbb`, and target the expected Supabase host. This establishes matching existing entry assets, not deployment of the candidate or independent identification of the current aliased provider commit.
-- GitHub records a successful Vercel status for remote main; this is historical status evidence, not proof that a new candidate was deployed. Hosting credentials/project deployment settings were not changed.
+- Project: `ileffhbbaomfimwulvpw` (Satchi), PostgreSQL 17.11.
+- Reused the existing 32,184,094-byte archive in the private `20261031T135451Z` release directory; its recorded checksum still matches. No second backup was created.
+- Built matching PostgreSQL 17.11 contrib modules (`uuid-ossp`, `pgcrypto`, `ltree`) in the disposable runtime; the server binary was unchanged.
+- Restored the actual archive into a socket-only isolated database. Rehearsed all 20 migrations without skipping restore errors, changing RLS or using migration-history repair.
+- Rehearsal preserved original records across 52 application tables, Auth users and Storage metadata. Derived standings reconciled. Focused production-sized probes passed: metrics 1.104s, practice analytics 0.289s, book catalog progress 0.352s, bank facets 0.123s, admin student books 0.965s, largest book snapshot 2.129s. These are rehearsal timings, not live guarantees.
+- Production cutover completed at `2026-10-31T15:29:51Z`: migration history now contains 102 versions, latest `20261031001400`.
+- All 54 protected table fingerprints (52 application tables, Auth users, Storage metadata) matched before/after migration after excluding newly added fields. No existing record mismatch was found.
+- Authenticated execution and exact signatures were verified for `battle_action`, `progress_activity`, `homework_management_directory`, `learning_book_progress`, and `delete_homework`; anonymous execution is denied. PostgREST schema reload requested.
+- Existing write gate restored to `compatible` with zero exemptions. Google provider remained enabled; authentication configuration was not changed.
+- Private evidence: `platform-restoration-verification.json`, `production-cutover-result.json`, before/after integrity snapshots and operator logs, all outside Git. The database archive includes Storage metadata, not object bytes; no Storage object changes were made.
 
-## Completed backup export and blocker
-
-The interrupted export completed. Reuse `/home/otabek/satchi-release-backups/final-release-20261031/20261031T135451Z`; do not restart the export unnecessarily. It is private, outside Git, and contains:
-
-- `application.dump`:32,184,094 bytes; public/Auth/Storage metadata/migration/release schemas.
-- `roles.sql`:6,260 bytes; role passwords intentionally excluded.
-- `export-manifest.json`, private operator logs and `final-release-checkpoint.json`.
-
-Both recorded SHA256 checksums were independently recomputed and matched. Provider backup listing returned `backups:null`, `pitr_enabled:false`; the earlier documented local backup directory was initially absent. No recent provider recovery point was established.
-
-The checksum-verified archive is **not yet restore-verified**. The socket-only isolated PostgreSQL17 rehearsal stopped during restore preparation because `uuid-ossp.control`/its module are absent in the cached runtime. The rehearsal also requires matching `pgcrypto` and `ltree` modules. It stopped before restoring application data or rehearsing any pending migration, and its isolated server shut down cleanly. No unsupported-extension stubs, skipped errors or weakened restore checks were used. Storage object bytes are separate from this database export.
-
-## Exact pending migrations
+## Applied migration sequence
 
 | Migration file | SHA256 |
 | --- | --- |
@@ -49,14 +40,12 @@ The checksum-verified archive is **not yet restore-verified**. The socket-only i
 | `20261031001300_book_progress_readability_cache.sql` | `2c0776a7e94056eb2854a9bf5b4bf39649ab3ffbf35ce4ff5ca45e29bde7316a` |
 | `20261031001400_safe_homework_deletion.sql` | `eda2c6ee2c9ff946ae2bf251918a9b2861aeb2971c2efb1d049d6d69eb07b022` |
 
-Key dependencies: `battle_action` starts in `20261030000200` with later Battle amendments; `progress_activity` is `20261031000300`; bounded Daily Homework is `20261031001200`; Book renderability/progress cache is `20261031001300`; `homework_management_directory` and history-preserving Delete are `20261031001400`. These remain pending, not applied or marked applied.
+All versions above were applied through the official linked-project migration command after checking that their hashes matched the successful rehearsal. No destructive reset, seed, role replacement, Vault mutation or history repair was used.
 
-## Resume safely
+## Frontend release state
 
-1. Supply genuine PostgreSQL17 contrib modules in the isolated runtime. Resume verification against the existing archive using the private `rehearsal-operator.py`; do not run the older repository rehearsal unchanged, since it targets a different eight-migration release.
-2. Complete real restore,20-migration compatibility rehearsal, protected-record/Auth/Storage-metadata comparisons and focused RPC checks. Keep restored student data socket-only/private; do not expose it through an app HTTP server.
-3. Establish the required production write-admission/integrity baseline, then apply only the reviewed pending versions in dependency order. Do not reset, repair migration history to bypass errors, disable RLS or waive recovery checks.
-4. Only after backend readiness, safely push/integrate the verified feature into main and publish the same verified revision on both existing hosting projects. Confirm provider commit metadata and actual live assets.
-5. Run focused authenticated production checks for Books, Homework, Progress, Battles, Question Bank/SBank and deletion/history using safely isolated verification records. Do not delete or overwrite existing student accounts, answers or grades.
-
-Authenticated checks of the **new production release**, new Homework Delete preservation and post-migration row-integrity checks were not performed because no cutover occurred. Previous isolated tests remain valid development evidence, not production-release success. No production student/account/answer records were modified by this attempt. No broad test suites were rerun.
+- Application source remains the previously verified `d4b6791` lineage; changes since then are release documentation only.
+- Netlify account access and ownership of site `02da050d-7e57-45c4-bb83-5de0660fbbf6` confirmed. Its Git source is `rakhimovotabek/sat-chi`, branch `main`.
+- Targets: https://sat-chi.netlify.app and https://satchi.vercel.app.
+- Before publishing, both still served the older `780eb95` release. Do not interpret backend readiness as proof that the new frontend is live.
+- Remaining: fast-forward integration/push, production build/deployment checks on both hosts, focused authenticated Books/Progress/Homework/Battles/SBank checks, fixture-only deletion/history verification, theme and saved-progress checks. Use only newly created, tagged verification accounts; preserve all existing student records.

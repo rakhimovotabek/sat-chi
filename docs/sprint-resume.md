@@ -1,3 +1,7 @@
+## Production release continuation — 2026-10-31
+
+The latest authorization supersedes historical no-deployment instructions. Recovery verification and all 20 production migrations are complete. Protected application/Auth/Storage metadata fingerprints match; write access is restored to compatible mode. Netlify login now owns the correct Git-connected site. Continue frontend publishing and focused live acceptance; do not repeat the backup, restore or migrations. See [production release checkpoint](production-release-20261031.md) for authoritative current state; older pending-migration statements below are historical.
+
 # Production release resume point — 2026-10-31
 
 The user authorized coordinated production release after the UI sprint. That release
