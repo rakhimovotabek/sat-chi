@@ -1,4 +1,5 @@
 import ProgressActivity from "./ProgressActivity.jsx";
+import PerformanceBreakdown from "./PerformanceBreakdown.jsx";
 import AdminAnswer from "./AdminAnswer.jsx";
 import { rpc } from "./api.js";
 import DailyHomeworkAnalytics from "./DailyHomeworkAnalytics.jsx";
@@ -157,27 +158,7 @@ export function StudentDashboard() {
   );
 }
 export function Progress() {
-  const state = useContent(() => metrics()),
-    [group, setGroup] = useState("domain");
-  const rows = new Map();
-  for (const b of state.data?.breakdowns || []) {
-    const key =
-      group === "domain"
-        ? `${b.section || "Practice"} · ${b.domain || "Unclassified"}`
-        : b[group] || "Unclassified";
-    const r = rows.get(key) || {
-      label: key,
-      attempted: 0,
-      correct: 0,
-      known: 0,
-      incorrect: 0,
-    };
-    r.attempted += Number(b.attempted);
-    r.correct += Number(b.correct);
-    r.known += Number(b.first_known || 0);
-    r.incorrect += Number(b.incorrect || 0);
-    rows.set(key, r);
-  }
+  const state = useContent(() => metrics());
   return (
     <>
       <PageHeader
@@ -233,62 +214,7 @@ export function Progress() {
               accuracy
             </p>
           </section>
-          <section className="card learning-panel">
-            <div className="section-heading">
-              <h2>Performance breakdown</h2>
-              <label>
-                Break down by
-                <select
-                  value={group}
-                  onChange={(e) => setGroup(e.target.value)}
-                >
-                  {["domain", "skill", "difficulty", "source"].map((g) => (
-                    <option key={g} value={g}>
-                      {g === "source" ? "Book / source" : g}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            {!rows.size ? (
-              <p className="empty-copy">
-                Complete a practice session to see your results.
-              </p>
-            ) : (
-              <div className="table-scroll">
-                <table className="students-table">
-                  <thead>
-                    <tr>
-                      <th>Area</th>
-                      <th>Answered</th>
-                      <th>Correct</th>
-                      <th>Incorrect</th>
-                      <th>First-attempt accuracy</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[...rows.values()]
-                      .sort(
-                        (a, b) =>
-                          a.correct / a.attempted - b.correct / b.attempted,
-                      )
-                      .map((r) => (
-                        <tr key={r.label}>
-                          <td>{r.label}</td>
-                          <td>{r.attempted}</td>
-                          <td>{r.correct}</td>
-                          <td>{r.incorrect}</td>
-                          <td>
-                            {percent(r.correct, r.known)}
-                            {r.known < r.attempted ? " · partial history" : ""}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
+          <PerformanceBreakdown breakdowns={state.data.breakdowns || []} />
           <Activity rows={state.data.activity} />
         </>
       )}

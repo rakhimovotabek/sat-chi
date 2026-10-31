@@ -179,6 +179,38 @@ test(
       .focus();
     await page.keyboard.press("Enter");
     await expect(panel.locator("tbody tr")).toHaveCount(7);
+    const breakdown = page.getByRole("region", {
+      name: "Performance breakdown",
+      exact: true,
+    });
+    const domainChart = breakdown.getByRole("group", {
+      name: "All-time domain first-attempt accuracy",
+    });
+    await domainChart.scrollIntoViewIfNeeded();
+    await expect(domainChart).toHaveAttribute("data-motion", "complete");
+    await expect(domainChart.locator("li")).toHaveCount(1);
+    await expect(domainChart).toContainText("Math · Algebra");
+    await expect(domainChart).toContainText("75%");
+    await expect(domainChart).toContainText(
+      "3 first correct / 4 known results",
+    );
+    const domainWidth = await domainChart
+      .locator("[data-chart-grow]")
+      .evaluate(
+        (bar) =>
+          bar.getBoundingClientRect().width /
+          bar.parentElement.getBoundingClientRect().width,
+      );
+    assert.ok(Math.abs(domainWidth - 0.75) < 0.001);
+    await breakdown
+      .getByText("Exact performance values", { exact: true })
+      .focus();
+    await page.keyboard.press("Enter");
+    await expect(breakdown.locator("tbody tr")).toHaveCount(1);
+    await expect(domainChart).toHaveAttribute("data-motion", "complete");
+    await breakdown.screenshot({
+      path: "test-results/analytics-breakdown-laptop.png",
+    });
     await page.screenshot({
       path: "test-results/analytics-progress-laptop.png",
       fullPage: true,
@@ -197,6 +229,17 @@ test(
       ),
       0,
     );
+    await domainChart.scrollIntoViewIfNeeded();
+    await expect(domainChart).toHaveAttribute("data-motion", "complete");
+    assert.equal(
+      await domainChart.evaluate(
+        (node) => node.getAnimations({ subtree: true }).length,
+      ),
+      0,
+    );
+    await breakdown.screenshot({
+      path: "test-results/analytics-breakdown-mobile.png",
+    });
     assert.ok(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -211,13 +254,11 @@ test(
     );
     await rpc("save_practice_changes", {
       p_session: app.session,
-      p_changes: homeworkItems
-        .slice(0, 2)
-        .map((item, index) => ({
-          id: item.id,
-          expected_revision: item.answer_revision,
-          selected_answer: index === 0 ? 1 : 0,
-        })),
+      p_changes: homeworkItems.slice(0, 2).map((item, index) => ({
+        id: item.id,
+        expected_revision: item.answer_revision,
+        selected_answer: index === 0 ? 1 : 0,
+      })),
     });
     await rpc("finish_book_practice", { p_session_id: app.session });
     await assert.rejects(

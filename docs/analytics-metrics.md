@@ -135,3 +135,40 @@ Actual synthetic-account captures: [Dashboard laptop](screenshots/analytics/anal
 Laptop is 1366×768 with normal motion; mobile is 390×844 with reduced motion.
 Full-page images may be taller. Dark mode, 768/1920 widths and performance at
 production-scale histories remain unverified. No chart dependency was added.
+
+
+## Performance breakdown bars and denominator correction
+
+Progress's all-time breakdown now shows horizontal bars for domain, skill,
+difficulty or source, keeping **section context in every grouping**. It sums
+canonical attempted/known/first-correct/first-incorrect counts from the existing
+`learning_metrics` response; it does not average percentages or introduce a query.
+Attempted includes ungraded selections, so labels say attempted, not graded.
+Accuracy is first-correct / known first results. Unknown-only rows display
+Unavailable with no filled bar; a real zero remains 0%. Values are rounded only
+for labels; bar widths retain the exact ratio. Counts/table remain inspectable.
+
+The previous table displayed accuracy with the known denominator but **sorted
+using all attempted questions**, potentially placing a 100%-known/50%-unknown
+area below a fully known 90% area. Sorting now uses the same known denominator
+as the chart, with unknown-only rows last. Small samples below ten known results
+are labeled, never asserted to be established weaknesses. This label does not
+change the existing separate 30-day Strong Areas/Needs Attention thresholds.
+Grouping changes restart one 750ms horizontal reveal; table interaction does not.
+Reduced motion is immediate. Existing grade history and RPCs are untouched.
+
+Evidence: two model tests cover weighted aggregation, denominator ordering,
+section separation, true zero, unknown-only and empty rows. Two single-worker
+browser fixtures verify normal/reduced motion, exact zero-to-final widths,
+keyboard table access, grouping and mobile overflow. The baseline test awaits
+Web Animations ready promises before measuring/releasing its paused frame;
+otherwise the test could race pending pause/play tasks. A native saved-Check
+extension verifies **Math · Algebra, 3/4 known, 75%** bar/table, no replay, normal
+motion and reduced-motion mobile against actual services.
+
+Native extension: **1/1 passed**, zero skips (`/tmp/satchi-performance-native.log`).
+The final combined line/breakdown fixture run passes **4/4**; model tests pass
+**2/2**. Final lint/build pass, detector has no findings. Actual disposable-account
+[breakdown laptop](screenshots/analytics/analytics-breakdown-laptop.png) and
+[breakdown mobile](screenshots/analytics/analytics-breakdown-mobile.png) captures
+show the measured 75%, including exact counts and small-sample labels.

@@ -47,6 +47,12 @@ export default function ActivityChart({
           ),
         );
         animations.push(
+          ...[...node.querySelectorAll("[data-chart-grow]")].map((bar) =>
+            bar.animate(
+              [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }],
+              { duration: 750, easing: "cubic-bezier(.16,1,.3,1)" },
+            ),
+          ),
           ...[...node.querySelectorAll("[data-chart-draw]")].map((path) =>
             path.animate(
               [

@@ -1,0 +1,41 @@
+.performance-bars ul {
+  list-style: none;
+  padding: 0;
+  margin-block: 24px;
+  display: grid;
+  gap: 24px;
+}
+.performance-bar-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.performance-bar-heading strong {
+  overflow-wrap: anywhere;
+}
+.performance-bars {
+  font-variant-numeric: tabular-nums;
+}
+.performance-bar-track {
+  height: 10px;
+  border-radius: 3px;
+  background: var(--border);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.performance-bar-track > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left;
+}
+.performance-breakdown summary {
+  cursor: pointer;
+  padding-block: 12px;
+}
+.performance-breakdown summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
