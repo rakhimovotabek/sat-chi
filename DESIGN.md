@@ -111,7 +111,7 @@ components:
 
 The Rounded Academic Commons uses humanist lettering, calm learning surfaces and comfortable rounded controls. White and blue organize light mode; deep navy surfaces and brighter blue organize dark mode. Battles adds a concentrated arena treatment while keeping questions and live states readable.
 
-This document records implemented source, not visual approval. The final rendered finish review is pending. The local Manrope font and license provenance are recorded in public/fonts/provenance.json.
+This document records implemented source. The finish reviewer resolved the listed fixes across the supplied 94 app captures and 14 supplementary captures; exact coverage and limits are recorded in docs/ui-redesign-review.md. The local Manrope font and license provenance are recorded in public/fonts/provenance.json.
 
 **Key Characteristics:**
 - Blue learning accents with semantic answer states.
@@ -142,15 +142,15 @@ Headlines use the frontmatter headline role. Dashboard and arena introductions g
 
 ## Layout
 
-The desktop shell uses a 224px rail, or 76px when collapsed, with a 72px topbar. Content is capped at 1200px. Main content padding is 36px 32px 24px, narrowing at 960px to 28px 22px and at 720px to 26px 16px. The shell switches its navigation treatment at 720px. Reused spacing follows the frontmatter scale; page compositions also use local intermediate values.
+The desktop shell uses a 224px rail, or 76px when collapsed, with a 72px topbar in the general shell. Practice instead uses an intrinsic top row, a 72px minimum topbar height and 12px vertical topbar padding so its heading and tools can wrap. On mobile, Practice retains three grid rows for topbar, navigation and content. Content is capped at 1200px. Main content padding is 36px 32px 24px, narrowing at 960px to 28px 22px and at 720px to 26px 16px. The shell switches its navigation treatment at 720px. Reused spacing follows the frontmatter scale; page compositions also use local intermediate values.
 
-Cards become a single column on mobile. Section headings wrap, account summaries disappear on narrower screens, and form text becomes 16px on mobile. Dashboard and Progress use distinct working compositions rather than a universal card grid. Preserve their source reading order when adapting layouts.
+General content card grids stack on mobile; metric snapshots retain two columns. Section headings wrap, account summaries disappear on narrower screens, and general form text becomes 16px on mobile. Progress filter selects retain a compact 13px size. Progress activity and its chart precede the all-time learning overview in source order. Filters wrap or stack within the available width; narrow activity charts use 160px tracks. Preserve the full chart baseline together with its scope controls in the verified first viewports. Dashboard and Progress use distinct working compositions rather than a universal card grid. Preserve their source reading order when adapting layouts.
 
 ## Elevation & Depth
 
 Soft shadows lift outer cards; nested cards and metric cards stay flat. Floating dialogs and book-card hover use the stronger float shadow. Borders and quiet surface tones supply most structural separation. Exact light/dark shadows and motion durations live in the sidecar and source stylesheet.
 
-**The Bounded Motion Rule.** Counters and charts settle in 750ms, start when visible and pause when hidden. Reduced motion shows final values immediately. No per-frame React updates or animation dependency are required. Loading skeletons breathe for three cycles; reduced motion disables that animation.
+**The Bounded Motion Rule.** Counters and charts settle in 750ms, start when visible and pause when hidden. Reduced motion shows final values immediately. No per-frame React updates or animation dependency are required. Loading skeletons breathe for three cycles; reduced motion disables that animation. Text inputs, selects and textareas also suppress their field transitions under reduced motion.
 
 ## Shapes
 
@@ -172,7 +172,7 @@ Theme surfaces, rounded corners and restrained borders define containers. Learni
 
 ### Inputs / Fields
 
-Fields use themed surfaces, a 1px border, the control radius and at least 44px height. Placeholder text uses muted text. Focus across interactive elements uses a 3px accent outline with 3px offset. Error panels use the negative pair; disabled selects use quiet surfaces.
+Fields use themed surfaces, a 1px border, the control radius and at least 44px height. Placeholder text uses muted text. Focus across interactive elements uses a 3px accent outline with 3px offset. Error panels use the negative pair; disabled selects use quiet surfaces. Correct and incorrect answer treatments use semantic positive and negative theme pairs, including existing practice state selectors.
 
 ### Navigation
 
@@ -190,6 +190,7 @@ Tabular metric counters expose the final saved value to assistive technology thr
 - **Do** preserve saved values and explicit unavailable states in analytics.
 - **Do** honor reduced motion and pause chart motion outside the viewport or hidden tab.
 - **Do** retain visible keyboard focus and clear answer-state labels.
+- **Do** keep Progress activity and scope controls before the all-time summary, and allow Practice header tools to wrap without losing the mobile navigation row.
 
 ### Don't:
 

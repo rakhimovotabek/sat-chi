@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-31T10:39:30.310428+00:00",
+  "generatedAt": "2026-10-31T12:47:43.133646+00:00",
   "title": "Design System: SAT’chi",
   "extensions": {
     "colorMeta": {
@@ -514,6 +514,11 @@
         "name": "motion-ease",
         "value": "cubic-bezier(0.2, 0.7, 0.2, 1)",
         "purpose": "Implemented state transition or data reveal."
+      },
+      {
+        "name": "reduced-motion-fields",
+        "value": "none",
+        "purpose": "Disable transitions on text inputs, selects and textareas when reduced motion is requested."
       }
     ],
     "breakpoints": [
@@ -528,6 +533,10 @@
       {
         "name": "intermediate",
         "value": "1100px"
+      },
+      {
+        "name": "progress-activity-container",
+        "value": "600px"
       }
     ]
   },
@@ -583,7 +592,7 @@
   ],
   "narrative": {
     "northStar": "The Rounded Academic Commons",
-    "overview": "The Rounded Academic Commons uses humanist lettering, calm learning surfaces and comfortable rounded controls. White and blue organize light mode; deep navy surfaces and brighter blue organize dark mode. Battles adds a concentrated arena treatment while keeping questions and live states readable.\n\nThis document records implemented source, not visual approval. The final rendered finish review is pending. The local Manrope font and license provenance are recorded in public/fonts/provenance.json.",
+    "overview": "The Rounded Academic Commons uses humanist lettering, calm learning surfaces and comfortable rounded controls. White and blue organize light mode; deep navy surfaces and brighter blue organize dark mode. Battles adds a concentrated arena treatment while keeping questions and live states readable.\n\nThis document records implemented source. The finish reviewer resolved the listed fixes across the supplied 94 app captures and 14 supplementary captures; exact coverage and limits are recorded in docs/ui-redesign-review.md. The local Manrope font and license provenance are recorded in public/fonts/provenance.json.",
     "keyCharacteristics": [
       "Blue learning accents with semantic answer states.",
       "Rounded cards, pill actions and visible keyboard focus.",
@@ -597,7 +606,7 @@
       },
       {
         "name": "The Bounded Motion Rule",
-        "body": "Counters and charts settle in 750ms, start when visible and pause when hidden. Reduced motion shows final values immediately. No per-frame React updates or animation dependency are required. Loading skeletons breathe for three cycles; reduced motion disables that animation.",
+        "body": "Counters and charts settle in 750ms, start when visible and pause when hidden. Reduced motion shows final values immediately. No per-frame React updates or animation dependency are required. Loading skeletons breathe for three cycles; reduced motion disables that animation. Text inputs, selects and textareas also suppress their field transitions under reduced motion.",
         "section": "elevation"
       }
     ],
@@ -605,7 +614,8 @@
       "Do use semantic surface and text variables so both themes remain readable.",
       "Do preserve saved values and explicit unavailable states in analytics.",
       "Do honor reduced motion and pause chart motion outside the viewport or hidden tab.",
-      "Do retain visible keyboard focus and clear answer-state labels."
+      "Do retain visible keyboard focus and clear answer-state labels.",
+      "Do keep Progress activity and scope controls before the all-time summary, and allow Practice header tools to wrap without losing the mobile navigation row."
     ],
     "donts": [
       "Don't invent progress, achievements, scores or learning history.",

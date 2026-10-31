@@ -1,63 +1,43 @@
-# UI redesign checkpoint — 2026-10-31
+# UI redesign completed locally — 2026-10-31
 
-Resumed from `ba996ca` on `feature/universal-book-import`. User changed priority to
-visual redesign, then imposed a battery/time limit. No hosted changes, push or deployment.
+Current verified implementation: `17bb621`, branch `feature/universal-book-import`,
+following `67e2a02`, `138c9b0` and `76bfd90`. The following report-only commit
+finishes the documentation. Inspect HEAD/status before further edits.
 
-Implemented a rounded academic design system, persistent Light/Dark/System themes,
-local licensed Manrope font, shared controls/cards/navigation/dialog/table/skeleton
-surfaces, responsive student/admin workspaces and short navigation transitions.
-Dashboard composition, Progress overview/activity/heatmap, book completion rings,
-Question Bank filter framing, vocabulary counters, solving states, admin quick
-links and Battle landing/lobby/team/readiness/round/result presentation now use it.
-AnimatedValue and ActivityChart animate actual saved values with stable accessible
-values, visibility/hidden-tab suspension and reduced-motion support. No backend,
-scoring or grading policy changed; SBank IDs and Homework deletion are preserved.
+User revoked the temporary battery/pause limit after plugging in the laptop.
+The requested code-first premium academic redesign pass is implemented and verified.
+Do not restart completed backend investigations or an old pause instruction.
 
-Commits: `67e2a02` establishes shared themes/design system; `138c9b0` refines
-learning/analytics/Battles.
+See [ui-redesign.md](ui-redesign.md), [ui-redesign-review.md](ui-redesign-review.md)
+and root DESIGN.md for exact changes, commands, evidence, review scope and limits.
+Implemented: shared rounded typography/surfaces/controls and Light/Dark/System themes;
+Dashboard/Progress composition; genuine in-view saved counters, rings, bars, trend
+and heatmap motion; Books/Bank/Vocabulary/Homework/Study Plan/Profile/Settings/admin
+styling; dedicated Battle arena/team/readiness/round/result presentation; readable
+graded practice states and intrinsically sized responsive tool headers. Source IDs,
+grading, saving and safe deletion behavior remain intact.
 
-Verification this continuation:
-- Final lint and production build pass (logs `/tmp/satchi-redesign-final-*.log`).
-- Theme storage/system/restricted-storage unit: **1/1**.
-- Focused Progress/performance/SBank browsers: **11/11**.
-- Broader Books/practice/tools/motion/Settings run: **24/30 initially passed**.
-  Five stale tests expected earlier explanation policy, old input labels or the
-  former JSON-import button. Updated tests reflect behavior already present at
-  `ba996ca`; no grading/explanation business logic was changed. The sixth failed
-  during initial account loading. All **six targeted reruns passed**. Entire
-  30-case batch was not rerun after those test updates.
-- Real local Auth/Postgres/PostgREST walkthrough: **1/1**, repeated successfully
-  after fixes. Covers 23 student/admin routes × two themes ×390/768/1366 widths
-  (**138 combinations**), plus Battle creation/readiness at all widths/themes,
-  refresh/login and exact equality of saved answer/Check history before/after.
-  Actual fixture metrics: two distinct questions, 50% first accuracy, two eventually
-  correct; no invented student values. Found/fixed a768px Homework overflow caused
-  by an absolutely positioned hidden assignment label escaping the table.
-- Final native evidence: `.impeccable/review/redesign/manifest.json` and54 PNGs.
-  Earlier captures under test-results were removed by Playwright's normal cleanup;
-  native captures now live outside that cleaned directory.
-- Manual detector ran once: thick result border and width animation warnings;
-  both mechanical issues corrected. No new raster illustration assets.
+Verification: lint/build pass; theme unit1/1;46 distinct focused browser cases
+verified across broad run and targeted reruns; native23-route ×2-theme ×3-width
+walkthrough passes (138 combinations), plus focused Imports title checks. Exact
+saved answer/Check records remain equal. Real official-services2v2 browser regression
+passes lobby/team/timer/reconnect/saved player/team scores. Real Delete regression
+passes retained historical grades, refresh/login and concurrent activity; its dialog
+was exercised in both themes at390/768/1366. All operations used disposable users.
 
-Finish status / next steps:
-1. Fresh finish review found input contrast issues: light Question Bank “Search
-   book titles” appears charcoal with a dark placeholder; dark Battle invitation
-   input looks gray. Diagnose theme/control state, fix, recapture and get the
-   reviewer verdict. Review coverage is partial; see its report when available.
-   Do not claim whole-surface visual acceptance.
-2. DESIGN.md and .impeccable/design.json now document implemented tokens and
-   motion. JSON parses; documentation explicitly records pending visual review.
-3. Live multiplayer/countdown/round/final-result browser regression, Homework
-   deletion regression and extended lower-page visual coverage were not rerun in
-   this UI continuation. Previous verified functional milestones remain documented
-   below; do not label these additional checks complete.
-4. Inspect git status/log before editing. Code-first style decisions remain pinned;
-   no further style interview is needed. Run memory-heavy suites serially.
+Fresh visual review resolved every listed fix across94 app captures and14
+supplemental captures. Its disposition is `ship` for the scored fixes and supplied
+evidence, not certification of every deep editor state or physical-device frame
+time. The full historical repository test suite and all older multiplayer format
+matrices were not rerun in this UI-only pass; previous functional evidence remains
+below. No push, deployment, hosted migration or real student-data write occurred.
 
-Review locally with `npm run dev:isolated` (disposable PG/PostgREST, fixture Auth
-and Storage); `npm run dev:platform` exercises the fuller local platform. Ordinary
-`npm run dev` still uses hosted credentials from .env.local and hosted schema drift
-remains untouched. Never apply hosted migrations merely to make that command work.
+Next useful step: user review of working pages via `npm run dev:isolated`; the
+terminal supplies the safe URL/accounts. Ordinary `npm run dev` still reads the
+hosted credentials and hosted schema drift is intentionally unchanged. Preserve
+production restrictions. The older sprint/backlog sections below are historical
+context, not an instruction to repeat completed work or automatically resume the
+separate content-conversion/backend scope.
 
 ---
 
