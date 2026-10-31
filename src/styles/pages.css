@@ -124,7 +124,7 @@
   padding: 22px;
   border: 1px solid var(--border);
   border-radius: 9px;
-  background: white;
+  background: var(--surface);
 }
 .section-card:hover {
   border-color: #9ab5df;
@@ -173,7 +173,7 @@
   padding: 22px;
   border: 1px solid var(--border);
   border-radius: 9px;
-  background: white;
+  background: var(--surface);
 }
 .progress-panel h2 {
   font-size: 14px;
@@ -197,7 +197,7 @@
   padding: 48px 24px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: white;
+  background: var(--surface);
   text-align: center;
 }
 .empty-icon {

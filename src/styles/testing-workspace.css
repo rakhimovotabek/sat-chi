@@ -2,7 +2,7 @@
 .bank-workspace {
   border: 0;
   border-radius: 0;
-  background: white;
+  background: var(--surface);
   padding: 8px 0;
   margin-bottom: 24px;
 }
@@ -19,7 +19,7 @@
 }
 .bank-advanced {
   border: 0;
-  background: white;
+  background: var(--surface);
   gap: 16px;
   border-radius: 0;
 }
@@ -40,7 +40,7 @@
   border: 1px solid #e2e7ef;
   border-radius: 8px;
   margin-top: 6px;
-  background: #fff;
+  background: var(--surface);
 }
 .bank-domain.is-selected {
   border-color: #8aaae1;
@@ -75,8 +75,8 @@
 }
 .bank-action-bar {
   position: static;
-  background: #fff;
-  color: #172b4d;
+  background: var(--surface);
+  color: var(--ink);
   border-top: 1px solid var(--border);
   box-shadow: none;
   border-radius: 0;
@@ -195,7 +195,7 @@
 }
 /* Dedicated testing canvas; the stimulus and response share one surface. */
 .practice-page {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 6px;
   overflow: clip;
@@ -215,7 +215,7 @@
   display: none;
 }
 .player-toolbar {
-  background: #fff;
+  background: var(--surface);
   border: 0;
   border-bottom: 1px solid var(--border);
   border-radius: 0;
@@ -239,10 +239,10 @@
   border: 0;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: calc(100dvh - 330px);
-  background: #fff;
+  background: var(--surface);
 }
 .stimulus-panel {
-  background: #fff;
+  background: var(--surface);
   border-right: 1px solid var(--border);
   padding: 28px 24px;
 }
@@ -298,7 +298,7 @@
   opacity: 0.55;
 }
 .player-footer {
-  background: #fff;
+  background: var(--surface);
   border: 0;
   border-top: 1px solid var(--border);
   border-radius: 0;
@@ -319,7 +319,7 @@
   top: 140px;
   width: min(620px, calc(100vw - 32px));
   height: min(600px, calc(100dvh - 200px));
-  background: #fff;
+  background: var(--surface);
   border: 1px solid #aab8cc;
   border-radius: 8px;
   box-shadow: 0 16px 50px #172b4d30;
@@ -365,8 +365,8 @@
 }
 .math-reference {
   padding: 24px;
-  background: #fff;
-  color: #172b4d;
+  background: var(--surface);
+  color: var(--ink);
 }
 .math-reference h3 {
   font-size: 18px;
@@ -524,14 +524,14 @@
 .learning-modal:has(.question-overview) { width: min(540px, calc(100vw - 32px)); padding: 22px; border-radius: 16px; }
 .question-overview { border: 0; padding: 0; background: transparent; }
 .question-overview .question-numbers { display: grid; grid-template-columns: repeat(10,minmax(0,1fr)); gap: 8px; max-height: min(52vh,400px); overflow: auto; padding: 12px 2px 18px; }
-.question-overview .question-number { position: relative; width: 100%; min-height: 36px; padding: 0; border: 1px solid #cbd2dc; border-radius: 9px; background: white; color: #39475a; font-variant-numeric: tabular-nums; }
+.question-overview .question-number { position: relative; width: 100%; min-height: 36px; padding: 0; border: 1px solid #cbd2dc; border-radius: 9px; background: var(--surface); color: #39475a; font-variant-numeric: tabular-nums; }
 .question-number.is-correct,.legend-dot.is-correct { background: #168544; color: white; border-color: #168544; }
 .question-number.is-incorrect,.legend-dot.is-incorrect { background: #c63838; color: white; border-color: #c63838; }
 .question-overview .question-number.is-previously-correct, .legend-dot.is-previously-correct { background: #e5f4eb; color: #116b36; border: 2px dashed #168544; }
 .question-overview .question-number.is-previously-incorrect, .legend-dot.is-previously-incorrect { background: #fff0ef; color: #9d2727; border: 2px dashed #c63838; }
 .question-overview .question-number.is-previously-corrected, .legend-dot.is-previously-corrected { background: #fff4d6; color: #755000; border: 2px dashed #a97000; }
 .question-overview .question-number.is-checked-current, .legend-dot.is-checked-current { text-decoration: underline; text-underline-offset: 3px; }
-.prior-history { border-inline-start: 3px solid var(--accent, #245bcc); background: var(--surface-quiet, #f4f6fa); padding: 16px; margin-block: 16px; }
+.prior-history { border-inline-start: 3px solid var(--accent, #245bcc); background: var(--surface-quiet); padding: 16px; margin-block: 16px; }
 .prior-history p { overflow-wrap: anywhere; }
 .prior-history summary { cursor: pointer; min-height: 44px; padding-block: 10px; }
 .question-number.is-current,.legend-dot.is-current { background: #1261d8; color: white; border-color: #1261d8; }
@@ -567,7 +567,7 @@
   flex-direction: column;
   min-width: 0;
   height: min(680px, calc(100dvh - 100px));
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 6px;
   overflow: hidden;

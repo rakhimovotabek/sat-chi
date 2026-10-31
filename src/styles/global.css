@@ -5,8 +5,8 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  color: #172b4d;
-  background: #f6f8fc;
+  color: var(--ink);
+  background: var(--canvas);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -101,7 +101,7 @@ a:focus-visible {
   left: 10px;
   z-index: 10;
   padding: 10px 16px;
-  background: white;
+  background: var(--surface);
   transform: translateY(-150%);
 }
 .skip-link:focus {

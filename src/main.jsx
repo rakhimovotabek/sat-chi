@@ -14,6 +14,18 @@ import "./styles/learning.css";
 import "./styles/review.css";
 import "./styles/study-workspace.css";
 import "./styles/testing-workspace.css";
+import "./styles/design-system.css";
+import { applyTheme, readTheme } from "./lib/theme.js";
+try {
+  applyTheme(
+    readTheme(localStorage),
+    document.documentElement,
+    undefined,
+    matchMedia("(prefers-color-scheme: dark)").matches,
+  );
+} catch {
+  document.documentElement.dataset.theme = "light";
+}
 
 import { readNightLightLevel, applyNightLight } from "./lib/night-light.js";
 try {

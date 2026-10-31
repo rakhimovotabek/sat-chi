@@ -11,11 +11,11 @@
   padding: 36px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: white;
+  background: var(--surface);
 }
 .auth-brand {
   margin-bottom: 32px;
-  color: #172b4d;
+  color: var(--ink);
   font-size: 30px;
   font-weight: 750;
   letter-spacing: -0.07em;
@@ -40,7 +40,7 @@
 label {
   display: grid;
   gap: 8px;
-  color: #263b5b;
+  color: var(--ink);
   font-size: 12px;
   font-weight: 600;
 }
@@ -51,8 +51,8 @@ input {
   padding: 10px 12px;
   border: 1px solid #b8c5d7;
   border-radius: 6px;
-  background: #fff;
-  color: #172b4d;
+  background: var(--surface);
+  color: var(--ink);
   font-size: 14px;
 }
 input:focus-visible {
@@ -60,7 +60,7 @@ input:focus-visible {
   outline-offset: 2px;
 }
 input:disabled {
-  background: #f4f6fa;
+  background: var(--surface-quiet);
 }
 .button {
   display: inline-flex;
@@ -85,8 +85,8 @@ input:disabled {
 }
 .button-secondary {
   border-color: var(--border);
-  background: white;
-  color: #263b5b;
+  background: var(--surface);
+  color: var(--ink);
 }
 .button-danger {
   border-color: #edc6c6;
@@ -157,7 +157,7 @@ input:disabled {
   padding: 24px;
   border: 1px solid var(--border);
   border-radius: 9px;
-  background: white;
+  background: var(--surface);
 }
 .management-panel h2,
 .delete-confirmation h2 {
@@ -281,7 +281,7 @@ input:disabled {
 
 .auth-brand {
   display: block;
-  color: #172b4d;
+  color: var(--ink);
 }
 .auth-card {
   box-shadow: 0 16px 45px #213a6510;
@@ -311,7 +311,7 @@ input:disabled {
 }
 .google-button {
   width: 100%;
-  color: #172b4d;
+  color: var(--ink);
 }
 .profile-fields {
   display: grid;
@@ -334,8 +334,8 @@ textarea {
   padding: 10px 12px;
   border: 1px solid #b8c5d7;
   border-radius: 6px;
-  background: white;
-  color: #172b4d;
+  background: var(--surface);
+  color: var(--ink);
 }
 select:focus-visible,
 textarea:focus-visible {
@@ -384,10 +384,10 @@ textarea:focus-visible {
   margin-top: 16px;
 }
 .workspace-admin .sidebar {
-  background: #f0f4fa;
+  background: var(--surface);
 }
 .workspace-admin .brand-caption {
-  color: #365e79;
+  color: var(--text-muted);
   font-weight: 700;
 }
 .modal-shell {
@@ -395,13 +395,13 @@ textarea:focus-visible {
   padding: 24px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: white;
+  background: var(--surface);
 }
 .card {
   padding: 24px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: white;
+  background: var(--surface);
 }
 table {
   border-collapse: collapse;

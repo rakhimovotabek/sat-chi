@@ -2,7 +2,7 @@ import {
   LearningToolsContext,
   PracticeHeadingContext,
 } from "../components/LearningToolsContext.js";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router";
 import Sidebar from "../components/Sidebar.jsx";
 import TopBar from "../components/TopBar.jsx";
@@ -39,6 +39,18 @@ export default function AppShell({ workspace, navigation }) {
     return () => window.removeEventListener("keydown", escape);
   }, [menuOpen]);
   const { pathname } = useLocation();
+  const content = useRef(null);
+  useEffect(() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const animation = content.current?.animate?.(
+      [
+        { opacity: 0.7, transform: "translateY(5px)" },
+        { opacity: 1, transform: "translateY(0)" },
+      ],
+      { duration: 180, easing: "ease-out" },
+    );
+    return () => animation?.cancel();
+  }, [pathname]);
   const page = navigation.find(
     (item) =>
       pathname.replace(/\/$/, "") ===
@@ -64,6 +76,11 @@ export default function AppShell({ workspace, navigation }) {
     <PracticeHeadingContext.Provider value={practiceHeading}>
       <LearningToolsContext.Provider value={learningTools}>
         <div
+          data-page={
+            pathname.split("/").filter(Boolean)[
+              workspace === "admin" ? 1 : 0
+            ] || "dashboard"
+          }
           className={`app-shell workspace-${workspace} ${collapsed ? "sidebar-collapsed" : ""}`}
         >
           <a className="skip-link" href="#main-content">
@@ -98,7 +115,7 @@ export default function AppShell({ workspace, navigation }) {
             tabIndex={-1}
             inert={menuOpen ? true : undefined}
           >
-            <div className="content-container">
+            <div className="content-container" ref={content}>
               <Outlet />
             </div>
             <footer className="content-footer">

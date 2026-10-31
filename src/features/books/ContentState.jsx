@@ -1,9 +1,10 @@
 export default function ContentState({ loading, error, onRetry }) {
   if (loading)
     return (
-      <p className="card" role="status">
-        Loading learning materials…
-      </p>
+      <div className="content-skeleton" role="status" aria-label="Loading learning materials">
+        <span className="visually-hidden">Loading learning materials…</span>
+        <div aria-hidden="true"><span /><span /><span /></div>
+      </div>
     );
   if (error)
     return (

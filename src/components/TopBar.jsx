@@ -1,4 +1,5 @@
 import Icon from "./Icon.jsx";
+import ThemeControl from "./ThemeControl.jsx";
 import NightLight from "./NightLight.jsx";
 import { useState } from "react";
 import useAuth from "../hooks/useAuth.js";
@@ -51,6 +52,7 @@ export default function TopBar({
           ref={learningToolsRef}
           data-learning-tools
         />
+        <ThemeControl />
         <NightLight />
         <div className="account-summary">
           <strong>

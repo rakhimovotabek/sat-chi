@@ -21,7 +21,7 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
-  background: white;
+  background: var(--surface);
   transition: border-color 180ms ease, background-color 180ms ease;
 }
 .book-card:hover {
@@ -160,7 +160,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   padding: 16px 20px;
 }
@@ -180,7 +180,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 460px;
-  background: white;
+  background: var(--surface);
   border-inline: 1px solid var(--border);
 }
 .stimulus-panel,
@@ -300,13 +300,13 @@
   border-color: #16a34a !important;
   box-shadow: inset 0 0 0 1px #16a34a;
   background: #f0fdf4 !important;
-  color: #172b4d;
+  color: var(--ink);
 }
 .incorrect-choice {
   border-color: #ef4444 !important;
   box-shadow: inset 0 0 0 1px #ef4444;
   background: #fff5f5 !important;
-  color: #172b4d;
+  color: var(--ink);
 }
 .answer-result {
   padding: 12px;
@@ -328,7 +328,7 @@
   margin-bottom: 12px;
 }
 .question-overview {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 18px 20px;
@@ -357,7 +357,7 @@
   min-height: 40px;
   border: 1px solid #d0daea;
   border-radius: 6px;
-  background: white;
+  background: var(--surface);
   color: #546581;
   font-size: 12px;
 }
@@ -394,7 +394,7 @@
   margin-bottom: 22px;
 }
 .practice-results > div {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 18px;
@@ -409,7 +409,7 @@
   font-size: 22px;
 }
 .stimulus-table {
-  background: white;
+  background: var(--surface);
   margin-top: 20px;
   font-size: 13px;
 }
@@ -564,7 +564,7 @@
   max-width: 100%;
   max-height: 60vh;
   overflow: auto;
-  background: white;
+  background: var(--surface);
 }
 .book-image-viewer img {
   display: block;

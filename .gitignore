@@ -21,3 +21,7 @@ __pycache__/
 
 # Private rollback exports for the one-time Books reset.
 book-reset-backups/
+
+# Local design review captures and transient adviser cache.
+.impeccable/review/
+.impeccable/hook.cache.json
