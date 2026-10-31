@@ -1,9 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { learningFixture } from "./helpers/learning.js";
-import {
-  COLLEGE_BOARD_TAXONOMY,
-  COLLEGE_BOARD_URL,
-} from "../../src/features/learning/college-board-taxonomy.js";
+import { COLLEGE_BOARD_URL } from "../../src/features/learning/college-board-taxonomy.js";
 
 const source = (page, name) =>
   page
@@ -81,7 +78,7 @@ test("SAT'chi remains default; independent filters, volume and mode survive swit
   ).toHaveAttribute("aria-pressed", "true");
 });
 
-test("SBank has accurate domains and skills, unavailable counts and no SAT'chi data requests", async ({
+test("SBank queries its isolated source and enables real practice controls", async ({
   page,
 }) => {
   const store = await learningFixture(page);
@@ -90,49 +87,33 @@ test("SBank has accurate domains and skills, unavailable counts and no SAT'chi d
     page.getByRole("heading", { name: "3 questions match" }),
   ).toBeVisible();
   await source(page, "SBank").click();
-  const requests = store.requests.length;
-  for (const [section, domains] of Object.entries(COLLEGE_BOARD_TAXONOMY)) {
-    await page.getByRole("button", { name: section, exact: true }).click();
-    for (const [domain, skills] of Object.entries(domains)) {
-      await page
-        .getByRole("button", { name: `Expand ${domain} skills`, exact: true })
-        .click();
-      const group = page
-        .locator(".bank-domain:visible")
-        .filter({ has: page.getByText(domain, { exact: true }) });
-      for (const skill of skills)
-        await expect(group.getByText(skill, { exact: true })).toBeVisible();
-      await expect(group.locator(".bank-count").first()).toHaveText("—");
-    }
-  }
+  const work = page.locator("#bank-source-college-board");
   await expect(
-    page.getByRole("button", { name: "Start Practice Session" }),
-  ).toBeDisabled();
+    work.getByRole("button", { name: "Start Practice Session" }),
+  ).toBeEnabled();
   await expect(
-    page.getByRole("combobox", { name: "Previous practice" }),
-  ).toBeDisabled();
+    work.getByLabel("Previous practice", { exact: true }),
+  ).toBeEnabled();
   await expect(
-    page.getByRole("combobox", { name: "Marked for review" }),
-  ).toBeDisabled();
-  await expect(
-    page.getByRole("link", { name: "College Board official Question Bank" }),
+    work.getByRole("link", { name: "College Board official Question Bank" }),
   ).toHaveAttribute("href", COLLEGE_BOARD_URL);
-  await expect(
-    page.getByRole("heading", { name: "Matching questions" }),
-  ).toHaveCount(0);
+  await expect
+    .poll(() =>
+      store.requests.some(
+        (r) =>
+          r.path.endsWith("/question_bank") &&
+          r.body.p_filters.source === "sbank",
+      ),
+    )
+    .toBe(true);
+  await source(page, "SAT'chi Bank").click();
   expect(
-    store.requests
-      .slice(requests)
-      .filter((r) => /question_bank|start_bank_practice/.test(r.path)),
-  ).toHaveLength(0);
-  await page.reload();
-  const afterReload = store.requests.length;
-  await page.getByRole("button", { name: "Easy", exact: true }).click();
-  expect(
-    store.requests
-      .slice(afterReload)
-      .filter((r) => /question_bank|start_bank_practice/.test(r.path)),
-  ).toHaveLength(0);
+    store.requests.some(
+      (r) =>
+        r.path.endsWith("/question_bank") &&
+        r.body.p_filters.source === "satchi",
+    ),
+  ).toBe(true);
 });
 
 test("source switching leaves saved answers and marks intact and SAT'chi starts its existing engine", async ({
@@ -181,7 +162,7 @@ for (const width of [1366, 768, 390, 320])
     await page.goto("/question-bank");
     await source(page, "SBank").click();
     await expect(
-      page.getByRole("heading", { name: "Local practice unavailable" }),
+      page.getByRole("heading", { name: "3 questions match" }),
     ).toBeVisible();
     expect(
       await page.evaluate(

@@ -1,3 +1,15 @@
+## Active implementation checkpoint (supersedes the original audit status below)
+
+The user explicitly attests that these packages are copyright-free and authorizes publication. This is recorded as user attestation, with the original manifest provenance retained; no CC0/open-source license or independent creator verification is claimed.
+
+Migration `20261031001500_sbank_source_isolation` is now applied (103 total). All65 protected production table fingerprints matched across this migration and compatible access was restored. A default-preserving `books.bank_source` field and source-aware candidate/query wrappers isolate `satchi` and `sbank`; selector key `college-board` is retained for compatibility. The original Books catalog excludes SBank backing books.
+
+Prepared content: Math1,922 eligible questions plus3 duplicate candidates in review; R&W1,844 eligible plus1 ambiguous-choice candidate. Every joined image segment was verified pixel-for-pixel. Forty-question bounded ZIPs were generated (49 Math,47 R&W), with per-asset SHA256 inventories and deterministic archive IDs. All work files/assets stay outside Git.
+
+Verified: focused SQL source/filter/grading/history test; actual PostgreSQL and authenticated browser practice test; seven source/answer-retention/responsive browser cases; transport tests proving stored-byte verification precedes checkpoints and corrupted storage prevents completion. Import uploads are bounded in the cloud; asset checkpoints advance only after verified storage and cannot regress. Draft creation uses the existing authenticated Edge/admin workflow. Imported questions are not automatically published.
+
+Production draft staging is in progress. Private resumable state: `/home/otabek/satchi-release-backups/sbank-prepared/production-state.private.json`; prepared Math/R&W folders and import logs live alongside it. Two40-question drafts completed before the checkpointed transport optimization restart. The operator now resumes saved jobs without reuploading their ZIPs. Do not claim all records imported/published or live student acceptance until database counts and both hosts have been verified.
+
 # Desktop SBank packages — complete local inventory; not imported
 
 Production release remains `0c74db32e537a221daeb2bff76658cc4b6368f31`. Its restore,20 migrations (102 total, latest `20261031001400`) and both hosting deployments were verified in the production release report. No backup, migration, import, upload or deployment was repeated for this inspection. No production records were changed.

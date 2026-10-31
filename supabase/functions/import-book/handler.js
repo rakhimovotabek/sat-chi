@@ -232,45 +232,60 @@ export function createImportHandler({ createClient, env }) {
           path,
           `${job.fingerprint}/${await sha256(bytes)}.${path.split(".").pop()}`,
         );
-      for (const [path, bytes] of assets.slice(
+      const pendingAssets = assets.slice(
         job.asset_cursor,
-        job.asset_cursor + 20,
-      )) {
-        const storagePath = paths.get(path);
-        const mime = path.endsWith(".png")
-          ? "image/png"
-          : path.endsWith(".webp")
-            ? "image/webp"
-            : "image/jpeg";
-        await checked(
-          admin.storage
-            .from("book-package-assets")
-            .upload(storagePath, bytes, { upsert: true, contentType: mime }),
-        );
-        const verify = await checked(
-          admin.storage.from("book-package-assets").download(storagePath),
-        );
-        if (
-          (await sha256(await verify.arrayBuffer())) !== (await sha256(bytes))
-        )
-          throw new Error(`Asset verification failed: ${path}`);
-        await checked(
-          admin.from("book_package_assets").upsert({
-            path: storagePath,
-            book_id: job.book_id,
-            question_id: null,
-            kind: "archive",
-            source_path: path,
-            sha256: await sha256(bytes),
+        job.asset_cursor + 80,
+      );
+      const assetMetadata = [];
+      // Bounded cloud I/O; advance the checkpoint only after every hash matches.
+      for (let offset = 0; offset < pendingAssets.length; offset += 4) {
+        await Promise.all(
+          pendingAssets.slice(offset, offset + 4).map(async ([path, bytes]) => {
+            const storagePath = paths.get(path);
+            const mime = path.endsWith(".png")
+              ? "image/png"
+              : path.endsWith(".webp")
+                ? "image/webp"
+                : "image/jpeg";
+            await checked(
+              admin.storage
+                .from("book-package-assets")
+                .upload(storagePath, bytes, {
+                  upsert: true,
+                  contentType: mime,
+                }),
+            );
+            const verify = await checked(
+              admin.storage.from("book-package-assets").download(storagePath),
+            );
+            if (
+              (await sha256(await verify.arrayBuffer())) !==
+              (await sha256(bytes))
+            )
+              throw new Error(`Asset verification failed: ${path}`);
+            assetMetadata.push({
+              path: storagePath,
+              book_id: job.book_id,
+              question_id: null,
+              kind: "archive",
+              source_path: path,
+              sha256: await sha256(bytes),
+            });
           }),
         );
       }
-      job.asset_cursor = Math.min(assets.length, job.asset_cursor + 20);
+      if (assetMetadata.length)
+        await checked(admin.from("book_package_assets").upsert(assetMetadata));
+      job.asset_cursor = Math.min(
+        assets.length,
+        job.asset_cursor + pendingAssets.length,
+      );
       await checked(
         admin
           .from("universal_book_jobs")
           .update({ asset_cursor: job.asset_cursor })
-          .eq("id", job.id),
+          .eq("id", job.id)
+          .lte("asset_cursor", job.asset_cursor),
       );
       const assetUrl = (path) =>
         path

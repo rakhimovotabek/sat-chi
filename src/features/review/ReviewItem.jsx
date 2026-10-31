@@ -145,7 +145,16 @@ export default function ReviewItem({
                   <h3>{p.question || "Prompt not recovered"}</h3>
                   <ol type="A">
                     {(p.options || []).map((o, i) => (
-                      <li key={i}>{o || "Missing choice"}</li>
+                      <li key={i}>
+                        {p.option_image_urls?.[i] ? (
+                          <QuestionImage
+                            src={p.option_image_urls[i]}
+                            alt={`Choice ${String.fromCharCode(65 + i)}`}
+                          />
+                        ) : (
+                          o || "Missing choice"
+                        )}
+                      </li>
                     ))}
                   </ol>
                   <p>

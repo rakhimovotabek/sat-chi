@@ -30,6 +30,7 @@ export async function getBookCatalog(
         count: "exact",
       },
     )
+    .eq("bank_source", "satchi")
     .ilike("title", `%${title}%`)
     .order("created_at", { ascending: false })
     .order("id")
@@ -76,6 +77,7 @@ export async function getBookOptions(page = 0, search = "") {
   const { data, count, error } = await supabase
     .from("books")
     .select("id,title", { count: "exact" })
+    .eq("bank_source", "satchi")
     .ilike("title", `%${search.replace(/[%_\\]/g, "").trim()}%`)
     .order("created_at", { ascending: false })
     .order("id")

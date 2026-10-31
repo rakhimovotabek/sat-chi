@@ -43,7 +43,7 @@ export default function QuestionBank({ admin = false }) {
     }
   });
   // Retain each visited workspace, including filters, disclosures and pagination.
-  // SBank retains its legacy collection key and never queries the SAT'chi dataset or mounts a practice player.
+  // Retain the legacy selector key; backend filters isolate the two collections.
   const [visited, setVisited] = useState(() => new Set([source]));
   useEffect(() => {
     try {
@@ -106,6 +106,7 @@ function BankWorkspace({ admin, source }) {
       ...saved.filters,
       section: saved.filters?.section || "Math",
       ...(!collegeBoard ? location.state?.preset : {}),
+      source: collegeBoard ? "sbank" : "satchi",
     }),
     [page, setPage] = useState(0),
     [expanded, setExpanded] = useState([]),
@@ -126,17 +127,14 @@ function BankWorkspace({ admin, source }) {
   };
   const field = (name, value) => change({ ...filters, [name]: value });
   const state = useContent(
-    () =>
-      collegeBoard
-        ? Promise.resolve({ count: null, rows: [] })
-        : bank(filters, page),
+    () => bank(filters, page),
     [JSON.stringify(filters), page],
   );
   const facetFilters = { ...filters };
   delete facetFilters.domains;
   delete facetFilters.skills;
   const facets = useContent(
-    () => (collegeBoard ? Promise.resolve([]) : bankFacets(facetFilters)),
+    () => bankFacets(facetFilters),
     [JSON.stringify(facetFilters)],
   );
   const rows = facets.data || [];
@@ -155,9 +153,9 @@ function BankWorkspace({ admin, source }) {
           <div>
             <h2>SBank</h2>
             <p>
-              SBank is a separate SAT’chi Bank collection. Explore SAT domains
-              and skills below. Local practice will be available when authorized
-              question content is ready. Question counts are unavailable.
+              Practice the supplied SBank collection, organized by SAT domain
+              and skill. Its source records and attribution remain separate from
+              SAT’chi Bank.
             </p>
           </div>
           <a
@@ -181,7 +179,7 @@ function BankWorkspace({ admin, source }) {
                 aria-label="Matching question count"
                 aria-busy={state.loading}
               >
-                {collegeBoard ? "Unavailable" : state.loading ? "…" : matching}
+                {state.loading ? "…" : matching}
               </span>
             </div>
             <div
@@ -228,9 +226,9 @@ function BankWorkspace({ admin, source }) {
               {domains.map((domain, index) => {
                 const items = rows.filter((r) => r.domain === domain);
                 const total = items.reduce((n, r) => n + r.count, 0);
-                const skills = collegeBoard
-                  ? taxonomy[domain] || []
-                  : [...new Set(items.map((r) => r.skill).filter(Boolean))];
+                const skills = [
+                  ...new Set(items.map((r) => r.skill).filter(Boolean)),
+                ];
                 const whole = (filters.domains || []).includes(domain);
                 const partial = (filters.skills || []).some(
                   (s) => s.domain === domain,
@@ -254,7 +252,7 @@ function BankWorkspace({ admin, source }) {
                         />
                         <span>{domain || "Unclassified domain"}</span>
                         <span className="bank-count">
-                          {collegeBoard ? "—" : facets.loading ? "…" : total}
+                          {facets.loading ? "…" : total}
                         </span>
                       </label>
                       <button
@@ -294,13 +292,11 @@ function BankWorkspace({ admin, source }) {
                             />
                             <span>{skill}</span>
                             <span className="bank-count">
-                              {collegeBoard
-                                ? "—"
-                                : facets.loading
-                                  ? "…"
-                                  : items
-                                      .filter((s) => s.skill === skill)
-                                      .reduce((n, s) => n + s.count, 0)}
+                              {facets.loading
+                                ? "…"
+                                : items
+                                    .filter((s) => s.skill === skill)
+                                    .reduce((n, s) => n + s.count, 0)}
                             </span>
                           </label>
                         ))
@@ -376,8 +372,8 @@ function BankWorkspace({ admin, source }) {
                 <span>Question source</span>
                 <strong>SBank · SAT</strong>
                 <p className="bank-hint">
-                  Public College Board SAT classification. No third-party
-                  questions are bundled in this collection.
+                  User-supplied question packages. Original source identifiers,
+                  image choices and difficulty labels are preserved.
                 </p>
               </div>
             ) : (
@@ -391,7 +387,7 @@ function BankWorkspace({ admin, source }) {
             <label>
               Previous practice
               <select
-                disabled={collegeBoard}
+                disabled={state.loading}
                 aria-label="Previous practice"
                 value={filters.status || ""}
                 onChange={(e) => field("status", e.target.value)}
@@ -407,7 +403,7 @@ function BankWorkspace({ admin, source }) {
             <label>
               Marked for review
               <select
-                disabled={collegeBoard}
+                disabled={state.loading}
                 aria-label="Marked for review"
                 value={filters.marked || ""}
                 onChange={(e) => field("marked", e.target.value)}
@@ -419,7 +415,7 @@ function BankWorkspace({ admin, source }) {
             </label>
             <p className="bank-hint">
               {collegeBoard
-                ? "Practice history and review marks will be available with authorized local practice. Your SAT'chi history stays with SAT'chi Bank."
+                ? "Your saved SBank practice stays separate from the SAT'chi Bank question pool."
                 : "History and review marks come from your own practice. Domain counts follow these filters."}
             </p>
           </section>
@@ -460,11 +456,9 @@ function BankWorkspace({ admin, source }) {
           </div>
           <div className="bank-start">
             <h2 aria-live="polite">
-              {collegeBoard
-                ? "Local practice unavailable"
-                : state.loading
-                  ? "Updating matches…"
-                  : `${matching} questions match`}
+              {state.loading
+                ? "Updating matches…"
+                : `${matching} questions match`}
             </h2>
             {count === "all" && matching > 500 && (
               <small>500 questions per session</small>
@@ -472,17 +466,10 @@ function BankWorkspace({ admin, source }) {
             <button
               className="button"
               disabled={
-                collegeBoard ||
-                action.busy ||
-                state.loading ||
-                !!state.error ||
-                !matching
+                action.busy || state.loading || !!state.error || !matching
               }
-              aria-describedby={
-                collegeBoard ? "college-board-practice-reason" : undefined
-              }
+              aria-describedby={undefined}
               onClick={() =>
-                !collegeBoard &&
                 action.run(async () =>
                   navigate(
                     `${admin ? "/admin" : ""}/practice/${await startBank(filters, Math.min(matching, count === "all" ? 500 : Number(count)), timed)}`,
@@ -492,11 +479,6 @@ function BankWorkspace({ admin, source }) {
             >
               Start Practice Session
             </button>
-            {collegeBoard && (
-              <small id="college-board-practice-reason">
-                Awaiting authorized question content
-              </small>
-            )}
           </div>
         </footer>
       </section>
@@ -506,7 +488,7 @@ function BankWorkspace({ admin, source }) {
           {action.error}
         </p>
       )}
-      {!collegeBoard && (
+      {
         <section className="bank-preview" aria-busy={state.loading}>
           <div className="bank-section-heading">
             <h2>Matching questions</h2>
@@ -580,7 +562,7 @@ function BankWorkspace({ admin, source }) {
             </>
           )}
         </section>
-      )}
+      }
       {admin && !collegeBoard && (
         <Link className="primary-link" to="/admin/questions">
           Manage questions
