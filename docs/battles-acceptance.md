@@ -40,7 +40,23 @@ Quick Match into a complete original Vocabulary Word Matching game. Exact
 source/timer matching, retry identity and persisted 100/100 Math and 100/0
 Vocabulary results are verified. See [Quick Match evidence](battle-quick-match.md).
 
-## Previous checkpoint details
+`npm run test:battles:reading`: **3/3 passed**, zero skips. An original six-question
+R&W ZIP passes actual Edge/Storage import and publication, then a filtered passage
+match completes with independent Auth clients and saved **100/0** histories.
+Its canonical UUID also appears in Question Bank. Meaning Rush and Reverse
+Meaning each complete with real published original pairs, **100/0** histories,
+private active keys and duplicate-answer idempotency. This is real HTTP backend
+acceptance; complete browser R&W/Meaning Rush/Reverse Meaning is not claimed.
+
+## Remaining acceptance
+
+Failed-request transport throttling, dedicated Battle rankings/XP, richer custom
+formats, host category/source edits, Realtime presence/service restart/load tests,
+and complete R&W/Meaning Rush/Reverse Meaning browser journeys remain open.
+Snapshot polling needs production-scale profiling. Results remain separate from
+practice/Homework and award no XP.
+
+## Previous checkpoint details (historical; superseded where stated above)
 
 **VERIFIED BACKEND**, plus real native browser/network acceptance via
 `npm run test:sprint:native`. PostgreSQL 17.11, PostgREST 14.1 and Auth v2.197.0
@@ -82,7 +98,5 @@ published books and readable sets with title search. Realtime itself is still
 snapshots/polling. Storage and Node Edge-handler substitutions are described in
 [native testing](native-sprint-testing.md). No full Supabase-stack claim.
 
-Remaining: word matching, Quick Match, custom teams/kick/settings UI, total-match
-timer, public rankings, failed-request transport throttling, longer typed and complete R&W
-browser matches and real Realtime disconnect/reconnect/load acceptance. Battle
-results remain separate from ordinary practice and Homework and award no XP.
+The unfinished list recorded at that checkpoint has been superseded by the
+current remaining-acceptance section above.

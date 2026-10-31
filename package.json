@@ -38,6 +38,8 @@
     "test:battles:timer": "node scripts/testing/sprint-native.js --services --battle-timer",
     "test:battles:matching": "node scripts/testing/sprint-native.js --services --battle-matching",
     "test:battles:quick": "node scripts/testing/sprint-native.js --services --quick-match",
+    "test:analytics:native": "node scripts/testing/sprint-native.js --services --analytics",
+    "test:battles:reading": "node scripts/testing/sprint-native.js --services --reading",
     "setup:test-services": "python3 scripts/testing/setup-supabase-services.py",
     "setup:test-tools": "python3 scripts/testing/setup-native-tools.py"
   },

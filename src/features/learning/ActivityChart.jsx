@@ -1,7 +1,12 @@
 import { useEffect, useRef } from "react";
 
 // Browser-owned transforms: no per-frame React updates or animation dependency.
-export default function ActivityChart({ label, children }) {
+export default function ActivityChart({
+  label,
+  children,
+  className = "progress-chart",
+  role = "img",
+}) {
   const ref = useRef(null);
   useEffect(() => {
     const node = ref.current;
@@ -31,12 +36,26 @@ export default function ActivityChart({ label, children }) {
       }
       if (!started) {
         started = true;
-        animations = [...node.querySelectorAll(".progress-column > span")].map(
-          (bar) =>
-            bar.animate(
-              [{ transform: "scaleY(0)" }, { transform: "scaleY(1)" }],
+        animations = [
+          ...node.querySelectorAll(
+            ".progress-column > span, [data-chart-rise]",
+          ),
+        ].map((bar) =>
+          bar.animate(
+            [{ transform: "scaleY(0)" }, { transform: "scaleY(1)" }],
+            { duration: 750, easing: "cubic-bezier(.16,1,.3,1)" },
+          ),
+        );
+        animations.push(
+          ...[...node.querySelectorAll("[data-chart-draw]")].map((path) =>
+            path.animate(
+              [
+                { clipPath: "inset(0 100% 0 0)" },
+                { clipPath: "inset(0 0% 0 0)" },
+              ],
               { duration: 750, easing: "cubic-bezier(.16,1,.3,1)" },
             ),
+          ),
         );
         Promise.all(animations.map((animation) => animation.finished))
           .then(() => {
@@ -71,7 +90,7 @@ export default function ActivityChart({ label, children }) {
     };
   }, []);
   return (
-    <div ref={ref} className="progress-chart" role="img" aria-label={label}>
+    <div ref={ref} className={className} role={role} aria-label={label}>
       {children}
     </div>
   );

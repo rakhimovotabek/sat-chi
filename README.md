@@ -366,6 +366,8 @@ npm run test:battles:network # Twenty independent Auth clients, simultaneous/ret
 npm run test:battles:timer   # Actual natural whole-match expiry, no SQL clock mutation
 npm run test:battles:matching # Two authenticated browsers, real stored vocabulary pairs
 npm run test:battles:quick   # Concurrent public matching + two-browser Vocabulary game
+npm run test:battles:reading # Complete R&W, Meaning Rush and Reverse Meaning HTTP histories
+npm run test:analytics:native # Real saved Checks → Dashboard/Progress/admin heatmap motion
 npm run test:sprint:services # Actual Storage API/file backend + Edge Runtime + Realtime
 ```
 

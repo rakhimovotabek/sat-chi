@@ -2,6 +2,7 @@ import { useState } from "react";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import { rpc } from "./api.js";
+import ActivityChart from "./ActivityChart.jsx";
 import "./homework-heatmap.css";
 
 export default function HomeworkHeatmap({ homework, day }) {
@@ -47,10 +48,17 @@ export default function HomeworkHeatmap({ homework, day }) {
           </p>
           {rows.length ? (
             <>
-              <div className="question-heatmap">
+              <ActivityChart
+                key={`${homework}:${day}:${page}:${mode}`}
+                className="question-heatmap"
+                role="group"
+                label="Submitted question performance heatmap"
+              >
                 {rows.map((row) => (
                   <button
                     type="button"
+                    data-chart-rise="true"
+                    style={{ transformOrigin: "bottom" }}
                     key={row.question_id}
                     className={`heatmap-cell ${mode === "time" ? "timed" : row.known < 5 ? "small-sample" : row.accuracy >= 80 ? "high" : row.accuracy >= 50 ? "middle" : "low"}`}
                     onClick={() => setSelected(row)}
@@ -76,7 +84,7 @@ export default function HomeworkHeatmap({ homework, day }) {
                     </small>
                   </button>
                 ))}
-              </div>
+              </ActivityChart>
               <p>
                 Accuracy legend: high ≥80% · middle 50–79% · low &lt;50%. Small
                 samples use a neutral style. Time shows positive recorded active

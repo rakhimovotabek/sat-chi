@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
 import { rpc } from "./api.js";
+import ActivityChart from "./ActivityChart.jsx";
 
 export default function DashboardInsights({ metrics }) {
   const state = useContent(() => rpc("dashboard_study_activity"));
@@ -27,24 +28,37 @@ export default function DashboardInsights({ metrics }) {
             <p className="empty-copy">
               Distinct questions checked per day · last 7 days · {data.timezone}
             </p>
-            <ol className="weekly-activity">
-              {data.days.map((d) => (
-                <li key={d.day}>
-                  <strong>{d.questions}</strong>
-                  <span className="activity-bar-track" aria-hidden="true">
-                    <span
-                      style={{ height: `${(d.questions / maximum) * 100}%` }}
-                    />
-                  </span>
-                  <span>
-                    {new Date(d.day + "T12:00:00Z").toLocaleDateString(
-                      undefined,
-                      { weekday: "short", timeZone: "UTC" },
-                    )}
-                  </span>
-                </li>
-              ))}
-            </ol>
+            <ActivityChart
+              key={data.days
+                .map((day) => `${day.day}:${day.questions}`)
+                .join("|")}
+              className="weekly-activity-motion"
+              role="group"
+              label="Recorded study activity for the last seven days"
+            >
+              <ol className="weekly-activity">
+                {data.days.map((d) => (
+                  <li key={d.day}>
+                    <strong>{d.questions}</strong>
+                    <span className="activity-bar-track" aria-hidden="true">
+                      <span
+                        data-chart-rise="true"
+                        style={{
+                          height: `${(d.questions / maximum) * 100}%`,
+                          transformOrigin: "bottom",
+                        }}
+                      />
+                    </span>
+                    <span>
+                      {new Date(d.day + "T12:00:00Z").toLocaleDateString(
+                        undefined,
+                        { weekday: "short", timeZone: "UTC" },
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </ActivityChart>
             <p>
               {improvement == null
                 ? "A trend needs at least 10 recorded first results in each 14-day period."

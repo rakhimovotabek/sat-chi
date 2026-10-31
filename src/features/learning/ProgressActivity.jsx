@@ -1,4 +1,5 @@
 import ActivityChart from "./ActivityChart.jsx";
+import AccuracyTrend from "./AccuracyTrend.jsx";
 import { useEffect, useState } from "react";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
@@ -11,7 +12,7 @@ function savedScope() {
     return value &&
       [7, 30, 90].includes(value.days) &&
       ["", "Math", "Reading & Writing"].includes(value.section) &&
-      ["questions", "accuracy"].includes(value.metric)
+      ["questions", "accuracy", "accuracy-trend"].includes(value.metric)
       ? value
       : {};
   } catch {
@@ -81,6 +82,7 @@ export default function ProgressActivity() {
           <select value={metric} onChange={(e) => setMetric(e.target.value)}>
             <option value="questions">Questions</option>
             <option value="accuracy">First-attempt accuracy</option>
+            <option value="accuracy-trend">Accuracy trend line</option>
           </select>
         </label>
       </div>
@@ -98,30 +100,42 @@ export default function ProgressActivity() {
           </p>
           {data.questions ? (
             <>
-              <ActivityChart
-                key={`${days}:${section}:${metric}`}
-                label={`${metric === "accuracy" ? "Daily first-attempt accuracy, scale 0 to 100 percent" : `Daily questions, scale 0 to ${maximum}`}. Exact values in the table below.`}
-              >
-                {data.days.map((row) => {
-                  const value =
-                    metric === "accuracy" ? row.accuracy : row.questions;
-                  return (
-                    <div
-                      className="progress-column"
-                      key={row.day}
-                      title={`${row.day}: ${value == null ? "No known first results" : value}${metric === "accuracy" && value != null ? "%" : " questions"}`}
-                    >
-                      <span
-                        style={{ height: `${((value || 0) / maximum) * 100}%` }}
-                      />
-                    </div>
-                  );
-                })}
-              </ActivityChart>
-              <div className="progress-axis" aria-hidden="true">
-                <span>{data.days[0]?.day}</span>
-                <span>{data.days.at(-1)?.day}</span>
-              </div>
+              {metric === "accuracy-trend" ? (
+                <AccuracyTrend
+                  key={`${days}:${section}:${metric}`}
+                  days={data.days}
+                  timezone={data.timezone}
+                />
+              ) : (
+                <>
+                  <ActivityChart
+                    key={`${days}:${section}:${metric}`}
+                    label={`${metric === "accuracy" ? "Daily first-attempt accuracy, scale 0 to 100 percent" : `Daily questions, scale 0 to ${maximum}`}. Exact values in the table below.`}
+                  >
+                    {data.days.map((row) => {
+                      const value =
+                        metric === "accuracy" ? row.accuracy : row.questions;
+                      return (
+                        <div
+                          className="progress-column"
+                          key={row.day}
+                          title={`${row.day}: ${value == null ? "No known first results" : value}${metric === "accuracy" && value != null ? "%" : " questions"}`}
+                        >
+                          <span
+                            style={{
+                              height: `${((value || 0) / maximum) * 100}%`,
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </ActivityChart>
+                  <div className="progress-axis" aria-hidden="true">
+                    <span>{data.days[0]?.day}</span>
+                    <span>{data.days.at(-1)?.day}</span>
+                  </div>
+                </>
+              )}
               <details>
                 <summary>Daily values and sample sizes</summary>
                 <div className="table-scroll">
