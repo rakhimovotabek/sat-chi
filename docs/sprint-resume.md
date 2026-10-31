@@ -1,3 +1,29 @@
+# Paused at the user’s request — 2026-10-31
+
+User asked to pause because their usage limit was nearly exhausted. Stop work
+until they explicitly resume. No redesign implementation has started yet.
+
+Latest implementation: `65bb8ac`, following `429c81e` (safe Homework deletion)
+and `26498bd` (database recovery). Branch `feature/universal-book-import`.
+Database recovery, Homework deletion and SBank are locally committed and verified;
+hosted production remains untouched and still lacks the pending migrations.
+
+Next on resume: premium redesign and additional animated saved-data analytics.
+Confirmed user direction: combine the four supplied references cohesively, never
+literally; clean blue/white light theme, sophisticated navy/electric-blue dark;
+energetic Battles, elegant readable Progress/Books/Admin; meaningful counters,
+charts, hover and navigation; no repetitive animation, unnecessary blur or heavy
+graphics. User explicitly chose **build directly in the working app, then review
+working pages**. Do not ask those preferences again. Persist the confirmed
+code-first workflow when starting design; no PRODUCT.md/DESIGN.md/theme or new
+Admin Analytics aggregate has been implemented yet. Read existing feature evidence
+below, inspect current HEAD/status and continue without rerunning service setup.
+
+No push, deployment, production migration or real student-data write occurred.
+All completed acceptance results are recorded below and in focused evidence docs.
+
+---
+
 # Active recovery/deletion/redesign sprint — 2026-10-31
 
 New user scope begins at clean `d7041b2`, branch `feature/universal-book-import`.
