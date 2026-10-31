@@ -3,13 +3,37 @@ import {
   inspectPackage,
   sha256,
   LIMITS,
+  validateRasterAsset,
 } from "../_shared/universal-package.js";
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization,apikey,content-type,x-client-info",
+    "authorization,apikey,content-type,x-client-info,x-satchi-job",
   "Access-Control-Allow-Methods": "POST,OPTIONS",
 };
+async function boundedBody(request, maximum, label) {
+  if (!request.body) throw new Error("Request body required");
+  const reader = request.body.getReader(),
+    chunks = [];
+  let size = 0;
+  for (;;) {
+    const next = await reader.read();
+    if (next.done) break;
+    size += next.value.length;
+    if (size > maximum) {
+      await reader.cancel();
+      throw new Error(`${label} exceeds ${maximum / 1048576} MiB`);
+    }
+    chunks.push(next.value);
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return bytes;
+}
 export function createImportHandler({ createClient, env }) {
   return async (request) => {
     if (request.method === "OPTIONS")
@@ -41,27 +65,80 @@ export function createImportHandler({ createClient, env }) {
         return data;
       };
       let job;
+      const imageTypes = {
+        "image/png": "png",
+        "image/jpeg": "jpg",
+        "image/webp": "webp",
+      };
+      const imageExtension = imageTypes[request.headers.get("Content-Type")];
+      if (imageExtension) {
+        job = await checked(
+          admin
+            .from("universal_book_jobs")
+            .select("*")
+            .eq("id", request.headers.get("x-satchi-job"))
+            .single(),
+        );
+        if (job.created_by !== auth.user.id)
+          return reply(
+            { error: "Import job belongs to another administrator" },
+            403,
+          );
+        const book = await checked(
+          admin
+            .from("books")
+            .select("published,archived_at")
+            .eq("id", job.book_id)
+            .single(),
+        );
+        if (job.status === "importing" || book.published || book.archived_at)
+          throw new Error(
+            "Finish importing, restore and hide the book before replacing images",
+          );
+        const bytes = await boundedBody(request, LIMITS.entry, "Image");
+        const hash = await sha256(bytes),
+          reference = `assets/repairs/${hash}.${imageExtension}`;
+        await validateRasterAsset(reference, bytes);
+        const path = `${job.fingerprint}/${hash}.${imageExtension}`;
+        const existing = await checked(
+          admin
+            .from("book_package_assets")
+            .select("book_id,source_path")
+            .eq("path", path)
+            .maybeSingle(),
+        );
+        if (existing && existing.book_id !== job.book_id)
+          throw new Error("Asset belongs to another book");
+        await checked(
+          admin.storage.from("book-package-assets").upload(path, bytes, {
+            upsert: true,
+            contentType: request.headers.get("Content-Type"),
+          }),
+        );
+        const saved = await checked(
+          admin.storage.from("book-package-assets").download(path),
+        );
+        if ((await sha256(await saved.arrayBuffer())) !== hash)
+          throw new Error("Replacement image verification failed");
+        if (!existing)
+          await checked(
+            admin.from("book_package_assets").upsert({
+              path,
+              book_id: job.book_id,
+              question_id: null,
+              kind: "archive",
+              source_path: reference,
+              sha256: hash,
+            }),
+          );
+        return reply({
+          path: existing?.source_path || reference,
+          imageUrl: `https://satchi.invalid/storage/v1/object/authenticated/book-package-assets/${path}`,
+        });
+      }
       if (request.headers.get("Content-Type")?.startsWith("application/zip")) {
-        // Read incrementally; Content-Length is not trusted.
-        const reader = request.body.getReader(),
-          chunks = [];
-        let size = 0;
-        for (;;) {
-          const next = await reader.read();
-          if (next.done) break;
-          size += next.value.length;
-          if (size > LIMITS.zip) {
-            await reader.cancel();
-            throw new Error("ZIP exceeds 32 MB");
-          }
-          chunks.push(next.value);
-        }
-        const bytes = new Uint8Array(size);
-        let offset = 0;
-        for (const chunk of chunks) {
-          bytes.set(chunk, offset);
-          offset += chunk.length;
-        }
+        // Content-Length is not trusted.
+        const bytes = await boundedBody(request, LIMITS.zip, "ZIP");
         const pkg = await inspectPackage(bytes);
         const id = await checked(
           admin.rpc("universal_begin", {
@@ -83,7 +160,15 @@ export function createImportHandler({ createClient, env }) {
         );
         return reply(job);
       }
-      const { jobId, correction } = await request.json();
+      if (request.headers.get("Content-Type")?.startsWith("image/"))
+        throw new Error(
+          "Only PNG, JPEG and WebP replacement images are supported",
+        );
+      const { jobId, correction } = JSON.parse(
+        new TextDecoder("utf-8", { fatal: true }).decode(
+          await boundedBody(request, LIMITS.entry, "JSON correction"),
+        ),
+      );
       job = await checked(
         admin.from("universal_book_jobs").select("*").eq("id", jobId).single(),
       );

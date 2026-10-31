@@ -126,3 +126,52 @@ test("database begin prevents inactive actors and cross-admin fingerprint takeov
     /permission denied/,
   );
 });
+
+test("replacement images and correction bodies reject invalid formats/oversized streams before Storage writes", async () => {
+  for (const [type, body, message] of [
+    ["image/png", "not a PNG", /Invalid image signature/],
+    ["image/svg+xml", "<svg/>", /Only PNG/],
+  ]) {
+    const { handler, writes } = transport({ role: "admin", active: true });
+    const response = await handler(
+      new Request("http://127.0.0.1:54321/functions/v1/import-book", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer test",
+          "Content-Type": type,
+          "x-satchi-job": "job",
+        },
+        body,
+      }),
+    );
+    assert.equal(response.status, 400);
+    assert.match((await response.json()).error, message);
+    assert.equal(writes(), 0);
+  }
+  for (const type of ["image/png", "application/json"]) {
+    const { handler, writes } = transport({ role: "admin", active: true });
+    let chunks = 0;
+    const body = new ReadableStream({
+      pull(controller) {
+        if (chunks++ < 9) controller.enqueue(new Uint8Array(1024 * 1024));
+        else controller.close();
+      },
+    });
+    const response = await handler(
+      new Request("http://127.0.0.1:54321/functions/v1/import-book", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer test",
+          "Content-Type": type,
+          "x-satchi-job": "job",
+          "Content-Length": "1",
+        },
+        body,
+        duplex: "half",
+      }),
+    );
+    assert.equal(response.status, 400);
+    assert.match((await response.json()).error, /exceeds 8 MiB/);
+    assert.equal(writes(), 0);
+  }
+});

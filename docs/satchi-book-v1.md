@@ -60,3 +60,18 @@ code 1. Conversion chats need no SAT’chi credentials: prepare these four membe
 use the schemas in `docs/schemas`, include original or licensed assets, run this
 validator, and upload the ZIP through Admin. Never guess an answer or mark an
 uncertain record approved.
+
+## Correcting option/stem assets
+
+In an imported book's hidden draft, open the correction editor, choose the record
+and stem/A-D target, then upload an authorized PNG/JPEG/WebP (maximum 8 MiB).
+The server validates and hash-verifies the bytes; preview and JSON reference are
+staged until **Save validated correction**. Existing option text remains editable.
+Original files are retained. Audits identify the active owning admin, canonical
+question and old/new record. Published/archived book asset replacement is rejected;
+hide/restore first. New repair assets are separate from the original ZIP inventory.
+
+This route does not replace the missing crop-boundary editor or establish rights
+for legacy books. New stems/options can be prepared with the original-authorized
+[lossless crop examples](../assets/examples/math-repair/README.md). Never apply a
+repair to a different canonical identity or reimport an old book to bypass history.

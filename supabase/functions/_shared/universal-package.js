@@ -460,6 +460,30 @@ async function checkRaster(path, data) {
     else fail(`Unsupported WebP frame: ${path}`);
   }
 }
+export async function validateRasterAsset(path, data) {
+  if (
+    !safePath(path) ||
+    !/^assets\/.+\.(png|jpg|jpeg|webp)$/.test(path) ||
+    !(data instanceof Uint8Array) ||
+    !data.length ||
+    data.length > LIMITS.entry
+  )
+    fail("Invalid image path or size (maximum 8 MiB)");
+  const png =
+    path.endsWith(".png") &&
+    [137, 80, 78, 71, 13, 10, 26, 10].every((b, i) => data[i] === b);
+  const jpeg =
+    /\.jpe?g$/.test(path) &&
+    data[0] === 255 &&
+    data[1] === 216 &&
+    data[2] === 255;
+  const webp =
+    path.endsWith(".webp") &&
+    new TextDecoder().decode(data.subarray(0, 4)) === "RIFF" &&
+    new TextDecoder().decode(data.subarray(8, 12)) === "WEBP";
+  if (!png && !jpeg && !webp) fail(`Invalid image signature: ${path}`);
+  await checkRaster(path, data);
+}
 export async function inspectPackage(input) {
   const files = await readZip(input),
     decode = (name) =>
@@ -498,20 +522,7 @@ export async function inspectPackage(input) {
   }
   for (const [path, data] of files)
     if (path.startsWith("assets/")) {
-      const png =
-        path.endsWith(".png") &&
-        [137, 80, 78, 71, 13, 10, 26, 10].every((b, i) => data[i] === b);
-      const jpeg =
-        /\.jpe?g$/.test(path) &&
-        data[0] === 255 &&
-        data[1] === 216 &&
-        data[2] === 255;
-      const webp =
-        path.endsWith(".webp") &&
-        new TextDecoder().decode(data.subarray(0, 4)) === "RIFF" &&
-        new TextDecoder().decode(data.subarray(8, 12)) === "WEBP";
-      if (!png && !jpeg && !webp) fail(`Invalid image signature: ${path}`);
-      await checkRaster(path, data);
+      await validateRasterAsset(path, data);
     }
   return {
     manifest,

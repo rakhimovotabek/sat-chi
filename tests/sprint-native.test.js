@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile, mkdir } from "node:fs/promises";
+import { readFile, mkdir, mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { execFileSync } from "node:child_process";
 import { createClient } from "@supabase/supabase-js";
 import { chromium, expect } from "@playwright/test";
 import {
@@ -66,6 +69,18 @@ test(
       await page.getByRole("button", { name: "Sign In", exact: true }).click();
       await page.waitForURL(/\/(admin|dashboard)/);
     };
+    const repairFolder = await mkdtemp(
+      join(tmpdir(), "satchi-original-option-"),
+    );
+    t.after(() => rm(repairFolder, { recursive: true, force: true }));
+    const replacement = join(repairFolder, "option-b.png");
+    execFileSync("magick", [
+      "assets/examples/math-repair/two-column.png",
+      "-crop",
+      "250x70+350+70",
+      "+repage",
+      replacement,
+    ]);
     let book, job, firstId;
     await t.test(
       "browser uploads actual ZIP bytes, resumes durable draft and edits canonical question",
@@ -140,6 +155,21 @@ test(
         await expect(
           teacherPage.getByLabel("Question record", { exact: true }),
         ).toHaveValue(/Verified local draft correction/);
+        await teacherPage
+          .getByRole("combobox", { name: "Question", exact: true })
+          .selectOption("1");
+        await teacherPage
+          .getByLabel("Replacement PNG, JPEG or WebP")
+          .setInputFiles(replacement);
+        await expect(
+          teacherPage.getByAltText("Replacement image preview"),
+        ).toHaveJSProperty("naturalWidth", 250);
+        await teacherPage
+          .getByRole("button", { name: "Save validated correction" })
+          .click();
+        await expect(
+          teacherPage.getByText("Correction saved.", { exact: false }),
+        ).toBeVisible();
         await teacherPage.goto(`${app.appUrl}/admin/books`);
         await teacherPage
           .getByRole("button", { name: "Import Book", exact: true })
@@ -204,8 +234,14 @@ test(
         ).toBeVisible();
         await page.getByRole("button", { name: "Next", exact: true }).click();
         await expect(page.locator(".book-option-content img")).toHaveCount(4);
-        for (const img of await page.locator(".book-option-content img").all())
-          await expect(img).toHaveJSProperty("naturalWidth", 120);
+        const optionImages = await page
+          .locator(".book-option-content img")
+          .all();
+        for (const [index, img] of optionImages.entries())
+          await expect(img).toHaveJSProperty(
+            "naturalWidth",
+            index === 1 ? 250 : 120,
+          );
         await page.getByRole("radio").nth(1).check();
         await page.getByRole("button", { name: "Check", exact: true }).click();
         await expect(page.locator(".attempt-feedback strong")).toHaveText(
@@ -326,6 +362,18 @@ test(
           headers: { "Content-Type": "application/zip" },
         });
         assert.ok(bad.error);
+        const publishedReplacement = await teacher.functions.invoke(
+          "import-book",
+          {
+            body: new Blob([await readFile(replacement)]),
+            headers: { "Content-Type": "image/png", "x-satchi-job": job },
+          },
+        );
+        assert.ok(publishedReplacement.error);
+        assert.match(
+          (await publishedReplacement.error.context.json()).error,
+          /hide the book/,
+        );
         assert.equal(
           await app.json("select count(*) from universal_book_jobs"),
           1,

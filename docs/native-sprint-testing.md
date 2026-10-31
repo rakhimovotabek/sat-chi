@@ -79,3 +79,27 @@ Bank pagination assumptions and concurrent-suite resource pressure. These were
 fixed; the final focused checks pass. Full historical suites and true dark-mode,
 Realtime and hosted Edge/Storage acceptance are not claimed. No production,
 GitHub or deployment operation occurred.
+
+## Image replacement and manual startup
+
+The draft editor can now upload a PNG/JPEG/WebP stem or A-D option image. Worker
+checks active admin/ownership, completed import and hidden/unarchived book,
+validates bounded raster bytes with the same package validator, hashes/re-reads
+Storage and retains originals. Upload stages an asset; explicit Save applies the
+canonical correction and its audit. Published direct requests are rejected.
+Identical-byte uploads retain existing source-path aliases. JSON correction and
+image bodies are incrementally capped at 8 MiB; ZIP remains 32 MiB, independent
+of declared Content-Length. JPEG/WebP header/dimension checking does not prove full
+entropy decoding; PNG checks include CRC and bounded pixel expansion.
+
+Native browser proof: replace B with a new 250px original crop, preview it, save,
+publish, render all four student options at actual widths and grade B correctly.
+All ten native tests pass with the repaired image; eight focused package/
+authorization tests pass, including invalid formats and oversized image/JSON
+streams rejected before Storage writes. Lint and build pass.
+
+`npm run dev:platform` was also actually started successfully: real local Auth,
+PostgreSQL/PostgREST, Vite, SMTP inbox, 15 synthetic catalog books and zero private
+cover previews. It printed local app/inbox URLs and was stopped cleanly with
+SIGINT after verification. Restart to obtain fresh ports. Disposable credentials
+remain in the existing platform guide; never use real accounts or `.env.local`.

@@ -319,7 +319,7 @@ export async function nativeAppEnvironment({
       res.setHeader("Access-Control-Allow-Origin", appUrl);
       res.setHeader(
         "Access-Control-Allow-Headers",
-        "authorization,apikey,content-type,x-client-info,x-supabase-api-version,x-satchi-client-version,prefer,range,range-unit,accept-profile,content-profile",
+        "authorization,apikey,content-type,x-client-info,x-supabase-api-version,x-satchi-client-version,x-satchi-job,prefer,range,range-unit,accept-profile,content-profile",
       );
       res.setHeader(
         "Access-Control-Allow-Methods",
