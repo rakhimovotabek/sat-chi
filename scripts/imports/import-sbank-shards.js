@@ -36,6 +36,7 @@ const jobs = roots.flatMap((root) =>
     (v) => ({ ...v, root }),
   ),
 );
+jobs.sort((a,b)=>a.file.localeCompare(b.file));
 // Full raster/CRC audit was completed offline. The Edge handler repeats ZIP,
 // raster and digest validation before creating each remote draft.
 for (const root of roots) {
@@ -141,7 +142,7 @@ async function worker() {
   }
 }
 try {
-  await Promise.all(Array.from({ length: 4 }, () => worker()));
+  await Promise.all(Array.from({ length: 2 }, () => worker()));
 } finally {
   sdk.auth.stopAutoRefresh();
   sdk.realtime.disconnect();

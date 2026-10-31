@@ -104,7 +104,7 @@ for (const tamper of [false, true])
       assert.equal(result.status, 200);
       assert.equal(job.status, "draft");
       assert.equal(job.question_cursor, pkg.questions.length);
-      assert(max > 1 && max <= 4);
+      assert(max > 1 && max <= 6);
       assert(stored.size > 0);
     }
   });

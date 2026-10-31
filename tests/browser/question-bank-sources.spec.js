@@ -106,6 +106,16 @@ test("SBank queries its isolated source and enables real practice controls", asy
       ),
     )
     .toBe(true);
+  await work
+    .getByRole("button", { name: "Reset filters", exact: true })
+    .click();
+  await expect
+    .poll(
+      () =>
+        store.requests.filter((r) => r.path.endsWith("/question_bank")).at(-1)
+          ?.body.p_filters.source,
+    )
+    .toBe("sbank");
   await source(page, "SAT'chi Bank").click();
   expect(
     store.requests.some(

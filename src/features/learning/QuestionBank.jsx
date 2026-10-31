@@ -123,7 +123,7 @@ function BankWorkspace({ admin, source }) {
   }, [key, filters, count, timed]);
   const change = (next) => {
     setPage(0);
-    setFilters(next);
+    setFilters({ ...next, source: collegeBoard ? "sbank" : "satchi" });
   };
   const field = (name, value) => change({ ...filters, [name]: value });
   const state = useContent(

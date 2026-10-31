@@ -234,13 +234,13 @@ export function createImportHandler({ createClient, env }) {
         );
       const pendingAssets = assets.slice(
         job.asset_cursor,
-        job.asset_cursor + 80,
+        job.asset_cursor + 320,
       );
       const assetMetadata = [];
       // Bounded cloud I/O; advance the checkpoint only after every hash matches.
-      for (let offset = 0; offset < pendingAssets.length; offset += 4) {
+      for (let offset = 0; offset < pendingAssets.length; offset += 6) {
         await Promise.all(
-          pendingAssets.slice(offset, offset + 4).map(async ([path, bytes]) => {
+          pendingAssets.slice(offset, offset + 6).map(async ([path, bytes]) => {
             const storagePath = paths.get(path);
             const mime = path.endsWith(".png")
               ? "image/png"
@@ -292,28 +292,34 @@ export function createImportHandler({ createClient, env }) {
           ? `https://satchi.invalid/storage/v1/object/authenticated/book-package-assets/${paths.get(path)}`
           : null;
       if (job.asset_cursor === assets.length) {
-        const batch = pkg.questions
-          .slice(job.question_cursor, job.question_cursor + 25)
-          .map((q) => ({
-            ...q,
-            imageUrl: assetUrl(q.image),
-            options: q.options?.map((o) => ({
-              ...o,
-              imageUrl: assetUrl(o.image),
-            })),
-            explanation:
-              (q.explanation || "") +
-              (q.explanationImage
-                ? `\n![Explanation](${assetUrl(q.explanationImage)})`
-                : ""),
-          }));
-        job.question_cursor = await checked(
-          admin.rpc("universal_append", {
-            p_job: job.id,
-            p_expected: job.question_cursor,
-            p_questions: batch,
-          }),
-        );
+        for (
+          let turn = 0;
+          turn < 2 && job.question_cursor < pkg.questions.length;
+          turn++
+        ) {
+          const batch = pkg.questions
+            .slice(job.question_cursor, job.question_cursor + 25)
+            .map((q) => ({
+              ...q,
+              imageUrl: assetUrl(q.image),
+              options: q.options?.map((o) => ({
+                ...o,
+                imageUrl: assetUrl(o.image),
+              })),
+              explanation:
+                (q.explanation || "") +
+                (q.explanationImage
+                  ? `\n![Explanation](${assetUrl(q.explanationImage)})`
+                  : ""),
+            }));
+          job.question_cursor = await checked(
+            admin.rpc("universal_append", {
+              p_job: job.id,
+              p_expected: job.question_cursor,
+              p_questions: batch,
+            }),
+          );
+        }
         if (job.question_cursor === pkg.questions.length) {
           if (pkg.manifest.book.cover)
             await checked(
