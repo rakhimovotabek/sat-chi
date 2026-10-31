@@ -8,7 +8,7 @@ import {
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization,apikey,content-type,x-client-info,x-satchi-job",
+    "authorization,apikey,content-type,x-client-info,x-satchi-job,x-satchi-client-version",
   "Access-Control-Allow-Methods": "POST,OPTIONS",
 };
 async function boundedBody(request, maximum, label) {

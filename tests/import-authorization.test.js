@@ -175,3 +175,39 @@ test("replacement images and correction bodies reject invalid formats/oversized 
     assert.equal(writes(), 0);
   }
 });
+
+test("browser import preflight accepts the version header without accessing credentials or data", async () => {
+  const handler = createImportHandler({
+    createClient: () => {
+      throw new Error("Preflight must not access data");
+    },
+    env: () => {
+      throw new Error("Preflight must not read credentials");
+    },
+  });
+  const response = await handler(
+    new Request("http://127.0.0.1:54321/functions/v1/import-book", {
+      method: "OPTIONS",
+      headers: {
+        Origin: "https://sat-chi.netlify.app",
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers":
+          "authorization,apikey,content-type,x-client-info,x-satchi-client-version,x-satchi-job",
+      },
+    }),
+  );
+  assert.equal(response.status, 200);
+  const allowed = response.headers
+    .get("Access-Control-Allow-Headers")
+    .split(",");
+  for (const name of [
+    "authorization",
+    "apikey",
+    "content-type",
+    "x-client-info",
+    "x-satchi-client-version",
+    "x-satchi-job",
+  ]) {
+    assert.ok(allowed.includes(name), `${name} must pass browser preflight`);
+  }
+});
