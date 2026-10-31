@@ -172,3 +172,6 @@ The final combined line/breakdown fixture run passes **4/4**; model tests pass
 [breakdown laptop](screenshots/analytics/analytics-breakdown-laptop.png) and
 [breakdown mobile](screenshots/analytics/analytics-breakdown-mobile.png) captures
 show the measured 75%, including exact counts and small-sample labels.
+
+The original daily-bar browser regression also passes **2/2** after the final
+shared-animation change (`/tmp/satchi-progress-bars-regression.log`).

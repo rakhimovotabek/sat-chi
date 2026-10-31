@@ -6,21 +6,40 @@ Branch: `feature/universal-book-import`. Baseline: `780eb95`. All implementation
 
 ## Current recovery checkpoint (2026-10-31)
 
-The absent tool cache has been restored locally: PostgreSQL 17.11, PostgREST 14.1,
-Auth v2.197.0. Native browser/HTTP acceptance now verifies original ZIP import,
-actual assets, durable draft/correction/publication, student solving/Bank/history,
-real network 1v1/2v2, full Typed Word match, R&W passage round, persisted Progress
-and admin Homework heatmap. Actual replacement option upload/preview/grade and
-attributed correction audits preserve IDs and old grades. A reviewed lossless
-crop tool runs on two original synthetic layouts; existing corpus conversions
-remain zero pending rights/canonical reconciliation.
+Continuation began clean at `b0c4072`. Verified local milestones:
 
-Final focused checks pass: 10 unit, 8 SQL, 10 native (parent plus nine scenarios),
-6 browser fixtures; lint/build. Storage HTTP/Node Edge transport are explicitly
-substituted; full Storage/Edge/Realtime is not verified. Actual native screenshots
-and exact commands/limitations are linked in [the current resume](sprint-resume.md).
-The detailed sections below record earlier milestones and their evidence; their
-missing-native-tool statements are superseded by this recovery checkpoint.
+- `a960921`: official Storage API/file backend + Edge Runtime + Realtime; host
+  lobby controls/recovery; combined actual-service acceptance **12/12**.
+- `fa5aac0`: whole-match server deadlines, natural-clock expiry and two-browser
+  settings/display; default native setup regression preserved.
+- `1bdba1c`: four-pair Vocabulary Word Matching, private server grading, saved
+  readable pair review; SQL and actual two-browser completion.
+- `68e0407`: transactional compatible public 1v1 Quick Match; four concurrent
+  Auth clients and actual two-browser Vocabulary completion.
+- `9df8029`: measured daily accuracy line, Dashboard bars/admin Homework entry
+  motion, real saved-Check integration; complete R&W/Meaning Rush/Reverse Meaning
+  HTTP matches with exact saved histories (**3/3**).
+- `f3ccc48`: measured Progress breakdown bars, correct known-denominator ordering,
+  section-preserving grouping and exact 75% saved-data browser acceptance.
+
+Twenty separately authenticated clients also complete a two-round room with
+forty saved answers and twenty histories. Member-only Realtime delivery is actual
+WAL/WebSocket, not polling evidence. The [continuation evidence report](continuation-acceptance.md), [current resume](sprint-resume.md),
+[Battles acceptance](battles-acceptance.md), [analytics definitions](analytics-metrics.md)
+and [service evidence](isolated-supabase-services.md) contain exact commands,
+counts and boundaries. Database/browser suites run serially on the 3816 MiB laptop; no load or
+peak-memory benchmark is claimed. Full historical suite has not been rerun.
+
+**Still open:** S3/hosted gateway verification; broader admin/student analytics,
+XP/levels/badges; failed-request Battle transport throttling and presence/load;
+true dark theme/broader responsive and performance checks; rights/export-blocked
+Math corpus application and full crop-review UI. Existing metadata inventory is
+2367 occurrences/2060 candidate source IDs, not verified canonical totals.
+Zero third-party Math conversions were performed in this continuation.
+
+The feature detail sections below originated in earlier checkpoints. Their
+statements about missing real services, unfinished Quick Match/Matching/timers
+and incomplete R&W HTTP histories are superseded by the current evidence above.
 
 ## Universal Import System
 

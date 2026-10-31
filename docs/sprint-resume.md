@@ -1,116 +1,142 @@
 # SAT’chi recovery checkpoint — 2026-10-31
 
-Branch: `feature/universal-book-import`. Started clean at `b0c4072`.
-Latest committed implementation: `a960921` (real Supabase services and Battle
-lobby recovery). Timer UI/native-harness regression is the current next milestone.
-Use `git status --short` and `git log` before resuming; newer work may exist.
+Branch: `feature/universal-book-import`. Continuation began clean at `b0c4072`.
+Latest verified implementation: **`f3ccc48a385012b7afb8db19fe3edf53e1bdecb5`**.
+The documentation checkpoint follows it. Inspect `git status --short --branch`
+and `git log -10 --oneline` before modifying; later work may exist.
 
-## Verified service milestone
+Read [the continuation acceptance report](continuation-acceptance.md) for the
+full evidence matrix and [major sprint report](major-development-sprint.md) for
+product context. Do not repeat successful service/tool investigations or reread
+the whole codebase. No new Math corpus authorization/export has appeared.
 
-- `npm run test:sprint:services`: **12/12 passed**, zero skips. Official
-  Supabase Storage API 1.81.0 (file backend), Edge Runtime 1.77.4 user workers,
-  Realtime 2.143.3, plus native PostgreSQL 17.11/PostgREST 14.1/Auth v2.197.0.
-- Actual browser ZIP/6 assets/30 canonical questions; private draft and denied
-  student signing/staging/public downloads; reload, audited correction, new option
-  upload/preview, idempotent retry, publish, student asset decode/MCQ/SPR,
-  explanation/resume, Bank UUID, hide/archive/restore and unchanged Check history.
-- Real network complete 1v1/2v2/3v3; fresh Auth login restores the same seat and
-  answer. Replay/capacity races, exact team scores and saved histories pass.
-- Actual WAL-backed WebSocket revisions reach a member and not an outsider;
-  payload contains only battle ID, revision and timestamp. Focused Realtime 1/1.
-- Two independent browser sessions complete 2v2: server-confirmed host settings,
-  team swap, confirmed kick, rejoin denial, balanced replacement join, ready/start,
-  offline/reload same-seat/answer recovery and exact persisted final scores.
-  Standalone browser check also passes. Laptop/mobile captures are under
-  `docs/screenshots/real-services/`.
-- Real twenty-client HTTP acceptance **1/1 passed**: twenty independent Auth
-  sessions, simultaneous joins/readiness/answers, two frozen rounds, repeated
-  answer intents, forty saved rows, 100 points each/2000 total and twenty saved
-  personal histories. These are synthetic clients, not humans or a load benchmark.
-- Actual admin-host selection failure fixed: admission and sampling now use the
-  same approved/published pool. No unapproved question was exposed: the old final
-  safety gate rejected the match. The new parity regression passes.
-- Existing real Progress (3 first-correct questions, 100%, Math/7 days) and Admin
-  Homework heatmap browser narratives pass against the actual service mode.
+## Implemented and verified in this continuation
 
-## Tests and constraints
+1. **Actual isolated backend:** official Storage API 1.81.0/file backend, Edge
+   Runtime 1.77.4 user workers, Realtime 2.143.3 beside preserved native PostgreSQL
+   17.11/PostgREST 14.1/Auth v2.197.0. Combined suite **12/12**, zero skips. Actual
+   30-question ZIP, six assets, durable draft, private denial, correction/replacement,
+   retry/publication,
+   student MCQ/SPR, Bank canonical identity, hide/archive/restore/history. Separate
+   actual WAL/WebSocket member/outsider test **1/1**. Cache/setup, safe rootfs
+   extraction, role/listener/plugin/path fixes and cleanup are done. No need to
+   install Docker or modify local system services.
+2. **Battles:** complete real 1v1/2v2/3v3 and twenty-client concurrent room with
+   exact histories; two-browser 2v2 offline/reload recovery; host teams/settings/
+   kick and balanced replacement; whole-match/per-question/untimed timers,
+   natural 30-second expiry; pool parity fix. Word Matching and typed Word have
+   actual browser completion. Meaning Rush/Reverse Meaning and original imported
+   R&W now finish full HTTP matches/history (**3/3**). Quick Match pairs compatible
+   public 1v1s transactionally; four concurrent Math clients and actual two-browser
+   Vocabulary complete (**2/2**). Same server state machine, no second subsystem.
+3. **Animated analytics:** Progress daily line with real gaps/exact table;
+   Dashboard existing per-day bar motion; admin Homework heatmap entry motion;
+   all-time domain/skill/difficulty/source horizontal bars. Breakdown ordering now
+   uses the same known-first-result denominator as displayed accuracy and keeps
+   section context. Actual saved Checks verify four known/three correct (**75%**), one later
+   correction, daily 50/100/100 and Algebra 75%; actual admin cells 100/0/unknown;
+   no inferred time and unchanged original Check history. Normal/reduced motion,
+   baseline/final geometry, keyboard table, no replay, reload/mobile are tested.
+   No chart dependency/per-frame React animation state. Four supplied references
+   were inspected; sample statistics were not copied.
 
-New focused unit: **3/3** (account bounds/identity compatibility, inherited-env
-isolation, chunk-split secret/JWT log redaction). New disposable SQL: **5/5**
-(2 lobby/heartbeat, 2 whole-match timers, 1 pool parity), all individually passed.
-Lint and production build pass. Full historical suite has not been run.
+Local implementation commits: `a960921`, `fa5aac0`, `1bdba1c`, `68e0407`,
+`9df8029`, `f3ccc48`; checkpoint `5c5b951` and this checkpoint follow separately.
 
-Official images are SHA-256 pinned in the setup script and cached user-locally.
-Bubblewrap/user namespaces run them without Docker, sudo or system packages.
-`wal2json` 2.7 is compiled into the existing user-cache PostgreSQL installation.
-Every listener is loopback; no dotenv chooses write targets. Service logs are
-redacted before disk, child shutdown is awaited and upgraded sockets are closed.
-Run heavy suites serially on this 3816 MiB laptop; concurrent PGlite/cold Storage
-startup produced a timeout during development. No speed/peak-memory claim.
+## Latest passing checks
 
-**Boundary:** actual Storage API/file backend is verified; S3/MinIO and hosted
-Storage/gateway/JWT configuration are not. Auth retains its existing separate
-local Auth database with synthetic matching application UUIDs. Realtime presence,
-hosted delivery and broad load capacity remain unverified. No full production
-Supabase clone or deployment-readiness claim. Details:
-[service evidence](isolated-supabase-services.md), [Battles](battles-acceptance.md),
-[lobby controls](battle-lobby-controls.md).
+All zero skips. Counts are per command; do not sum overlapping narratives.
 
-## Remaining priorities
+- Focused units **7/7**: account/env isolation, chunk-safe secret log redaction,
+  geometry and performance aggregation/sorting.
+- Disposable SQL: lobby 2, timers 2, pool 1, matching + existing Battles 6, Quick 1.
+  Matching-history source-change assertion also passed in its focused rerun.
+- Actual services: combined 12, Realtime 1, twenty-client 1, natural-timer 1,
+  host/timer-browser 1, matching-browser 1, Quick 2, R&W/Vocabulary 3, analytics 1.
+- Original default-native two-browser regression **1/1**.
+- Final browser fixtures: accuracy line+breakdown **4/4**; original daily bars
+  **2/2** after the shared-animation change. One worker throughout.
+- Final `npm run lint`, `npm run build`, `git diff --check` pass; detector has no
+  findings. Full historical suite has not been rerun. No runtime/peak-memory
+  performance claim; run heavy suites serially on this3816 MiB laptop.
 
-1. Complete whole-match timer UI/native-harness regression. Natural-clock HTTP
-   expiry already passed 1/1 with actual services (30-second budget, late-answer
-   rejection, one persisted correct answer/100 points, unanswered zero). Migration
-   `20261031000800` already has two passing SQL checks: missed countdowns no longer
-   grant fresh full rounds; whole deadlines reject late answers, preserve earned
-   points and give unanswered items zero. Settings bounds and untimed questions
-   with a total budget are covered. UI verification is not established by SQL.
-2. Vocabulary Word Matching and Quick Match; richer custom formats/rankings;
-   complete R&W and Meaning Rush/Reverse Meaning network histories. Typed Word
-   has actual browser completion; R&W has one real passage round. Keep live
-   subscriptions/poll fallback and private keys intact.
-3. New animated analytics/gamification work remains. Existing Progress and admin
-   charts are measured, but no new Dashboard/Admin Analytics redesign or XP,
-   levels, badges/leaderboard ledger was implemented in this continuation.
-4. Math: prior metadata inventory retained (2367 occurrences/2060 candidate IDs;
-   1677 composite MCQs/690 SPR; 140 collision groups/447 occurrences). Actual
-   canonical unique total is unknown without a sanitized export. Existing corpus
-   processing rights remain unverified; **zero third-party conversions**. Prior
-   two original synthetic layouts/ten lossless crops remain valid. Do not infer
-   rights from local files or rewrite colliding historical IDs. Crop-review UI
-   and full authorized corpus application remain unfinished.
-5. True dark theme, remaining responsive sizes, import diagnostics/recovery,
-   and broader accessibility/performance profiling remain unfinished. Current
-   Battle captures are light/reduced-motion laptop/mobile only.
+Actual synthetic-account captures are committed under `docs/screenshots/analytics/`,
+`real-services/`, `native-timer/` and `word-matching/`. Light theme, 1366×768 and
+390×844 only. `native-timer` is deliberately the default-native mode. All screenshots
+are disposable fixtures, not real student accounts.
 
-## Resume commands
+## Next highest-value unfinished work
+
+1. Backend boundary: actual **Storage file backend** is complete. S3/MinIO and
+   hosted gateway/JWT behavior remain unverified. Add S3 acceptance only in another
+   disposable local configuration; preserve the working default native setup.
+   Maximum ZIP Edge benchmarking, richer diagnostics/recovery and JPEG/WebP full
+   decoding remain open. No production URL/config is a test target.
+2. Battles: full browser R&W/Meaning Rush/Reverse Meaning can reuse the completed
+   HTTP fixtures in `tests/battle-reading-vocabulary-native.test.js` and existing
+   browser helpers. Do not repeat backend-only narratives as a substitute. Failed
+   request throttling remains a transport release dependency; SQL successful-call
+   limits roll back on failure. Realtime presence/service restart/load, richer
+   custom formats/host source edits and dedicated Battle ranking remain open.
+3. Analytics: next extend **actual routed** `src/features/learning/Reporting.jsx`
+   and its feature components, not unused `src/pages/*/Dashboard.jsx`. Implement
+   measured time charts/coherent cross-panel filters and admin cohort metrics
+   from authorized saved data. Existing activity controls scope only that panel;
+   breakdown/cards are all time. No animated counters/new streak model/XP ledger,
+   levels or achievements were implemented. Introduce explicit idempotent earning
+   rules/security tests before displaying XP, not invented seed totals.
+4. Math: **zero third-party conversions**. Preserved inventory: 2367 occurrences =
+   1677 composite MCQs + 690 SPRs, 2060 candidate IDs; 140 collision groups / 447 occurrences =
+   307 excess. All 2367 remain rights-blocked. Canonical live unique/already-satisfactory/
+   missing-source/review/failure totals remain unknown without a sanitized export.
+   Prior two original synthetic layouts / ten lossless crops are separate evidence.
+   Complete the reusable crop-review UI and audited canonical application, but
+   do not read/convert existing copyrighted sources or rewrite historical IDs
+   without processing rights/export reconciliation. See `math-corpus-conversion.md`.
+5. True dark theme, 768/1920 widths, broader accessibility, import/route polish and
+   measured low-memory/runtime profiling remain open. Never turn Night Light into
+   a claimed dark theme or infer duration from idle wall-clock time.
+
+## Reproduce selected checks (serially)
 
 ```bash
-npm run setup:test-tools        # only if native cache is missing
-npm run setup:test-services     # pinned cache; ~730 MiB compressed images
+git status --short --branch
+git log -10 --oneline
+npm run setup:test-tools       # only if cache missing
+npm run setup:test-services    # pinned cache; only if missing
 npm run test:realtime
-npm run test:battles:network
-npm run test:battles:browser
+npm run test:battles:reading
+npm run test:battles:quick
+npm run test:analytics:native
 npm run test:sprint:services
-node scripts/testing/sprint-native.js --battle-browser  # default native mode
-node --test tests/native-environment.test.js tests/service-log.test.js
-node --expose-gc --import ./scripts/testing/release-memory.js --test --test-concurrency=1 tests/battle-lobby-controls.test.js tests/battle-match-timers.test.js tests/battle-pool-parity.test.js
+node --test tests/native-environment.test.js tests/service-log.test.js tests/accuracy-geometry.test.js tests/performance-breakdown.test.js
+npx playwright test tests/browser/accuracy-trend.spec.js tests/browser/performance-breakdown.spec.js tests/browser/progress-activity.spec.js --workers=1
 npm run lint
 npm run build
 ```
 
+For changed SQL, run only relevant files via the existing disposable PostgreSQL
+helper, e.g. `node --expose-gc --import ./scripts/testing/release-memory.js --test
+--test-concurrency=1 tests/battle-quick-match.test.js`. Other exact Battle commands
+are in README and focused evidence docs. Do not start PGlite/browser/service suites
+concurrently to save time on this laptop.
+
 New pending migrations: `20261031000700_battle_lobby_controls.sql`,
 `20261031000800_battle_match_timers.sql`, `20261031000900_battle_pool_parity.sql`,
-plus every prior checkpoint's pending dependencies. Additive changes preserve
-saved grades, IDs and frozen history; apply only to disposable copies until a
-separately authorized release. No backfill invents student outcomes.
+`20261031001000_battle_word_matching.sql`, `20261031001100_battle_quick_match.sql`,
+plus all preceding checkpoint dependencies. Tested only on disposable copies.
+Preserve IDs, original grades, frozen match snapshots and historical answers.
 
-Logs: `/tmp/satchi-official-final.log`, `/tmp/satchi-realtime-focused.log`,
-`/tmp/satchi-battle-browser.log`, `/tmp/satchi-battle-network.log`,
-`/tmp/satchi-lobby-controls.log`, `/tmp/satchi-match-timers.log`,
-`/tmp/satchi-pool-parity.log`, `/tmp/satchi-service-unit.log`,
-`/tmp/satchi-services-lint.log`, `/tmp/satchi-services-build.log`.
+Useful temporary logs: `/tmp/satchi-official-final.log`,
+`/tmp/satchi-realtime-focused.log`, `/tmp/satchi-battle-network.log`,
+`/tmp/satchi-natural-timer.log`, `/tmp/satchi-word-matching-sql.log`,
+`/tmp/satchi-quick-native.log`, `/tmp/satchi-reading-vocabulary.log`,
+`/tmp/satchi-continuation-unit-final.log`, `/tmp/satchi-performance-native.log`,
+`/tmp/satchi-performance-browser-verified.log`,
+`/tmp/satchi-progress-bars-regression.log`, `/tmp/satchi-performance-lint.log`,
+`/tmp/satchi-performance-build.log`, `/tmp/satchi-performance-design-check.json`.
 
-**No push, deployment, hosted migration, production data/config write or real
-student-account test occurred.** No test service was left running after the
-verified milestone. Full sprint acceptance remains unfinished.
+All disposable services stopped after acceptance; the stale stopped directory
+from the earlier interrupted service run was removed. No GitHub push, deployment,
+hosted/production migration, real student/config write or real student-account
+test occurred. Full requested sprint remains unfinished.

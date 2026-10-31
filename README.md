@@ -355,7 +355,7 @@ The suite launches disposable Vite/PostgREST/database fixtures and verifies save
 
 ### Universal imports and Battles sprint (local verification)
 
-See [the implementation report](docs/major-development-sprint.md) for implemented behavior, outstanding acceptance checks, additive migrations and isolated localhost setup. The [satchi-book-v1 specification](docs/satchi-book-v1.md) includes an original CC0 ZIP fixture and conversion guidance.
+See [the implementation report](docs/major-development-sprint.md) for implemented behavior, outstanding acceptance checks, pending migrations and isolated localhost setup. The [continuation evidence](docs/continuation-acceptance.md) and [resume checkpoint](docs/sprint-resume.md) record the latest verified commits and exact next tasks. The [satchi-book-v1 specification](docs/satchi-book-v1.md) includes an original CC0 ZIP fixture and conversion guidance.
 
 ```bash
 npm run test:sprint     # Disposable PostgreSQL functions/RLS and package/math regressions, one worker
