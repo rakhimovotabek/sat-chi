@@ -1,3 +1,22 @@
+# Production release resume point — 2026-10-31
+
+The user authorized coordinated production release after the UI sprint. That release
+is **blocked at recovery verification**, not completed. Read
+[production-release-20261031.md](production-release-20261031.md) first.
+
+Candidate application remains `d4b6791`; no production migrations, Git push/main
+integration or new deployment occurred. Fresh export completed privately at
+`/home/otabek/satchi-release-backups/final-release-20261031/20261031T135451Z`.
+Checksums match, but local PG17 restore preparation lacks genuine contrib extensions
+(starting with uuid-ossp), so recoverability and20-migration rehearsal are unverified.
+Reuse this export; do not redo earlier UI audits or falsely label it restore-tested.
+Both existing sites return200 and serve matching old entry assets; candidate is
+not live. Hosted migration history remains82 through `20261015000800`.
+
+This report-only checkpoint commit does not change the verified application.
+
+---
+
 # UI redesign completed locally — 2026-10-31
 
 Current verified implementation: `17bb621`, branch `feature/universal-book-import`,
