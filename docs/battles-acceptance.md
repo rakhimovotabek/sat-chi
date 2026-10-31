@@ -34,6 +34,12 @@ pairs, private mapping, strict response validation, 100/0 server scoring and
 readable persisted pairs are verified. All five earlier Battle SQL regressions
 also pass. See [matching evidence](battle-word-matching.md).
 
+Quick Match now passes a SQL regression and two actual-service scenarios:
+four concurrent Auth clients form two compatible public 1v1s, and two browsers
+Quick Match into a complete original Vocabulary Word Matching game. Exact
+source/timer matching, retry identity and persisted 100/100 Math and 100/0
+Vocabulary results are verified. See [Quick Match evidence](battle-quick-match.md).
+
 ## Previous checkpoint details
 
 **VERIFIED BACKEND**, plus real native browser/network acceptance via

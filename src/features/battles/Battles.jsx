@@ -19,10 +19,13 @@ const storedId = () => {
   }
 };
 async function rpc(action, data = {}) {
-  const { data: result, error } = await supabase.rpc("battle_action", {
-    p_action: action,
-    p_data: data,
-  });
+  const quick = action === "quick-match";
+  const payload = { ...data };
+  if (quick) delete payload.id;
+  const { data: result, error } = await supabase.rpc(
+    quick ? "battle_quick_match" : "battle_action",
+    quick ? { p_data: payload } : { p_action: action, p_data: data },
+  );
   if (error) throw new Error(error.message);
   return result;
 }
@@ -214,7 +217,12 @@ export default function Battles() {
               className="card content-form"
               onSubmit={(e) => {
                 e.preventDefault();
-                act("create", settings);
+                act(
+                  e.nativeEvent.submitter?.value === "quick-match"
+                    ? "quick-match"
+                    : "create",
+                  settings,
+                );
               }}
             >
               <h2>Create Battle</h2>
@@ -363,6 +371,22 @@ export default function Battles() {
               <button className="button" disabled={busy}>
                 Create Battle
               </button>
+              {settings.capacity === 2 && settings.teamSize === 0 && (
+                <>
+                  <button
+                    className="button button-secondary"
+                    type="submit"
+                    value="quick-match"
+                    disabled={busy}
+                  >
+                    Quick Match
+                  </button>
+                  <p>
+                    Find or open a public 1v1 using these sources, mode and
+                    timers. Both players still mark ready before starting.
+                  </p>
+                </>
+              )}
             </form>
             <section className="card">
               <h2>Join Battle</h2>

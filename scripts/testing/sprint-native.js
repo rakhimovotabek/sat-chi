@@ -39,6 +39,30 @@ for (const file of [
     );
   }
 }
+if (process.argv.includes("--quick-match")) {
+  env.SATCHI_TEST_QUICK_MATCH = "1";
+  console.log(
+    "[test flow] simultaneous Math Quick Match and two-browser Vocabulary matching",
+  );
+}
+const selectedTests = process.argv.includes("--quick-match")
+  ? [
+      "tests/battle-quick-native.test.js",
+      "tests/battle-matching-native.test.js",
+    ]
+  : [
+      process.argv.includes("--realtime")
+        ? "tests/supabase-realtime.test.js"
+        : process.argv.includes("--battle-browser")
+          ? "tests/battle-browser-native.test.js"
+          : process.argv.includes("--battle-timer")
+            ? "tests/battle-timer-native.test.js"
+            : process.argv.includes("--battle-matching")
+              ? "tests/battle-matching-native.test.js"
+              : process.argv.includes("--battle-network")
+                ? "tests/battle-network-native.test.js"
+                : "tests/sprint-native.test.js",
+    ];
 const result = spawnSync(
   process.execPath,
   [
@@ -47,17 +71,7 @@ const result = spawnSync(
     ...process.argv
       .slice(2)
       .filter((arg) => arg.startsWith("--test-name-pattern=")),
-    process.argv.includes("--realtime")
-      ? "tests/supabase-realtime.test.js"
-      : process.argv.includes("--battle-browser")
-        ? "tests/battle-browser-native.test.js"
-        : process.argv.includes("--battle-timer")
-          ? "tests/battle-timer-native.test.js"
-          : process.argv.includes("--battle-matching")
-            ? "tests/battle-matching-native.test.js"
-            : process.argv.includes("--battle-network")
-              ? "tests/battle-network-native.test.js"
-              : "tests/sprint-native.test.js",
+    ...selectedTests,
   ],
   { env, stdio: "inherit" },
 );

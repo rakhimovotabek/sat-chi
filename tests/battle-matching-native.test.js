@@ -96,25 +96,32 @@ test(
       await page.waitForURL(/\/dashboard/);
       await page.goto(`${app.appUrl}/battles`);
     };
+    const configure = async (page) => {
+      await page
+        .getByLabel("Category", { exact: true })
+        .selectOption("Vocabulary");
+      await page
+        .getByLabel("Vocabulary mode", { exact: true })
+        .selectOption("word-matching");
+      await page
+        .getByText("Vocabulary book and topic sets", { exact: true })
+        .click();
+      await page
+        .getByLabel("Vocabulary book", { exact: true })
+        .selectOption(book);
+      await page
+        .getByRole("checkbox", { name: "Original matching set", exact: true })
+        .check();
+      await page.getByLabel("Matching rounds", { exact: false }).fill("1");
+    };
+    const quick = process.env.SATCHI_TEST_QUICK_MATCH === "1";
     await login(host, "student");
+    await configure(host);
     await host
-      .getByLabel("Category", { exact: true })
-      .selectOption("Vocabulary");
-    await host
-      .getByLabel("Vocabulary mode", { exact: true })
-      .selectOption("word-matching");
-    await host
-      .getByText("Vocabulary book and topic sets", { exact: true })
-      .click();
-    await host
-      .getByLabel("Vocabulary book", { exact: true })
-      .selectOption(book);
-    await host
-      .getByRole("checkbox", { name: "Original matching set", exact: true })
-      .check();
-    await host.getByLabel("Matching rounds", { exact: false }).fill("1");
-    await host
-      .getByRole("button", { name: "Create Battle", exact: true })
+      .getByRole("button", {
+        name: quick ? "Quick Match" : "Create Battle",
+        exact: true,
+      })
       .click();
     await expect(
       host.getByRole("button", { name: "Mark ready", exact: true }),
@@ -123,11 +130,23 @@ test(
       `select to_jsonb(b)from battles b where host_id='${student}'and state='LOBBY'order by created_at desc limit 1`,
     );
     assert.deepEqual(row.filters.sets, [set]);
+    if (quick) assert.equal(row.public, true);
     await login(guest, "studentB");
-    await guest.getByLabel("Invitation code").fill(row.code);
-    await guest
-      .getByRole("button", { name: "Join lobby", exact: true })
-      .click();
+    if (quick) {
+      await configure(guest);
+      await guest
+        .getByRole("button", { name: "Quick Match", exact: true })
+        .click();
+    } else {
+      await guest.getByLabel("Invitation code").fill(row.code);
+      await guest
+        .getByRole("button", { name: "Join lobby", exact: true })
+        .click();
+    }
+    assert.equal(
+      (await action(clients[0], "state", { id: row.id })).members.length,
+      2,
+    );
     await guest
       .getByRole("button", { name: "Mark ready", exact: true })
       .click();
