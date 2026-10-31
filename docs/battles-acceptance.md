@@ -28,6 +28,12 @@ default-native browser regression. See [timing evidence](battle-match-timers.md)
 Per-question, total-only and friendly untimed configurations are supported.
 No XP/practice grade is awarded or rewritten by Battle results.
 
+Word Matching now passes a two-round, multi-set SQL narrative and a real
+two-browser match using a published original vocabulary book/set. Four distinct
+pairs, private mapping, strict response validation, 100/0 server scoring and
+readable persisted pairs are verified. All five earlier Battle SQL regressions
+also pass. See [matching evidence](battle-word-matching.md).
+
 ## Previous checkpoint details
 
 **VERIFIED BACKEND**, plus real native browser/network acceptance via

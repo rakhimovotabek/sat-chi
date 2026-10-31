@@ -364,6 +364,7 @@ npm run setup:test-services  # Cache pinned official services; needs native tool
 npm run test:realtime        # Actual local Realtime WAL/WebSocket/member RLS
 npm run test:battles:network # Twenty independent Auth clients, simultaneous/retried answers
 npm run test:battles:timer   # Actual natural whole-match expiry, no SQL clock mutation
+npm run test:battles:matching # Two authenticated browsers, real stored vocabulary pairs
 npm run test:sprint:services # Actual Storage API/file backend + Edge Runtime + Realtime
 ```
 

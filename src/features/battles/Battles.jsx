@@ -3,6 +3,7 @@ import BattleVocabularyFilters from "./BattleVocabularyFilters.jsx";
 import BattleHostControls from "./BattleHostControls.jsx";
 import BattleTimer from "./BattleTimer.jsx";
 import BattleMatchLimit from "./BattleMatchLimit.jsx";
+import MatchingChoices, { MatchingPairs } from "./MatchingChoices.jsx";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../lib/supabase.js";
 import PageHeader from "../../components/PageHeader.jsx";
@@ -242,9 +243,17 @@ export default function Battles() {
                     <option value="meaning-rush">Meaning Rush</option>
                     <option value="reverse-meaning">Reverse Meaning</option>
                     <option value="typed-word">Typed Word Challenge</option>
+                    <option value="word-matching">Word Matching</option>
                   </select>
                 </label>
               )}
+              {settings.category === "Vocabulary" &&
+                settings.filters?.mode === "word-matching" && (
+                  <p>
+                    Each matching round uses four distinct stored pairs. Every
+                    pair must be correct to earn the round’s 100 points.
+                  </p>
+                )}
               {settings.category === "Vocabulary" ? (
                 <BattleVocabularyFilters
                   value={settings.filters || {}}
@@ -297,7 +306,10 @@ export default function Battles() {
                 </select>
               </label>
               <label>
-                Questions
+                {settings.category === "Vocabulary" &&
+                settings.filters?.mode === "word-matching"
+                  ? "Matching rounds"
+                  : "Questions"}
                 <input
                   type="number"
                   min="1"
@@ -596,7 +608,16 @@ export default function Battles() {
                       act("answer", { round: room.round, response });
                     }}
                   >
-                    {["open", "vocabulary-typed"].includes(q.question_type) ? (
+                    {q.question_type === "vocabulary-matching" ? (
+                      <MatchingChoices
+                        question={q}
+                        response={response}
+                        onChange={setResponse}
+                        disabled={busy}
+                      />
+                    ) : ["open", "vocabulary-typed"].includes(
+                        q.question_type,
+                      ) ? (
                       <label>
                         {q.question_type === "vocabulary-typed"
                           ? "Type the word"
@@ -646,12 +667,20 @@ export default function Battles() {
               {room.review && (
                 <div role="status">
                   <h4>Round completed</h4>
-                  <p>
-                    Correct answer:{" "}
-                    {["open", "vocabulary-typed"].includes(q.question_type)
-                      ? room.review.acceptedAnswers?.join(", ")
-                      : "ABCD"[room.review.answer]}
-                  </p>
+                  {q.question_type === "vocabulary-matching" ? (
+                    <MatchingPairs
+                      question={q}
+                      mapping={room.review.acceptedAnswers}
+                      title="Correct pairs"
+                    />
+                  ) : (
+                    <p>
+                      Correct answer:{" "}
+                      {["open", "vocabulary-typed"].includes(q.question_type)
+                        ? room.review.acceptedAnswers?.join(", ")
+                        : "ABCD"[room.review.answer]}
+                    </p>
+                  )}
                   <p>
                     <FormattedText>{room.review.explanation}</FormattedText>
                   </p>
@@ -685,10 +714,25 @@ export default function Battles() {
                   <p>
                     <FormattedText>{h.question.question_text}</FormattedText>
                   </p>
-                  <p>
-                    Your answer: {h.response ?? "Unanswered"} · Correct:{" "}
-                    {h.acceptedAnswers?.join(", ") ?? "ABCD"[h.answer]}
-                  </p>
+                  {h.question.question_type === "vocabulary-matching" ? (
+                    <>
+                      <MatchingPairs
+                        question={h.question}
+                        mapping={h.response}
+                        title="Your pairs"
+                      />
+                      <MatchingPairs
+                        question={h.question}
+                        mapping={h.acceptedAnswers}
+                        title="Correct pairs"
+                      />
+                    </>
+                  ) : (
+                    <p>
+                      Your answer: {h.response ?? "Unanswered"} · Correct:{" "}
+                      {h.acceptedAnswers?.join(", ") ?? "ABCD"[h.answer]}
+                    </p>
+                  )}
                   <p>
                     <FormattedText>{h.explanation}</FormattedText>
                   </p>

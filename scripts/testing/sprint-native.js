@@ -53,9 +53,11 @@ const result = spawnSync(
         ? "tests/battle-browser-native.test.js"
         : process.argv.includes("--battle-timer")
           ? "tests/battle-timer-native.test.js"
-          : process.argv.includes("--battle-network")
-            ? "tests/battle-network-native.test.js"
-            : "tests/sprint-native.test.js",
+          : process.argv.includes("--battle-matching")
+            ? "tests/battle-matching-native.test.js"
+            : process.argv.includes("--battle-network")
+              ? "tests/battle-network-native.test.js"
+              : "tests/sprint-native.test.js",
   ],
   { env, stdio: "inherit" },
 );

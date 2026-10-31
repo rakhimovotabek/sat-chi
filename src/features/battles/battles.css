@@ -123,6 +123,51 @@
   font-variant-numeric: tabular-nums;
   font-weight: 600;
 }
+.battle-matching {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.battle-matching legend {
+  font-weight: 600;
+  margin-block-end: 0.5rem;
+}
+.battle-match-rows {
+  display: grid;
+  gap: 1rem;
+  margin-block: 1rem;
+}
+.battle-match-rows label {
+  display: grid;
+  grid-template-columns: minmax(6rem, 1fr) minmax(0, 3fr);
+  gap: 0.75rem;
+  align-items: center;
+}
+.battle-match-rows select {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  min-height: 44px;
+  font-size: 1rem;
+}
+.battle-match-rows strong { font-size: 1rem; }
+.battle-pairs {
+  display: grid;
+  gap: 0.75rem;
+}
+.battle-pairs dt {
+  font-weight: 600;
+}
+.battle-pairs dd {
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .battle-match-rows label {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .battle-player.team-1 {
   border-top: 3px solid #547deb;
 }
