@@ -2,7 +2,7 @@
 
 Branch: `feature/universal-book-import`. Baseline: `780eb95`. All implementation and checks stayed local. No hosted database changes, production account operations, deployments or GitHub pushes were performed.
 
-**Status: substantial implementation delivered; full sprint acceptance is not yet established.** The disposable SQL integration tests exercise actual PostgreSQL functions and RLS, but the complete Edge/Storage upload and real network multiplayer flows still need a disposable Supabase environment.
+**Status: substantial implementation delivered; full sprint acceptance is not yet established.** Real local Supabase Storage API/file backend, Edge Runtime user workers and Realtime now supplement the native PostgreSQL/Auth/PostgREST harness. The combined actual-service suite passes 12/12, including import/publication/private assets/student Bank/history, network 1v1/2v2/3v3 and a two-browser 2v2 with offline/reload recovery. Host team/settings/kick controls pass browser/network and two SQL regressions. See [service evidence](isolated-supabase-services.md). S3, hosted behavior, broad analytics/gamification completion and the rights-blocked real Math corpus remain unfinished.
 
 ## Current recovery checkpoint (2026-10-31)
 

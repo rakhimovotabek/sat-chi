@@ -31,6 +31,11 @@
     "test:sprint:ui": "playwright test tests/browser/universal-book-preview.spec.js --workers=1",
     "book:validate": "node scripts/imports/validate-universal.js",
     "test:sprint:native": "node scripts/testing/sprint-native.js",
+    "test:sprint:services": "node scripts/testing/sprint-native.js --services",
+    "test:realtime": "node scripts/testing/sprint-native.js --services --realtime",
+    "test:battles:browser": "node scripts/testing/sprint-native.js --services --battle-browser",
+    "test:battles:network": "node scripts/testing/sprint-native.js --services --battle-network",
+    "setup:test-services": "python3 scripts/testing/setup-supabase-services.py",
     "setup:test-tools": "python3 scripts/testing/setup-native-tools.py"
   },
   "dependencies": {

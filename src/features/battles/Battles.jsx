@@ -1,6 +1,8 @@
 import Filters from "../learning/Filters.jsx";
 import BattleVocabularyFilters from "./BattleVocabularyFilters.jsx";
-import { useEffect, useState } from "react";
+import BattleHostControls from "./BattleHostControls.jsx";
+import BattleTimer from "./BattleTimer.jsx";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../lib/supabase.js";
 import PageHeader from "../../components/PageHeader.jsx";
 import FormattedText from "../../components/FormattedText.jsx";
@@ -23,10 +25,13 @@ async function rpc(action, data = {}) {
   return result;
 }
 export default function Battles() {
+  const actionPending = useRef(false),
+    requestVersion = useRef(0);
   const [room, setRoom] = useState(null),
     [roomId, setRoomId] = useState(storedId),
     [catalog, setCatalog] = useState(null),
     [error, setError] = useState(""),
+    [syncError, setSyncError] = useState(""),
     [busy, setBusy] = useState(false),
     [online, setOnline] = useState(true),
     [code, setCode] = useState(""),
@@ -42,29 +47,43 @@ export default function Battles() {
   useEffect(() => {
     let active = true,
       inFlight = false;
-    async function refresh() {
-      if (inFlight) return;
+    async function refresh(force = false) {
+      if (
+        inFlight ||
+        actionPending.current ||
+        (document.hidden && force !== true)
+      )
+        return;
       inFlight = true;
+      const version = ++requestVersion.current;
       try {
         const result = await rpc(
           roomId ? "state" : "list",
           roomId ? { id: roomId } : {},
         );
-        if (active) {
+        if (active && version === requestVersion.current) {
           if (roomId) setRoom(result);
           else setCatalog(result);
           setOnline(true);
+          setSyncError("");
         }
       } catch (e) {
-        if (active) {
+        if (active && version === requestVersion.current) {
           setOnline(false);
-          setError(e.message);
+          setSyncError(e.message);
         }
       } finally {
         inFlight = false;
       }
     }
-    refresh();
+    refresh(true);
+    const wake = () => {
+      if (!document.hidden) refresh(true);
+    };
+    const offline = () => setOnline(false);
+    document.addEventListener("visibilitychange", wake);
+    window.addEventListener("online", wake);
+    window.addEventListener("offline", offline);
     const channel = roomId
       ? supabase
           .channel(`battle-signals-${roomId}`)
@@ -82,21 +101,35 @@ export default function Battles() {
             if (status === "SUBSCRIBED") refresh();
           })
       : null;
-    const timer = setInterval(refresh, 2000);
+    const timer = setInterval(() => refresh(), 2000);
     return () => {
       active = false;
       clearInterval(timer);
+      document.removeEventListener("visibilitychange", wake);
+      window.removeEventListener("online", wake);
+      window.removeEventListener("offline", offline);
       if (channel) supabase.removeChannel(channel);
     };
   }, [roomId]);
   useEffect(() => {
     setResponse("");
   }, [room?.round]);
-  async function act(action, data = {}) {
+  async function act(action, data = {}, control = false) {
+    if (actionPending.current) return false;
+    actionPending.current = true;
+    ++requestVersion.current;
     setBusy(true);
     setError("");
     try {
-      const next = await rpc(action, { id: roomId, ...data });
+      let next;
+      if (control) {
+        const result = await supabase.rpc("battle_lobby_control", {
+          p_action: action,
+          p_data: { id: roomId, ...data },
+        });
+        if (result.error) throw new Error(result.error.message);
+        next = result.data;
+      } else next = await rpc(action, { id: roomId, ...data });
       if (next.left) {
         setRoom(null);
         setRoomId(null);
@@ -107,9 +140,13 @@ export default function Battles() {
         sessionStorage.setItem("satchi-battle", next.id);
       }
       setOnline(true);
+      setSyncError("");
+      return true;
     } catch (e) {
       setError(e.message);
+      return false;
     } finally {
+      actionPending.current = false;
       setBusy(false);
     }
   }
@@ -140,15 +177,20 @@ export default function Battles() {
         title="Battles"
         description="Same questions. Shared arena. Bring your best thinking."
       />
-      {error && (
+      {(error || syncError) && (
         <p className="form-error" role="alert">
-          {error}
+          {error || syncError}
         </p>
       )}
       {!online && (
-        <p role="status">
-          Connection interrupted. Reconnecting to your saved seat…
-        </p>
+        <div role="status">
+          <p>Connection interrupted. Reconnecting to your saved seat…</p>
+          {roomId && (
+            <button className="button button-secondary" onClick={leaveView}>
+              Back to Battles
+            </button>
+          )}
+        </div>
       )}
       {!roomId ? (
         <>
@@ -442,7 +484,13 @@ export default function Battles() {
                 {host && (
                   <button
                     className="button"
-                    disabled={busy}
+                    disabled={
+                      busy ||
+                      room.members.length < 2 ||
+                      room.members.some((member) => !member.ready) ||
+                      (room.team_size > 0 &&
+                        room.members.length !== room.capacity)
+                    }
                     onClick={() => act("start")}
                   >
                     Start Battle
@@ -465,12 +513,23 @@ export default function Battles() {
                   </button>
                 )}
               </div>
+              {host && (
+                <BattleHostControls
+                  room={room}
+                  busy={busy}
+                  onControl={(action, data) => act(action, data, true)}
+                />
+              )}
             </section>
           )}
           {room.state === "COUNTDOWN" && (
             <section className="battle-countdown" role="status">
               <h3>Get ready.</h3>
               <p>The server is starting your shared question set.</p>
+              <BattleTimer
+                deadline={room.deadline}
+                serverNow={room.serverNow}
+              />
             </section>
           )}
           {q && ["PLAYING", "ROUND_RESULTS"].includes(room.state) && (
@@ -482,17 +541,10 @@ export default function Battles() {
                 <FormattedText>{q.question_text}</FormattedText>
               </h3>
               {room.deadline && (
-                <p>
-                  Server time remaining:{" "}
-                  {Math.max(
-                    0,
-                    Math.ceil(
-                      (Date.parse(room.deadline) - Date.parse(room.serverNow)) /
-                        1000,
-                    ),
-                  )}{" "}
-                  seconds
-                </p>
+                <BattleTimer
+                  deadline={room.deadline}
+                  serverNow={room.serverNow}
+                />
               )}
               {room.state === "PLAYING" &&
                 (room.submitted ? (

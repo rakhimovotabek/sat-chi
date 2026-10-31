@@ -1,5 +1,33 @@
 # Battles acceptance — 2026-10-31
 
+## Latest verified continuation
+
+Actual official Supabase Storage API (file backend), Edge Runtime user workers
+and Realtime now run beside the existing native Auth/PostgreSQL/PostgREST.
+The combined service suite passes **12/12**, including complete network
+1v1/2v2/**3v3**, real member-only WAL events and two independently authenticated
+browser sessions completing a 2v2 with offline/reload saved-seat/answer recovery.
+Host swaps/settings/confirmed kicks and balanced replacement joins also pass
+actual browser/network tests and two SQL regressions. See
+[service evidence](isolated-supabase-services.md) and
+[lobby controls](battle-lobby-controls.md). The older Realtime/3v3 limitations
+below describe the previous checkpoint and are superseded by this evidence.
+
+`npm run test:battles:network` separately passes **1/1**, with twenty independently
+issued Auth sessions, concurrent joins/readiness, two common frozen rounds,
+forty answer intents per round (including retries), exactly forty persisted
+answers across both rounds, 100 points per client/2000 total, and twenty saved
+personal histories. These are synthetic HTTP clients, not twenty human players
+or a browser load benchmark. An actual admin-host pool failure was fixed by
+`20261031000900_battle_pool_parity.sql`; admission and random selection now both
+exclude drafts/unapproved records before sampling. Its SQL regression passes.
+
+Whole-match timers have two passing SQL checks; their UI and natural-clock network
+expiry are the next milestone. No XP/practice grade is awarded or rewritten by
+Battle results.
+
+## Previous checkpoint details
+
 **VERIFIED BACKEND**, plus real native browser/network acceptance via
 `npm run test:sprint:native`. PostgreSQL 17.11, PostgREST 14.1 and Auth v2.197.0
 run locally with independently issued disposable sessions. No mocked REST/RPCs.

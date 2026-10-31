@@ -1,5 +1,12 @@
 # Recovered disposable testing — 2026-10-31
 
+**Continuation:** the default mode below still uses its documented substitutes.
+A new opt-in [official Supabase service mode](isolated-supabase-services.md) now
+passes 12/12 combined browser/network scenarios with actual Storage API/file
+backend, Edge Runtime user workers and Realtime. Separate 20-client network
+acceptance also passes. This supersedes the missing-service blocker below for
+local actual services; S3 and hosted behavior remain unverified.
+
 The missing prerequisite was the **entire user-local tool cache**. PostgreSQL,
 initdb, psql, PostgREST, Auth, Docker, Podman and Deno were absent from PATH.
 Docker was not needed to restore the existing native test environment.

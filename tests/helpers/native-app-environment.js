@@ -15,12 +15,31 @@ import { createImportHandler } from "../../supabase/functions/import-book/handle
 import { assertIsolatedTarget } from "../../scripts/testing/isolated-target.js";
 import { importStorage } from "./import-storage.js";
 import { isolatedAuth } from "./isolated-auth.js";
+import { supabaseServices } from "./supabase-services.js";
+import { redactedServiceLog } from "./service-log.js";
 const exec = promisify(execFile);
 export const admin = "f1000000-0000-0000-0000-000000000001",
   student = "f1000000-0000-0000-0000-000000000002",
   studentB = "f1000000-0000-0000-0000-000000000003",
-  studentC = "f1000000-0000-0000-0000-000000000004";
-const fixtureUsers = { admin, student, studentB, studentC };
+  studentC = "f1000000-0000-0000-0000-000000000004",
+  studentD = "f1000000-0000-0000-0000-000000000005",
+  studentE = "f1000000-0000-0000-0000-000000000006";
+const fixtureUsers = { admin, student, studentB, studentC, studentD, studentE };
+export function fixtureAccounts(extraUsers = false) {
+  const count =
+    typeof extraUsers === "number" ? extraUsers : extraUsers ? 6 : 2;
+  if (!Number.isInteger(count) || count < 2 || count > 20)
+    throw new Error("Disposable account count must be between 2 and 20");
+  const known = Object.entries(fixtureUsers);
+  return Array.from(
+    { length: count },
+    (_, index) =>
+      known[index] || [
+        `student${index + 1}`,
+        `f1000000-0000-0000-0000-${String(index + 1).padStart(12, "0")}`,
+      ],
+  );
+}
 const quote = (v) => "'" + String(v).replaceAll("'", "''") + "'";
 async function port() {
   const server = tcpServer();
@@ -32,7 +51,10 @@ async function port() {
 export async function nativeAppEnvironment({
   realAuth = null,
   extraUsers = false,
+  officialServices = false,
 } = {}) {
+  const accounts = fixtureAccounts(extraUsers),
+    users = Object.fromEntries(accounts);
   const localProcessEnv = localProcessEnvironment();
   const folder = await mkdtemp(join(tmpdir(), "satchi-native-app-"));
   const bin = process.env.SATCHI_TEST_POSTGRES_BIN;
@@ -46,10 +68,12 @@ export async function nativeAppEnvironment({
   const secret = randomBytes(48).toString("hex"),
     processes = [],
     streams = [],
+    gatewaySockets = new Set(),
     localAssetFiles = new Map();
   let running = false,
     gateway,
-    authService;
+    authService,
+    services;
   const sql = async (text, database = "postgres") =>
     (
       await exec(
@@ -114,13 +138,18 @@ export async function nativeAppEnvironment({
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
     });
-    child.stdout.pipe(stream);
-    child.stderr.pipe(stream);
+    child.stdout.pipe(redactedServiceLog(secret)).pipe(stream, { end: false });
+    child.stderr.pipe(redactedServiceLog(secret)).pipe(stream, { end: false });
+    child.on("error", (error) => {
+      child.startupError = error;
+    });
     processes.push(child);
     return child;
   };
   const waitFor = async (url) => {
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < (officialServices ? 600 : 300); i++) {
+      if (processes.some((child) => child.startupError))
+        throw new Error("A local test service executable could not start");
       try {
         if ((await fetch(url)).ok) return;
       } catch {
@@ -131,9 +160,30 @@ export async function nativeAppEnvironment({
     throw new Error("Local test server did not start: " + url);
   };
   const close = async () => {
-    for (const child of processes.reverse()) child.kill("SIGTERM");
+    const exits = processes.map(
+      (child) =>
+        new Promise((resolve) => {
+          if (
+            !child.pid ||
+            (child.stdout.destroyed && child.stderr.destroyed)
+          ) {
+            resolve();
+            return;
+          }
+          const timer = setTimeout(() => {
+            child.kill("SIGKILL");
+            resolve();
+          }, 3000);
+          child.once("close", () => {
+            clearTimeout(timer);
+            resolve();
+          });
+        }),
+    );
+    for (const child of [...processes].reverse()) child.kill("SIGTERM");
     if (authService) await authService.close();
     if (gateway) {
+      for (const socket of gatewaySockets) socket.destroy();
       gateway.closeAllConnections();
       await new Promise((r) => gateway.close(r));
     }
@@ -146,7 +196,10 @@ export async function nativeAppEnvironment({
         "-w",
         "stop",
       ]);
-    for (const stream of streams) stream.end();
+    await Promise.all(exits);
+    await Promise.all(
+      streams.map((stream) => new Promise((resolve) => stream.end(resolve))),
+    );
     await rm(folder, { recursive: true, force: true });
   };
   try {
@@ -163,7 +216,7 @@ export async function nativeAppEnvironment({
       "-l",
       join(folder, "postgres.log"),
       "-o",
-      `-h 127.0.0.1 -p ${dbPort} -k ${folder} -c shared_buffers=32MB -c max_connections=30 -c work_mem=2MB`,
+      `-h 127.0.0.1 -p ${dbPort} -k ${folder} -c shared_buffers=32MB -c max_connections=${officialServices ? 60 : 30} -c work_mem=2MB${officialServices ? " -c wal_level=logical -c max_replication_slots=10 -c max_wal_senders=10 -c output_plugin_libraries=wal2json,pgoutput" : ""}`,
       "-w",
       "start",
     ]);
@@ -172,8 +225,25 @@ export async function nativeAppEnvironment({
     create role authenticator login;grant anon,authenticated,service_role to authenticator;
     create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');
     create function auth.uid() returns uuid language sql stable as $$select coalesce(nullif(current_setting('request.jwt.claim.sub',true),''),nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid$$;
-    grant usage on schema auth to anon,authenticated,service_role;
-    create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+    grant usage on schema auth to anon,authenticated,service_role;`);
+    if (officialServices) {
+      await sql(`create function auth.role() returns text language sql stable as $$select nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'role'$$;
+        create function auth.jwt() returns jsonb language sql stable as $$select nullif(current_setting('request.jwt.claims',true),'')::jsonb$$;
+        do $$begin if not exists(select 1 from pg_roles where rolname='postgres')then create role postgres superuser;end if;end$$;
+        create publication supabase_realtime;`);
+      services = await supabaseServices({
+        folder,
+        port,
+        launch,
+        sql,
+        waitFor,
+        apiUrl,
+        secret,
+        token,
+      });
+      await services.storage(dbPort);
+    } else
+      await sql(`create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
     create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);alter table storage.objects enable row level security;
     grant usage on schema storage to authenticated,anon;grant select,insert,update,delete on storage.objects to authenticated,anon;`);
     const migrations = (await readdir("supabase/migrations")).sort();
@@ -273,14 +343,25 @@ export async function nativeAppEnvironment({
       id: uid,
       aud: "authenticated",
       role: "authenticated",
-      email: `${Object.keys(fixtureUsers).find((key) => fixtureUsers[key] === uid)}@fixture.invalid`,
+      email: `${Object.keys(users).find((key) => users[key] === uid)}@fixture.invalid`,
       app_metadata: { provider: "email" },
       user_metadata: {},
       created_at: new Date().toISOString(),
     });
-    if (extraUsers)
+    if (accounts.length > 2)
       await sql(
-        `insert into auth.users(id,email)values('${studentB}','studentB@fixture.invalid'),('${studentC}','studentC@fixture.invalid');update public.profiles set onboarding_completed=true where id in('${studentB}','${studentC}');`,
+        `insert into auth.users(id,email)values${accounts
+          .slice(2)
+          .map(
+            ([name, id]) =>
+              `(${quote(id)},${quote(name + "@fixture.invalid")})`,
+          )
+          .join(
+            ",",
+          )};update public.profiles set display_name='Disposable Battle student',onboarding_completed=true,target_sat_score=1400,grade='11',main_goal='Improve Both' where id in(${accounts
+          .slice(2)
+          .map(([, id]) => quote(id))
+          .join(",")});`,
       );
     if (realAuth)
       authService = await isolatedAuth({
@@ -337,6 +418,26 @@ export async function nativeAppEnvironment({
       try {
         const url = new URL(req.url, apiUrl);
         if (url.pathname === "/functions/v1/import-book") {
+          if (services) {
+            const proxy = httpRequest(
+              {
+                hostname: "127.0.0.1",
+                port: services.ports.edge,
+                path: "/",
+                method: req.method,
+                headers: req.headers,
+              },
+              (reply) => {
+                res.writeHead(reply.statusCode, reply.headers);
+                reply.pipe(res);
+              },
+            );
+            proxy.on("error", () =>
+              send({ message: "Official Edge unavailable" }, 503),
+            );
+            req.pipe(proxy);
+            return;
+          }
           const response = await worker(
             new Request(apiUrl + req.url, {
               method: req.method,
@@ -349,7 +450,27 @@ export async function nativeAppEnvironment({
           res.end(Buffer.from(await response.arrayBuffer()));
           return;
         }
-        if (await storage(req, res, url)) return;
+        if (services && url.pathname.startsWith("/storage/v1/")) {
+          const proxy = httpRequest(
+            {
+              hostname: "127.0.0.1",
+              port: services.ports.storage,
+              path: req.url.slice("/storage/v1".length),
+              method: req.method,
+              headers: req.headers,
+            },
+            (reply) => {
+              res.writeHead(reply.statusCode, reply.headers);
+              reply.pipe(res);
+            },
+          );
+          proxy.on("error", () =>
+            send({ message: "Official Storage unavailable" }, 503),
+          );
+          req.pipe(proxy);
+          return;
+        }
+        if (!services && (await storage(req, res, url))) return;
         if (authService && url.pathname.startsWith("/auth/v1/")) {
           const proxy = httpRequest(
             {
@@ -402,7 +523,7 @@ export async function nativeAppEnvironment({
             url.searchParams.get("grant_type") === "refresh_token";
           const uid = refreshing
             ? claims(body.refresh_token).sub
-            : fixtureUsers[body.email?.split("@")[0]];
+            : users[body.email?.split("@")[0]];
           if (
             !uid ||
             (!refreshing &&
@@ -526,7 +647,48 @@ export async function nativeAppEnvironment({
         send({ message: e.message }, 401);
       }
     });
+    gateway.on("connection", (socket) => {
+      gatewaySockets.add(socket);
+      socket.on("close", () => gatewaySockets.delete(socket));
+    });
+    if (services)
+      gateway.on("upgrade", (req, socket, head) => {
+        if (!req.url.startsWith("/realtime/v1/")) {
+          socket.destroy();
+          return;
+        }
+        const proxy = httpRequest({
+          hostname: "127.0.0.1",
+          port: services.ports.realtime,
+          path: "/socket" + req.url.slice("/realtime/v1".length),
+          headers: { ...req.headers, host: "realtime-dev.localhost" },
+        });
+        proxy.on("upgrade", (reply, upstream, upstreamHead) => {
+          socket.write(
+            `HTTP/1.1 ${reply.statusCode} ${reply.statusMessage}\r\n` +
+              Object.entries(reply.headers)
+                .map(([key, value]) => `${key}: ${value}\r\n`)
+                .join("") +
+              "\r\n",
+          );
+          if (upstreamHead.length) socket.write(upstreamHead);
+          if (head.length) upstream.write(head);
+          upstream.pipe(socket);
+          socket.pipe(upstream);
+          socket.on("close", () => upstream.destroy());
+          upstream.on("error", () => socket.destroy());
+        });
+        proxy.on("error", () => socket.destroy());
+        proxy.on("response", (reply) => {
+          socket.end(
+            `HTTP/1.1 ${reply.statusCode} ${reply.statusMessage}\r\nConnection: close\r\n\r\n`,
+          );
+          reply.resume();
+        });
+        proxy.end();
+      });
     await new Promise((r) => gateway.listen(apiPort, "127.0.0.1", r));
+    if (services) await services.edge();
     const config = join(folder, "postgrest.conf");
     await writeFile(
       config,
@@ -557,6 +719,7 @@ export async function nativeAppEnvironment({
       ))
         await sql(await readFile(join("supabase/migrations", file), "utf8"));
       await sql("notify pgrst,'reload schema'");
+      if (services) await services.realtime(dbPort);
       const bearer = token({
         sub: student,
         role: "authenticated",
@@ -606,10 +769,57 @@ export async function nativeAppEnvironment({
       assignment,
       daily,
       authEmails: authService?.messages,
+      serviceDiagnostics: async () => {
+        const logs = [];
+        for (const name of ["storage", "edge", "realtime"]) {
+          try {
+            const log = await readFile(
+              join(folder, `official-${name}.log`),
+              "utf8",
+            );
+            logs.push(
+              name +
+                ": " +
+                log
+                  .slice(-9000)
+                  .replaceAll(secret, "[redacted]")
+                  .replace(
+                    /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,
+                    "[redacted JWT]",
+                  ),
+            );
+          } catch {
+            /* optional service */
+          }
+        }
+        return logs.join("\n");
+      },
       localAssetFiles,
       path,
     };
   } catch (e) {
+    if (officialServices) {
+      for (const name of ["storage", "edge", "realtime"]) {
+        try {
+          const log = await readFile(
+            join(folder, `official-${name}.log`),
+            "utf8",
+          );
+          console.error(
+            `[official ${name} startup diagnostic]`,
+            log
+              .slice(-6000)
+              .replaceAll(secret, "[redacted]")
+              .replace(
+                /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,
+                "[redacted JWT]",
+              ),
+          );
+        } catch {
+          /* not started */
+        }
+      }
+    }
     await close();
     throw e;
   }

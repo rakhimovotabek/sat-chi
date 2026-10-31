@@ -360,6 +360,9 @@ See [the implementation report](docs/major-development-sprint.md) for implemente
 ```bash
 npm run test:sprint     # Disposable PostgreSQL functions/RLS and package/math regressions, one worker
 npm run test:sprint:ui  # Fixture Auth/REST UI checks; real ZIP parsing, images and math rendering
+npm run setup:test-services  # Cache pinned official services; needs native tools + Bubblewrap
+npm run test:realtime        # Actual local Realtime WAL/WebSocket/member RLS
+npm run test:sprint:services # Actual Storage API/file backend + Edge Runtime + Realtime
 ```
 
-These commands do not contact the hosted Supabase project. Full import transport and network multiplayer acceptance require disposable Supabase/Edge/Storage services; passing these checks does not establish production readiness. No deployment is authorized by this sprint.
+These commands do not contact the hosted Supabase project. See [real service verification](docs/isolated-supabase-services.md) for prerequisites, pinned images, actual evidence and limits. Run heavyweight suites serially on a 4 GB laptop. The default native mode retains its substitutes; the service mode uses actual Supabase services with a file Storage backend. S3 and hosted behavior remain unverified. No deployment is authorized by this sprint.

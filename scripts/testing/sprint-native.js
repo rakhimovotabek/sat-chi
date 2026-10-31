@@ -14,6 +14,18 @@ const env = {
   SATCHI_TEST_AUTH_BIN:
     process.env.SATCHI_TEST_AUTH_BIN || join(cache, "auth2197/auth"),
 };
+if (process.argv.includes("--services")) {
+  if (spawnSync("bwrap", ["--version"], { stdio: "ignore" }).status !== 0)
+    throw new Error("Official service tests require Bubblewrap (bwrap)");
+  env.SATCHI_TEST_OFFICIAL_SERVICES = "1";
+  for (const name of ["storage", "edge", "realtime"]) {
+    await access(join(cache, "services", name, "verified-image.json"));
+  }
+  await access(join(cache, "pg17/opt/pgsql-17/lib/wal2json.so"));
+  console.log(
+    "[test services] official Storage file backend + Edge user worker + Realtime; disposable native PostgreSQL/Auth/PostgREST",
+  );
+}
 for (const file of [
   join(env.SATCHI_TEST_POSTGRES_BIN, "postgres"),
   env.SATCHI_TEST_POSTGREST,
@@ -29,7 +41,20 @@ for (const file of [
 }
 const result = spawnSync(
   process.execPath,
-  ["--test", "--test-concurrency=1", "tests/sprint-native.test.js"],
+  [
+    "--test",
+    "--test-concurrency=1",
+    ...process.argv
+      .slice(2)
+      .filter((arg) => arg.startsWith("--test-name-pattern=")),
+    process.argv.includes("--realtime")
+      ? "tests/supabase-realtime.test.js"
+      : process.argv.includes("--battle-browser")
+        ? "tests/battle-browser-native.test.js"
+        : process.argv.includes("--battle-network")
+          ? "tests/battle-network-native.test.js"
+          : "tests/sprint-native.test.js",
+  ],
   { env, stdio: "inherit" },
 );
 process.exitCode = result.status ?? 1;

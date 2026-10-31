@@ -4,12 +4,7 @@ import { dirname, join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { userInfo } from "node:os";
-import {
-  admin,
-  student,
-  studentB,
-  studentC,
-} from "./native-app-environment.js";
+import { fixtureAccounts } from "./native-app-environment.js";
 
 export async function isolatedAuth({
   binary,
@@ -105,16 +100,7 @@ export async function isolatedAuth({
     });
     launch("isolated-auth", binary, ["serve"], config, dirname(binary));
     await waitFor(`http://127.0.0.1:${authPort}/health`);
-    for (const [id, name] of [
-      [admin, "admin"],
-      [student, "student"],
-      ...(extraUsers
-        ? [
-            [studentB, "studentB"],
-            [studentC, "studentC"],
-          ]
-        : []),
-    ]) {
+    for (const [name, id] of fixtureAccounts(extraUsers)) {
       const response = await fetch(`http://127.0.0.1:${authPort}/admin/users`, {
         method: "POST",
         headers: {

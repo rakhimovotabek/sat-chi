@@ -67,6 +67,62 @@
 .battle-player small {
   display: block;
 }
+.battle-host-controls {
+  margin-block-start: 1.5rem;
+  border-block-start: 1px solid var(--border, currentColor);
+  padding-block-start: 1rem;
+}
+.battle-host-controls summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.battle-settings-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+.battle-settings-form label {
+  display: grid;
+  gap: 0.5rem;
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.battle-settings-form h4 {
+  flex-basis: 100%;
+  margin: 0;
+}
+.battle-settings-form input:not([type="checkbox"]),
+.battle-settings-form select {
+  width: 100%;
+  min-height: 44px;
+  font-size: 1rem;
+}
+.battle-settings-form label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+.battle-member-controls {
+  list-style: none;
+  padding: 0;
+}
+.battle-member-controls li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-block: 0.75rem;
+  border-block-end: 1px solid var(--border, currentColor);
+}
+.battle-member-controls li > span:first-child {
+  margin-inline-end: auto;
+}
+.battle-timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
 .battle-player.team-1 {
   border-top: 3px solid #547deb;
 }

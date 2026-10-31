@@ -1,3 +1,5 @@
+import { verifyBattleRealtime } from "./helpers/battle-realtime.js";
+import { verifyBattleBrowser } from "./helpers/battle-browser.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile, mkdir, mkdtemp, rm } from "node:fs/promises";
@@ -25,13 +27,21 @@ test(
     const app = await nativeAppEnvironment({
       realAuth: process.env.SATCHI_TEST_AUTH_BIN,
       extraUsers: true,
+      officialServices: process.env.SATCHI_TEST_OFFICIAL_SERVICES === "1",
     });
     t.after(() => app.close());
     assertIsolatedTarget(app.apiUrl);
     await app.upgrade();
     const anon = app.tokenFor(student, { role: "anon" });
     const clients = [];
-    for (const name of ["admin", "student", "studentB", "studentC"]) {
+    for (const name of [
+      "admin",
+      "student",
+      "studentB",
+      "studentC",
+      "studentD",
+      "studentE",
+    ]) {
       const client = createClient(app.apiUrl, anon, {
         auth: { persistSession: false, autoRefreshToken: false },
       });
@@ -41,7 +51,11 @@ test(
       });
       assert.ifError(error);
       clients.push(client);
-      t.after(() => client.auth.stopAutoRefresh());
+      t.after(async () => {
+        await client.removeAllChannels();
+        client.realtime.disconnect();
+        client.auth.stopAutoRefresh();
+      });
     }
     const [teacher, learner] = clients;
     const rpc = async (client, name, args = {}) => {
@@ -114,6 +128,34 @@ test(
         book = row.book_id;
         job = row.id;
         assert.equal(row.asset_cursor, 6);
+        const draftAsset = await app.json(
+          `select to_jsonb(path)from book_package_assets where book_id='${book}'limit 1`,
+        );
+        assert.ok(
+          (
+            await learner.storage
+              .from("book-package-assets")
+              .createSignedUrl(draftAsset, 60)
+          ).error,
+          "student cannot sign private draft assets",
+        );
+        assert.ok(
+          (
+            await learner.storage
+              .from("universal-book-staging")
+              .download(`${job}.zip`)
+          ).error,
+          "staged ZIP stays service-only",
+        );
+        assert.equal(
+          (
+            await fetch(
+              `${app.apiUrl}/storage/v1/object/public/book-package-assets/${draftAsset}`,
+            )
+          ).ok,
+          false,
+          "private assets have no public download path",
+        );
         assert.equal(
           (await learner.from("books").select("id").eq("id", book)).data.length,
           0,
@@ -381,7 +423,7 @@ test(
       },
     );
     await t.test(
-      "independently authenticated network clients finish 1v1 and 2v2 with reconnect and replay protection",
+      "independently authenticated network clients finish 1v1, 2v2 and 3v3 with reconnect and replay protection",
       async () => {
         const action = (client, action, data = {}) =>
           rpc(client, "battle_action", { p_action: action, p_data: data });
@@ -392,11 +434,15 @@ test(
               Math.max(0, Date.parse(value) - Date.now() + 80),
             ),
           );
-        for (const players of [[clients[1], clients[2]], clients]) {
+        for (const players of [
+          [clients[1], clients[2]],
+          clients.slice(0, 4),
+          clients,
+        ]) {
           let room = await action(players[0], "create", {
             category: "Math",
             capacity: players.length,
-            teamSize: players.length === 4 ? 2 : 0,
+            teamSize: players.length > 2 ? players.length / 2 : 0,
             questionCount: 1,
             seconds: 60,
             public: true,
@@ -423,7 +469,7 @@ test(
           const reconnect = createClient(app.apiUrl, anon, {
             auth: { persistSession: false, autoRefreshToken: false },
           });
-          const email = players.length === 4 ? "admin" : "student";
+          const email = players[0] === teacher ? "admin" : "student";
           assert.ifError(
             (
               await reconnect.auth.signInWithPassword({
@@ -451,13 +497,13 @@ test(
             room.members.reduce((n, member) => n + member.score, 0),
             players.length * 100,
           );
-          if (players.length === 4)
+          if (players.length > 2)
             for (const team of [1, 2])
               assert.equal(
                 room.members
                   .filter((member) => member.team === team)
                   .reduce((n, member) => n + member.score, 0),
-                200,
+                (players.length / 2) * 100,
               );
           await waitDeadline(room.deadline);
           room = await action(players[0], "state", { id });
@@ -471,6 +517,12 @@ test(
           );
         }
       },
+    );
+    await t.test(
+      "official Realtime delivers revision events only to authenticated room members",
+      { skip: process.env.SATCHI_TEST_OFFICIAL_SERVICES !== "1" },
+      async () =>
+        verifyBattleRealtime({ app, learner, outsider: clients[5], rpc }),
     );
     await t.test(
       "concurrent network joins cannot exceed capacity; host leave transfers control",
@@ -693,6 +745,7 @@ test(
           path: "test-results/native-typed-vocabulary-mobile.png",
           fullPage: true,
         });
+        await battlePage.close();
       },
     );
     await t.test(
@@ -839,6 +892,12 @@ test(
           path: "test-results/native-admin-heatmap-mobile.png",
           fullPage: true,
         });
+      },
+    );
+    await t.test(
+      "two real browser sessions manage teams, recover an offline saved answer and finish a match",
+      async () => {
+        await verifyBattleBrowser({ app, browser, login, clients, rpc });
       },
     );
     assert.deepEqual(errors, []);
