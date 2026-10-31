@@ -35,6 +35,7 @@
     "test:realtime": "node scripts/testing/sprint-native.js --services --realtime",
     "test:battles:browser": "node scripts/testing/sprint-native.js --services --battle-browser",
     "test:battles:network": "node scripts/testing/sprint-native.js --services --battle-network",
+    "test:battles:timer": "node scripts/testing/sprint-native.js --services --battle-timer",
     "setup:test-services": "python3 scripts/testing/setup-supabase-services.py",
     "setup:test-tools": "python3 scripts/testing/setup-native-tools.py"
   },

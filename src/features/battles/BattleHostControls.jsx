@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import BattleMatchLimit from "./BattleMatchLimit.jsx";
 
 export default function BattleHostControls({ room, busy, onControl }) {
   const [count, setCount] = useState(room.question_count);
   const [seconds, setSeconds] = useState(room.seconds);
+  const [totalSeconds, setTotalSeconds] = useState(room.total_seconds || 0);
   const [isPublic, setPublic] = useState(room.public);
   const [first, setFirst] = useState("");
   const [second, setSecond] = useState("");
@@ -17,8 +19,9 @@ export default function BattleHostControls({ room, busy, onControl }) {
   useEffect(() => {
     setCount(room.question_count);
     setSeconds(room.seconds);
+    setTotalSeconds(room.total_seconds || 0);
     setPublic(room.public);
-  }, [room.question_count, room.seconds, room.public]);
+  }, [room.question_count, room.seconds, room.public, room.total_seconds]);
   const firstMember = room.members.find((member) => member.user_id === first);
   return (
     <details className="battle-host-controls">
@@ -35,6 +38,7 @@ export default function BattleHostControls({ room, busy, onControl }) {
           submitControl("settings", {
             questionCount: Number(count),
             seconds: Number(seconds),
+            totalSeconds,
             public: isPublic,
           });
         }}
@@ -60,11 +64,12 @@ export default function BattleHostControls({ room, busy, onControl }) {
           >
             {[0, 30, 60, 90, 120, 180, 300, 600].map((value) => (
               <option key={value} value={value}>
-                {value ? `${value} seconds` : "Untimed friendly"}
+                {value ? `${value} seconds` : "Untimed questions"}
               </option>
             ))}
           </select>
         </label>
+        <BattleMatchLimit value={totalSeconds} onChange={setTotalSeconds} />
         <label>
           <input
             type="checkbox"

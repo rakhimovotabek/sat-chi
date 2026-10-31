@@ -362,6 +362,8 @@ npm run test:sprint     # Disposable PostgreSQL functions/RLS and package/math r
 npm run test:sprint:ui  # Fixture Auth/REST UI checks; real ZIP parsing, images and math rendering
 npm run setup:test-services  # Cache pinned official services; needs native tools + Bubblewrap
 npm run test:realtime        # Actual local Realtime WAL/WebSocket/member RLS
+npm run test:battles:network # Twenty independent Auth clients, simultaneous/retried answers
+npm run test:battles:timer   # Actual natural whole-match expiry, no SQL clock mutation
 npm run test:sprint:services # Actual Storage API/file backend + Edge Runtime + Realtime
 ```
 

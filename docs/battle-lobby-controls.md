@@ -38,8 +38,10 @@ replacement joins, a completed three-round 2v2, exact durable scores and rejecti
 of post-start edits. Heartbeat revision behavior is checked separately. The new
 two-browser control/offline scenario passed standalone and in the **12/12**
 combined official-service suite. See [service evidence](isolated-supabase-services.md).
-Desktop/mobile screenshots are in `screenshots/real-services/`. This does not complete Quick Match, vocabulary matching,
-whole-match timing, public rankings or load profiling.
+Desktop/mobile screenshots are in `screenshots/real-services/`. Whole-match
+timing now has [separate SQL, real-clock HTTP and browser evidence](battle-match-timers.md).
+Quick Match, vocabulary matching, public rankings and broader load profiling
+remain unfinished.
 
 Rollback for a future approved release: remove the new UI calls first. Reverting
 the join/trigger definitions requires deliberate SQL matching the deployed

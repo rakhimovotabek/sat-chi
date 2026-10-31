@@ -22,9 +22,11 @@ or a browser load benchmark. An actual admin-host pool failure was fixed by
 `20261031000900_battle_pool_parity.sql`; admission and random selection now both
 exclude drafts/unapproved records before sampling. Its SQL regression passes.
 
-Whole-match timers have two passing SQL checks; their UI and natural-clock network
-expiry are the next milestone. No XP/practice grade is awarded or rewritten by
-Battle results.
+Whole-match timers pass two SQL checks, actual 30-second natural-clock network
+expiry, official-service browser settings/decreasing-clock verification and a
+default-native browser regression. See [timing evidence](battle-match-timers.md).
+Per-question, total-only and friendly untimed configurations are supported.
+No XP/practice grade is awarded or rewritten by Battle results.
 
 ## Previous checkpoint details
 

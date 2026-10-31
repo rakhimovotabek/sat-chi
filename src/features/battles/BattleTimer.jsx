@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
-export default function BattleTimer({ deadline, serverNow }) {
+export default function BattleTimer({
+  deadline,
+  serverNow,
+  label = "Question time remaining",
+}) {
   const [remaining, setRemaining] = useState(null);
   useEffect(() => {
     const budget = Date.parse(deadline) - Date.parse(serverNow);
@@ -18,13 +22,8 @@ export default function BattleTimer({ deadline, serverNow }) {
     return () => clearInterval(timer);
   }, [deadline, serverNow]);
   return remaining === null ? null : (
-    <p
-      className="battle-timer"
-      role="timer"
-      aria-live="off"
-      aria-label="Time remaining"
-    >
-      {remaining} seconds remaining
+    <p className="battle-timer" role="timer" aria-live="off" aria-label={label}>
+      {label}: {remaining} seconds
     </p>
   );
 }

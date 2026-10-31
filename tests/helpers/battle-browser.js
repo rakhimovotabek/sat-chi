@@ -53,6 +53,7 @@ export async function verifyBattleBrowser({
     await controls
       .getByLabel("Time per question", { exact: true })
       .selectOption("60");
+    await controls.getByLabel("Whole-match limit").selectOption("120");
     await controls
       .getByRole("checkbox", { name: "Show in public lobbies" })
       .check();
@@ -62,6 +63,10 @@ export async function verifyBattleBrowser({
         async () => (await action(opponent, "state", { id: room.id })).seconds,
       )
       .toBe(60);
+    assert.equal(
+      (await action(opponent, "state", { id: room.id })).total_seconds,
+      120,
+    );
     await controls
       .getByLabel("First player", { exact: true })
       .selectOption(room.me);
@@ -124,6 +129,16 @@ export async function verifyBattleBrowser({
       hostPage.getByRole("button", { name: "Submit answer", exact: true }),
     ).toBeVisible({ timeout: 15000 });
     room = await action(host, "state", { id: room.id });
+    const timer = hostPage.getByRole("timer", {
+      name: "Match time remaining",
+      exact: true,
+    });
+    await expect(timer).toBeVisible();
+    const remaining = async () =>
+      Number((await timer.textContent()).match(/(\d+) seconds/)[1]);
+    const initial = await remaining();
+    assert.ok(initial > 0 && initial <= 120);
+    await expect.poll(remaining).toBeLessThan(initial);
     const answer = room.question.question_type === "open" ? "8.6" : "1";
     const fillAnswer = async (page) => {
       if (room.question.question_type === "open")

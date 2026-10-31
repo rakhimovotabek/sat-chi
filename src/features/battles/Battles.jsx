@@ -2,6 +2,7 @@ import Filters from "../learning/Filters.jsx";
 import BattleVocabularyFilters from "./BattleVocabularyFilters.jsx";
 import BattleHostControls from "./BattleHostControls.jsx";
 import BattleTimer from "./BattleTimer.jsx";
+import BattleMatchLimit from "./BattleMatchLimit.jsx";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../lib/supabase.js";
 import PageHeader from "../../components/PageHeader.jsx";
@@ -42,6 +43,7 @@ export default function Battles() {
     teamSize: 0,
     questionCount: 5,
     seconds: 90,
+    totalSeconds: 0,
     public: false,
   });
   useEffect(() => {
@@ -156,9 +158,13 @@ export default function Battles() {
       setSettings((s) => ({
         ...s,
         ...(name === "category" ? { filters: {} } : {}),
-        [name]: ["capacity", "teamSize", "questionCount", "seconds"].includes(
-          name,
-        )
+        [name]: [
+          "capacity",
+          "teamSize",
+          "questionCount",
+          "seconds",
+          "totalSeconds",
+        ].includes(name)
           ? Number(e.target.value)
           : e.target.value,
       })),
@@ -313,7 +319,7 @@ export default function Battles() {
               <label>
                 Time per question
                 <select {...field("seconds")}>
-                  <option value={0}>Untimed friendly</option>
+                  <option value={0}>Untimed questions</option>
                   {[60, 90, 120, 180, 300].map((n) => (
                     <option value={n} key={n}>
                       {n} seconds
@@ -321,6 +327,17 @@ export default function Battles() {
                   ))}
                 </select>
               </label>
+              <BattleMatchLimit
+                value={settings.totalSeconds}
+                onChange={(totalSeconds) =>
+                  setSettings((current) => ({ ...current, totalSeconds }))
+                }
+              />
+              <p>
+                Use untimed questions with a whole-match limit for one shared
+                timer. It starts after the countdown; unanswered questions earn
+                no points.
+              </p>
               <label>
                 <input
                   type="checkbox"
@@ -447,7 +464,7 @@ export default function Battles() {
                   {room.team_size ? `Team ${m.team} · ` : ""}
                   {m.ready ? "Ready" : "Not ready"}
                   {Date.parse(room.serverNow) - Date.parse(m.last_seen) > 30000
-                    ? " · Disconnected"
+                    ? " · Away"
                     : ""}
                 </small>
               </div>
@@ -470,9 +487,15 @@ export default function Battles() {
                 {room.members.length} / {room.capacity} players ·{" "}
                 {room.seconds
                   ? `${room.seconds} seconds per question`
-                  : "Untimed friendly"}{" "}
+                  : "Untimed questions"}{" "}
                 · Correct answer: 100 points
               </p>
+              {room.total_seconds > 0 && (
+                <p>
+                  Whole-match limit: {room.total_seconds} seconds, starting
+                  after the countdown.
+                </p>
+              )}
               <div className="button-row">
                 <button
                   className="button"
@@ -529,9 +552,18 @@ export default function Battles() {
               <BattleTimer
                 deadline={room.deadline}
                 serverNow={room.serverNow}
+                label="Starts in"
               />
             </section>
           )}
+          {room.match_deadline &&
+            ["PLAYING", "ROUND_RESULTS"].includes(room.state) && (
+              <BattleTimer
+                deadline={room.match_deadline}
+                serverNow={room.serverNow}
+                label="Match time remaining"
+              />
+            )}
           {q && ["PLAYING", "ROUND_RESULTS"].includes(room.state) && (
             <section className="card battle-question">
               {(q.passage || q.stimulus || q.image_url || q.stimulus_table) && (
@@ -540,12 +572,18 @@ export default function Battles() {
               <h3>
                 <FormattedText>{q.question_text}</FormattedText>
               </h3>
-              {room.deadline && (
-                <BattleTimer
-                  deadline={room.deadline}
-                  serverNow={room.serverNow}
-                />
-              )}
+              {room.deadline &&
+                (room.seconds > 0 || room.state === "ROUND_RESULTS") && (
+                  <BattleTimer
+                    deadline={room.deadline}
+                    serverNow={room.serverNow}
+                    label={
+                      room.state === "ROUND_RESULTS"
+                        ? "Next update in"
+                        : "Question time remaining"
+                    }
+                  />
+                )}
               {room.state === "PLAYING" &&
                 (room.submitted ? (
                   <p role="status">
