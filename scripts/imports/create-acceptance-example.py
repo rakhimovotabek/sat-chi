@@ -83,3 +83,28 @@ with zipfile.ZipFile(OUT/'acceptance-math-30.zip', 'w', zipfile.ZIP_DEFLATED) as
         info.compress_type = zipfile.ZIP_DEFLATED
         info.external_attr = 0o100644 << 16
         archive.writestr(info, data)
+
+# A separate authorized R&W package respects v1's single-section book contract.
+reading_manifest = {
+    'format': 'satchi-book-v1',
+    'book': {'id': 'satchi-original-reading-6', 'title': 'SAT’chi Original Acceptance — Reading & Writing', 'author': 'SAT’chi', 'section': 'Reading & Writing'},
+    'rights': manifest['rights'], 'topics': [{'id': 'ideas', 'title': 'Information and Ideas'}, {'id': 'writing', 'title': 'Writing with evidence'}],
+    'questionCount': 6, 'assetDigests': {},
+}
+reading_questions = []
+for index, name in enumerate(['Mira', 'Jasur', 'Lina', 'Omar', 'Ada', 'Ravi'], 1):
+    reading_questions.append({'id': f'r{index:04}', 'topic': 'ideas' if index <= 3 else 'writing', 'type': 'mcq',
+        'passage': f'{name} built a small rain collector. After a dry week, {name} moved it away from a roof that had blocked the rain.',
+        'text': f'According to the text, why did {name} move the collector?',
+        'options': [{'label': letter, 'text': text} for letter, text in zip('ABCD', ['To make it easier to carry', 'To let rain reach it directly', 'To measure the roof height', 'To reduce its storage capacity'])],
+        'answer': 1, 'explanation': 'The roof blocked rainfall. Moving the collector allowed rain to enter it directly.',
+        'domain': 'Information and Ideas', 'skill': 'Central Ideas and Details', 'difficulty': 'easy', 'reviewStatus': 'approved',
+        'source': {'reference': f'Original SATchi reading fixture {index}'}})
+reading_files = {'manifest.json': json.dumps(reading_manifest, ensure_ascii=False).encode(),
+    'questions.jsonl': ('\n'.join(json.dumps(q, ensure_ascii=False) for q in reading_questions)+'\n').encode(),
+    'review-report.csv': ('question_id,status,note\n'+''.join(f"{q['id']},approved,Original verified passage and key\n" for q in reading_questions)).encode(),
+    'README.md': b'Original CC0 reading passages and questions. Synthetic acceptance material, not an official SAT test. No external content or assets.\n'}
+with zipfile.ZipFile(OUT/'acceptance-reading-6.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+    for name, data in sorted(reading_files.items()):
+        info = zipfile.ZipInfo(name, date_time=(2026, 10, 31, 0, 0, 0)); info.compress_type = zipfile.ZIP_DEFLATED; info.external_attr = 0o100644 << 16
+        archive.writestr(info, data)

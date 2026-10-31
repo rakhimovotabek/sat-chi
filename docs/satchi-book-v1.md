@@ -49,8 +49,9 @@ npm run book:validate -- assets/examples/satchi-book-v1/acceptance-math-30.zip
 The deterministic CC0 fixture contains 30 Math questions across four topics,
 including a graph, triangle, passage, image-only options, LaTeX, signed SPR and
 an explanation image. Math and Reading & Writing currently require separate
-packages; this fixture does not establish mixed-section acceptance. The older
-original-practice fixture exercises Reading & Writing. Multiple explanation
+packages; this fixture does not establish mixed-section acceptance. The separate
+acceptance-reading-6 fixture exercises Reading & Writing. The older
+original-practice fixture is also Math. Multiple explanation
 images and paired-passage records remain unsupported in universal v1.
 
 The validator returns JSON with package fingerprint, counts, review totals,

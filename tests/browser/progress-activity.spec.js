@@ -59,6 +59,9 @@ for (const reducedMotion of ["reduce", "no-preference"]) {
       "70% first-attempt accuracy",
     );
     await expect(panel.locator(".progress-column")).toHaveCount(30);
+    const chart = panel.locator(".progress-chart");
+    await chart.scrollIntoViewIfNeeded();
+    await expect(chart).toHaveAttribute("data-motion", "complete");
     await expect
       .poll(() =>
         panel
@@ -81,6 +84,7 @@ for (const reducedMotion of ["reduce", "no-preference"]) {
       .focus();
     await page.keyboard.press("Enter");
     await expect(panel.getByRole("table")).toBeVisible();
+    await expect(chart).toHaveAttribute("data-motion", "complete");
     await panel.getByLabel("Activity period").selectOption("7");
     await expect(panel.locator("tbody tr")).toHaveCount(7);
     await panel.getByLabel("Activity subject").selectOption("Math");

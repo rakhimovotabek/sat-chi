@@ -1,3 +1,4 @@
+import { localProcessEnvironment } from "./local-process-env.js";
 // Real local PostgreSQL + PostgREST + Vite. Only Auth and Storage transport are
 // fixture services; no application REST/RPC request is intercepted or canned.
 import { execFile, spawn } from "node:child_process";
@@ -32,6 +33,7 @@ export async function nativeAppEnvironment({
   realAuth = null,
   extraUsers = false,
 } = {}) {
+  const localProcessEnv = localProcessEnvironment();
   const folder = await mkdtemp(join(tmpdir(), "satchi-native-app-"));
   const bin = process.env.SATCHI_TEST_POSTGRES_BIN;
   const dbPort = await port(),
@@ -66,7 +68,7 @@ export async function nativeAppEnvironment({
           "-c",
           text,
         ],
-        { maxBuffer: 16 * 1024 * 1024 },
+        { maxBuffer: 16 * 1024 * 1024, env: localProcessEnv },
       )
     ).stdout.trim();
   const as = (uid, text) =>
@@ -108,7 +110,7 @@ export async function nativeAppEnvironment({
     const stream = createWriteStream(join(folder, name + ".log"));
     streams.push(stream);
     const child = spawn(command, args, {
-      env: { ...process.env, ...env },
+      env: { ...localProcessEnv, ...env },
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -284,6 +286,7 @@ export async function nativeAppEnvironment({
       authService = await isolatedAuth({
         binary: realAuth,
         extraUsers,
+        baseEnv: localProcessEnv,
         dbPort,
         authPort: await port(),
         apiUrl,

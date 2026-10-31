@@ -1,3 +1,5 @@
+import Filters from "../learning/Filters.jsx";
+import BattleVocabularyFilters from "./BattleVocabularyFilters.jsx";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase.js";
 import PageHeader from "../../components/PageHeader.jsx";
@@ -169,7 +171,7 @@ export default function Battles() {
               <h2>Create Battle</h2>
               <label>
                 Category
-                <select {...field("category")}>
+                <select aria-label="Category" {...field("category")}>
                   <option>Vocabulary</option>
                   <option>Math</option>
                   <option>Reading &amp; Writing</option>
@@ -180,18 +182,46 @@ export default function Battles() {
                 <label>
                   Vocabulary mode
                   <select
+                    aria-label="Vocabulary mode"
                     value={settings.filters?.mode || "meaning-rush"}
                     onChange={(e) =>
                       setSettings((s) => ({
                         ...s,
-                        filters: { mode: e.target.value },
+                        filters: { ...s.filters, mode: e.target.value },
                       }))
                     }
                   >
                     <option value="meaning-rush">Meaning Rush</option>
                     <option value="reverse-meaning">Reverse Meaning</option>
+                    <option value="typed-word">Typed Word Challenge</option>
                   </select>
                 </label>
+              )}
+              {settings.category === "Vocabulary" ? (
+                <BattleVocabularyFilters
+                  value={settings.filters || {}}
+                  onChange={(filters) =>
+                    setSettings((current) => ({ ...current, filters }))
+                  }
+                />
+              ) : (
+                <details>
+                  <summary>Question sources, topics and difficulty</summary>
+                  <Filters
+                    status={false}
+                    showSection={false}
+                    value={{
+                      ...settings.filters,
+                      section:
+                        settings.category === "Mixed" ? "" : settings.category,
+                    }}
+                    onChange={(value) => {
+                      const filters = { ...value };
+                      delete filters.section;
+                      setSettings((current) => ({ ...current, filters }));
+                    }}
+                  />
+                </details>
               )}
               <label>
                 Format
@@ -220,11 +250,23 @@ export default function Battles() {
               </label>
               <label>
                 Questions
-                <select {...field("questionCount")}>
+                <input
+                  type="number"
+                  min="1"
+                  max="50"
+                  step="1"
+                  required
+                  list="battle-question-counts"
+                  {...field("questionCount")}
+                />
+                <datalist id="battle-question-counts">
                   {[5, 10, 15, 20, 30, 50].map((n) => (
-                    <option key={n}>{n}</option>
+                    <option key={n} value={n} />
                   ))}
-                </select>
+                </datalist>
+                <small>
+                  Choose 1–50 questions. The server checks the available pool.
+                </small>
               </label>
               <label>
                 Time per question
@@ -433,7 +475,9 @@ export default function Battles() {
           )}
           {q && ["PLAYING", "ROUND_RESULTS"].includes(room.state) && (
             <section className="card battle-question">
-              <Stimulus question={q} />
+              {(q.passage || q.stimulus || q.image_url || q.stimulus_table) && (
+                <Stimulus question={q} />
+              )}
               <h3>
                 <FormattedText>{q.question_text}</FormattedText>
               </h3>
@@ -462,13 +506,17 @@ export default function Battles() {
                       act("answer", { round: room.round, response });
                     }}
                   >
-                    {q.question_type === "open" ? (
+                    {["open", "vocabulary-typed"].includes(q.question_type) ? (
                       <label>
-                        Your numerical answer
+                        {q.question_type === "vocabulary-typed"
+                          ? "Type the word"
+                          : "Your numerical answer"}
                         <input
                           value={response}
                           onChange={(e) => setResponse(e.target.value)}
-                          maxLength={6}
+                          maxLength={
+                            q.question_type === "vocabulary-typed" ? 200 : 6
+                          }
                           required
                           inputMode="text"
                         />
@@ -510,14 +558,18 @@ export default function Battles() {
                   <h4>Round completed</h4>
                   <p>
                     Correct answer:{" "}
-                    {q.question_type === "open"
+                    {["open", "vocabulary-typed"].includes(q.question_type)
                       ? room.review.acceptedAnswers?.join(", ")
                       : "ABCD"[room.review.answer]}
                   </p>
                   <p>
                     <FormattedText>{room.review.explanation}</FormattedText>
                   </p>
-                  <p>The next round begins automatically.</p>
+                  <p>
+                    {room.round === room.question_count
+                      ? "Final results will appear automatically."
+                      : "The next round begins automatically."}
+                  </p>
                 </div>
               )}
             </section>

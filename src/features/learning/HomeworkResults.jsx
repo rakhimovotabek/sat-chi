@@ -1,3 +1,4 @@
+import HomeworkHeatmap from "./HomeworkHeatmap.jsx";
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import PageHeader from "../../components/PageHeader.jsx";
@@ -99,6 +100,11 @@ export default function HomeworkResults() {
               ))}
             </dl>
           </section>
+          <HomeworkHeatmap
+            key={`${homeworkId}:${recurring ? day : "once"}`}
+            homework={homeworkId}
+            day={recurring ? day : null}
+          />
           <section className="card learning-panel table-scroll">
             <h2>Student results</h2>
             <table className="students-table">

@@ -49,7 +49,6 @@
   background: var(--accent);
   border-radius: 3px 3px 0 0;
   transform-origin: bottom;
-  animation: progress-grow 750ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .progress-axis {
   display: flex;
@@ -68,17 +67,4 @@
 .progress-activity caption {
   text-align: start;
   padding-block: 12px;
-}
-@keyframes progress-grow {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .progress-column > span {
-    animation: none;
-  }
 }

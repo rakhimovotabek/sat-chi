@@ -56,3 +56,24 @@ assets, answer keys and historical attempts unchanged. Crop editor and batch
 application remain unimplemented. Tests exercise rights failure, identity
 collisions, count mismatch, SPR recognition, missing assets and LaTeX detection
 using original synthetic metadata only.
+
+
+## Authorized crop pipeline
+
+`python3 scripts/imports/crop-authorized-math.py <plan.json> --source-root <root>`
+validates reviewed canonical IDs, verified A-D key, non-overlapping coordinates,
+source checksum and dimensions. Explicit rights/review evidence is checked before
+opening any image. Add `--write` to create bounded lossless stem/A/B/C/D PNGs and a
+reversible conversion manifest; original hashes are preserved and changed outputs
+are rejected on retry. No database or Storage operation occurs. ImageMagick memory,
+map, disk, threads, raster dimensions and command time are bounded.
+
+[Two original CC0 plans/images](../assets/examples/math-repair/README.md) exercise
+vertical and two-column layouts. Both were actually converted locally into five
+assets apiece; tests compare pixels exactly, verify B remains 4, and reject
+rights/review failures, overlaps, wrong hashes, bounds and modified outputs.
+Three crop tests pass. These are **two synthetic test conversions**, separate from
+**zero existing third-party-corpus conversions**. Admin crop editing, asset
+replacement uploads and audited application/reconciliation to existing canonical
+records remain unfinished. Existing HardBook ID collisions remain blocked on a
+sanitized current canonical export and verified rights; no IDs/history were reset.

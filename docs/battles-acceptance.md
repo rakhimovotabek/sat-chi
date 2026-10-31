@@ -1,27 +1,46 @@
 # Battles acceptance — 2026-10-31
 
-**VERIFIED BACKEND** in disposable PGlite PostgreSQL: separate authenticated roles
-complete 1v1, 2v2, 3v3 and 20-player games; private keys and member signals are
-protected; duplicate answers do not score twice; deadlines, readiness, host
-transfer, expiration and persisted history are checked. Meaning Rush and Reverse
-Meaning use published synthetic vocabulary records. These are sequential database
-clients, not simultaneous network users. Realtime delivery/reconnect and actual
-two-browser/Auth journeys remain **BLOCKED** by the absent local Supabase stack.
+**VERIFIED BACKEND**, plus real native browser/network acceptance via
+`npm run test:sprint:native`. PostgreSQL 17.11, PostgREST 14.1 and Auth v2.197.0
+run locally with independently issued disposable sessions. No mocked REST/RPCs.
 
-Additive migration `20261031000200_battle_answer_privacy_and_pool.sql` masks
-current-round points in PLAYING snapshots, including scoreboard sort order.
-Previous-round totals remain visible; real current points return at ROUND_RESULTS.
-No answer/score rows are rewritten. Math/R&W/Mixed creation checks exact eligible
-published canonical count and rejects impossible settings transactionally, even
-for an admin with draft access. Battle filters reject personal history filters.
-Vocabulary pool validation still occurs at start; richer setup remains open.
+- Real network: complete 1v1 and 2v2, published source filters, natural server
+  countdown/result deadlines, personal history, same-seat fresh-login recovery,
+  replay protection, concurrent last-slot joins and nonmember rejection. Host
+  departure transfers ownership; the new host can cancel.
+- Actual student browser: select vocabulary book/set, create Typed Word Challenge,
+  ready/start and submit the word. Server accepts normalized case/whitespace,
+  scores once, hides the private word until reveal and awards no points for a
+  wrong word. The bounded custom-count control is exercised with a complete one-round match,
+  including its persisted typed response and score.
+- Real HTTP: original Reading & Writing ZIP imported/published, then a passage
+  battle graded with domain/book filters. This tests one round, not final R&W
+  history. The committed package has six original CC0 questions.
+- SQL regressions: complete 1v1/2v2/3v3/20-player games; all three vocabulary
+  modes; multi-set pools; exact scores, capacity, deadlines, membership, host
+  transfer, expiration, idempotency and history. These are sequential SQL roles;
+  3v3/20-player concurrent network rooms are not yet verified.
 
-Evidence: `node --expose-gc --import ./scripts/testing/release-memory.js --test
---test-concurrency=1 tests/battles.test.js`: five tests passed. New regressions
-check hidden score/order, failed-create rollback, zero matching pools and admin
-draft exclusion. No new grants, tables, indexes, RLS policies or backfill. The
-migration asserts the expected state-machine definition before replacing it;
-apply dependencies through the preceding migrations in order. Test only locally;
-production migration remains unauthorized. Forward correction is preferred over
-restoring the answer leak. Typed vocabulary, matching, total timers, Quick Match,
-custom teams/kick/settings UI and Battle XP remain unimplemented.
+Current-round points **and sort order** are hidden until ROUND_RESULTS; prior
+scores remain visible. Math/R&W admission counts eligible published canonical
+questions. Vocabulary now rejects impossible pools at creation, uses up to 32
+selected sets and supports Meaning Rush, Reverse Meaning and Typed Word Challenge.
+Typed grading is exact after Unicode NFKC, whitespace collapse/trim and case
+normalization; no fuzzy matching or invented word definitions. Private accepted
+words are kept in battle_rounds, omitted from active questions/snapshots.
+
+Migration `20261031000500_battle_typed_vocabulary.sql` adds private pool/generator
+helpers and patches the existing state machine. No second lobby system, answer
+migration, backfill or public key-table access. Existing frozen matches retain
+their snapshots. Migration prerequisites are asserted before patching.
+
+Source/topic/difficulty controls reuse existing Books filters; vocabulary uses
+published books and readable sets with title search. Realtime itself is still
+**UNVERIFIED**: the native harness has no Realtime server and exercises authoritative
+snapshots/polling. Storage and Node Edge-handler substitutions are described in
+[native testing](native-sprint-testing.md). No full Supabase-stack claim.
+
+Remaining: word matching, Quick Match, custom teams/kick/settings UI, total-match
+timer, public rankings, failed-request transport throttling, longer typed and complete R&W
+browser matches and real Realtime disconnect/reconnect/load acceptance. Battle
+results remain separate from ordinary practice and Homework and award no XP.

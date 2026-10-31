@@ -14,6 +14,7 @@ import {
 export async function isolatedAuth({
   binary,
   extraUsers = false,
+  baseEnv = {},
   dbPort,
   authPort,
   apiUrl,
@@ -100,7 +101,7 @@ export async function isolatedAuth({
     };
     await promisify(execFile)(binary, ["migrate"], {
       cwd: dirname(binary),
-      env: { ...process.env, ...config },
+      env: { ...baseEnv, ...config },
     });
     launch("isolated-auth", binary, ["serve"], config, dirname(binary));
     await waitFor(`http://127.0.0.1:${authPort}/health`);

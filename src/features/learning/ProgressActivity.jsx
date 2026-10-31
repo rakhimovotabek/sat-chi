@@ -1,3 +1,4 @@
+import ActivityChart from "./ActivityChart.jsx";
 import { useEffect, useState } from "react";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
@@ -97,11 +98,9 @@ export default function ProgressActivity() {
           </p>
           {data.questions ? (
             <>
-              <div
-                className="progress-chart"
+              <ActivityChart
                 key={`${days}:${section}:${metric}`}
-                role="img"
-                aria-label={`${metric === "accuracy" ? "Daily first-attempt accuracy, scale 0 to 100 percent" : `Daily questions, scale 0 to ${maximum}`}. Exact values in the table below.`}
+                label={`${metric === "accuracy" ? "Daily first-attempt accuracy, scale 0 to 100 percent" : `Daily questions, scale 0 to ${maximum}`}. Exact values in the table below.`}
               >
                 {data.days.map((row) => {
                   const value =
@@ -118,7 +117,7 @@ export default function ProgressActivity() {
                     </div>
                   );
                 })}
-              </div>
+              </ActivityChart>
               <div className="progress-axis" aria-hidden="true">
                 <span>{data.days[0]?.day}</span>
                 <span>{data.days.at(-1)?.day}</span>

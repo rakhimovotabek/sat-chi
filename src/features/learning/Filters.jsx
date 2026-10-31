@@ -19,7 +19,12 @@ export const OTHER_DOMAINS = {
   Math: "Other Math Topics & Strategies",
   "Reading & Writing": "Other Reading & Writing Topics",
 };
-export default function Filters({ value, onChange, status = true }) {
+export default function Filters({
+  value,
+  onChange,
+  status = true,
+  showSection = true,
+}) {
   const topics = useContent(
     () => (value.book ? getTopics(value.book) : Promise.resolve([])),
     [value.book],
@@ -33,19 +38,21 @@ export default function Filters({ value, onChange, status = true }) {
     });
   return (
     <div className="filter-grid">
-      <label>
-        Section
-        <select
-          aria-label="Section"
-          value={value.section || ""}
-          onChange={(e) => field("section", e.target.value)}
-        >
-          <option value="">All sections</option>
-          {Object.keys(DOMAINS).map((s) => (
-            <option key={s}>{s}</option>
-          ))}
-        </select>
-      </label>
+      {showSection && (
+        <label>
+          Section
+          <select
+            aria-label="Section"
+            value={value.section || ""}
+            onChange={(e) => field("section", e.target.value)}
+          >
+            <option value="">All sections</option>
+            {Object.keys(DOMAINS).map((s) => (
+              <option key={s}>{s}</option>
+            ))}
+          </select>
+        </label>
+      )}
       <label>
         Domain
         <select

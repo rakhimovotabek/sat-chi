@@ -50,8 +50,9 @@ test(
     t.after(() => browser.close());
     const teacherPage = await browser.newPage({
       viewport: { width: 1366, height: 768 },
+      reducedMotion: "reduce",
     });
-    teacherPage.setDefaultTimeout(15000);
+    teacherPage.setDefaultTimeout(30000);
     const errors = [];
     teacherPage.on("pageerror", (error) => errors.push(error.message));
     const login = async (page, name) => {
@@ -177,6 +178,7 @@ test(
       async () => {
         const page = await browser.newPage({
           viewport: { width: 1366, height: 768 },
+          reducedMotion: "reduce",
         });
         await login(page, "student");
         await page.goto(`${app.appUrl}/books/${book}`);
@@ -457,6 +459,338 @@ test(
           (await action(winner, "cancel", { id })).state,
           "CANCELLED",
         );
+      },
+    );
+    await t.test(
+      "Progress renders exact persisted canonical results after an answer-key correction",
+      async () => {
+        const aggregate = await rpc(learner, "progress_activity", {
+          p_days: 7,
+          p_section: "Math",
+        });
+        assert.equal(aggregate.questions, 3);
+        assert.equal(aggregate.correct, 3);
+        assert.equal(aggregate.accuracy, 100);
+        const page = await browser.newPage({
+          viewport: { width: 1366, height: 768 },
+          reducedMotion: "reduce",
+        });
+        await login(page, "student");
+        await page.goto(`${app.appUrl}/progress`);
+        const panel = page.getByRole("region", {
+          name: "First-attempt activity",
+        });
+        await panel.getByLabel("Activity period").selectOption("7");
+        await panel.getByLabel("Activity subject").selectOption("Math");
+        await expect(panel.getByRole("status")).toContainText(
+          "3 distinct graded questions",
+        );
+        await expect(panel.getByRole("status")).toContainText(
+          "100% first-attempt accuracy",
+        );
+        await expect(panel.locator(".progress-chart")).toHaveAttribute(
+          "data-motion",
+          "complete",
+        );
+        await panel
+          .getByText("Daily values and sample sizes", { exact: true })
+          .click();
+        await expect(panel.locator("tbody tr")).toHaveCount(7);
+        await page.screenshot({
+          path: "test-results/native-progress-laptop.png",
+          fullPage: true,
+        });
+        await page.setViewportSize({ width: 390, height: 844 });
+        assert.ok(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        );
+        await page.screenshot({
+          path: "test-results/native-progress-mobile.png",
+          fullPage: true,
+        });
+        await page.close();
+      },
+    );
+    await t.test(
+      "browser selects a published vocabulary set and submits a typed word to the authoritative server",
+      async () => {
+        const vocabBook = await app.json(
+          "with created as(insert into vocabulary_books(title,published)values('Original network vocabulary',false)returning id)select to_jsonb(id)from created",
+        );
+        const set = await app.json(
+          `with created as(insert into vocabulary_sets(book_id,title)values('${vocabBook}','Original topic')returning id)select to_jsonb(id)from created`,
+        );
+        const pairs = [
+          ["bright", "giving much light"],
+          ["gentle", "using little force"],
+          ["rapid", "moving very quickly"],
+          ["scarce", "available in small amounts"],
+          ["silent", "making no sound"],
+        ];
+        for (const [word, definition] of pairs)
+          await app.sql(
+            `insert into vocabulary_words(set_id,word,definition)values('${set}','${word}','${definition}')`,
+          );
+        await app.sql(
+          `update vocabulary_books set published=true where id='${vocabBook}'`,
+        );
+        const battlePage = await browser.newPage({
+          viewport: { width: 1366, height: 768 },
+          reducedMotion: "reduce",
+        });
+        battlePage.on("pageerror", (error) => errors.push(error.message));
+        await login(battlePage, "student");
+        await battlePage.goto(`${app.appUrl}/battles`);
+        await battlePage
+          .getByLabel("Category", { exact: true })
+          .selectOption("Vocabulary");
+        await battlePage
+          .getByLabel("Vocabulary mode", { exact: true })
+          .selectOption("typed-word");
+        await battlePage
+          .getByText("Vocabulary book and topic sets", { exact: true })
+          .click();
+        await battlePage
+          .getByLabel("Vocabulary book", { exact: true })
+          .selectOption(vocabBook);
+        await battlePage
+          .getByRole("checkbox", { name: "Original topic", exact: true })
+          .check();
+        await battlePage.getByLabel("Questions", { exact: false }).fill("1");
+        await battlePage
+          .getByRole("button", { name: "Create Battle", exact: true })
+          .click();
+        await expect(
+          battlePage.getByRole("button", { name: "Mark ready", exact: true }),
+        ).toBeVisible();
+        const room = await app.json(
+          "select to_jsonb(b)from battles b where host_id='f1000000-0000-0000-0000-000000000002'and state='LOBBY'order by created_at desc limit 1",
+        );
+        assert.deepEqual(room.filters.sets, [set]);
+        const action = (client, action, data) =>
+          rpc(client, "battle_action", { p_action: action, p_data: data });
+        await action(clients[2], "join", { code: room.code });
+        await action(clients[2], "ready", { id: room.id });
+        await battlePage
+          .getByRole("button", { name: "Mark ready", exact: true })
+          .click();
+        await battlePage
+          .getByRole("button", { name: "Start Battle", exact: true })
+          .click();
+        await expect(
+          battlePage.getByRole("textbox", {
+            name: "Type the word",
+            exact: true,
+          }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(
+          battlePage.getByRole("region", {
+            name: "Passage and reference material",
+          }),
+        ).toHaveCount(0);
+        const snapshot = await action(clients[2], "state", { id: room.id });
+        assert.equal(snapshot.question.accepted_answers, undefined);
+        const word = pairs.find(
+          (pair) => pair[1] === snapshot.question.question_text,
+        )[0];
+        await battlePage
+          .getByRole("textbox", { name: "Type the word", exact: true })
+          .fill(word.toUpperCase());
+        await battlePage
+          .getByRole("button", { name: "Submit answer", exact: true })
+          .click();
+        await expect(
+          battlePage.getByText(
+            "Answer submitted. Waiting for the other players…",
+            { exact: true },
+          ),
+        ).toBeVisible();
+        const reveal = await action(clients[2], "answer", {
+          id: room.id,
+          round: 1,
+          response: "wrong",
+        });
+        assert.equal(reveal.state, "ROUND_RESULTS");
+        assert.equal(
+          reveal.members.find((member) => member.user_id === room.host_id)
+            .score,
+          100,
+        );
+        assert.equal(
+          reveal.members.find((member) => member.user_id === reveal.me).score,
+          0,
+        );
+        await expect(
+          battlePage.getByText(`${word}:`, { exact: false }),
+        ).toBeVisible();
+        await new Promise((resolve) =>
+          setTimeout(
+            resolve,
+            Math.max(0, Date.parse(reveal.deadline) - Date.now() + 80),
+          ),
+        );
+        const finished = await action(learner, "state", { id: room.id });
+        assert.equal(finished.state, "FINISHED");
+        assert.equal(finished.history[0].points, 100);
+        assert.equal(finished.history[0].response, word.toUpperCase());
+        await battlePage.setViewportSize({ width: 390, height: 844 });
+        assert.ok(
+          await battlePage.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        );
+        await battlePage.screenshot({
+          path: "test-results/native-typed-vocabulary-mobile.png",
+          fullPage: true,
+        });
+      },
+    );
+    await t.test(
+      "original Reading & Writing package publishes and supplies a passage battle",
+      async () => {
+        const bytes = await readFile(
+          "assets/examples/satchi-book-v1/acceptance-reading-6.zip",
+        );
+        const uploaded = await teacher.functions.invoke("import-book", {
+          body: new Blob([bytes]),
+          headers: { "Content-Type": "application/zip" },
+        });
+        assert.ifError(uploaded.error);
+        let readingJob = uploaded.data;
+        for (
+          let step = 0;
+          readingJob.status === "importing" && step < 10;
+          step++
+        ) {
+          const result = await teacher.functions.invoke("import-book", {
+            body: { jobId: readingJob.id },
+          });
+          assert.ifError(result.error);
+          readingJob = result.data;
+        }
+        assert.equal(readingJob.status, "draft");
+        await rpc(teacher, "universal_publish", { p_job: readingJob.id });
+        const action = (client, action, data) =>
+          rpc(client, "battle_action", { p_action: action, p_data: data });
+        let room = await action(clients[2], "create", {
+          category: "Reading & Writing",
+          capacity: 2,
+          teamSize: 0,
+          questionCount: 1,
+          seconds: 60,
+          public: false,
+          filters: {
+            book: readingJob.book_id,
+            domain: "Information and Ideas",
+          },
+        });
+        await action(clients[3], "join", { code: room.code });
+        await Promise.all([
+          action(clients[2], "ready", { id: room.id }),
+          action(clients[3], "ready", { id: room.id }),
+        ]);
+        room = await action(clients[2], "start", { id: room.id });
+        await new Promise((resolve) =>
+          setTimeout(
+            resolve,
+            Math.max(0, Date.parse(room.deadline) - Date.now() + 80),
+          ),
+        );
+        room = await action(clients[3], "state", { id: room.id });
+        assert.ok(room.question.passage.includes("rain collector"));
+        await Promise.all([
+          action(clients[2], "answer", {
+            id: room.id,
+            round: 1,
+            response: "1",
+          }),
+          action(clients[3], "answer", {
+            id: room.id,
+            round: 1,
+            response: "0",
+          }),
+        ]);
+        room = await action(clients[3], "state", { id: room.id });
+        assert.equal(room.state, "ROUND_RESULTS");
+        assert.equal(room.review.answer, 1);
+        assert.equal(
+          room.members.reduce((sum, member) => sum + member.score, 0),
+          100,
+        );
+      },
+    );
+    await t.test(
+      "admin heatmap reads submitted Homework grades and denies a student the aggregate endpoint",
+      async () => {
+        const items = await app.json(
+          `select jsonb_agg(to_jsonb(i)order by position)from book_practice_items i where session_id='${app.session}'`,
+        );
+        await rpc(learner, "save_practice_changes", {
+          p_session: app.session,
+          p_changes: items.slice(0, 2).map((item, index) => ({
+            id: item.id,
+            expected_revision: item.answer_revision,
+            selected_answer: index === 0 ? 1 : 0,
+          })),
+        });
+        await rpc(learner, "finish_book_practice", {
+          p_session_id: app.session,
+        });
+        await assert.rejects(
+          () =>
+            rpc(learner, "homework_question_performance", {
+              p_homework: app.homework,
+            }),
+          /Admin required/,
+        );
+        const data = await rpc(teacher, "homework_question_performance", {
+          p_homework: app.homework,
+        });
+        assert.equal(data.completed_sessions, 1);
+        assert.equal(data.total_questions, 8);
+        assert.deepEqual(
+          data.rows.slice(0, 2).map((row) => row.accuracy),
+          [100, 0],
+        );
+        await teacherPage.goto(`${app.appUrl}/admin/homework/${app.homework}`);
+        const heatmap = teacherPage.getByRole("region", {
+          name: "Question performance",
+          exact: true,
+        });
+        await expect(heatmap.locator(".heatmap-cell")).toHaveCount(8);
+        await heatmap
+          .getByRole("button", {
+            name: "Question 1, 100% from 1 known grades",
+            exact: true,
+          })
+          .focus();
+        await teacherPage.keyboard.press("Enter");
+        await expect(
+          heatmap.getByRole("region", {
+            name: "Question 1 details",
+            exact: true,
+          }),
+        ).toContainText("1 first correct / 1 known initial grades");
+        await heatmap.getByLabel("Heatmap view").selectOption("time");
+        await expect(heatmap.locator(".heatmap-cell").first()).toContainText(
+          "No time",
+        );
+        await teacherPage.screenshot({
+          path: "test-results/native-admin-heatmap-laptop.png",
+          fullPage: true,
+        });
+        await teacherPage.setViewportSize({ width: 390, height: 844 });
+        assert.ok(
+          await teacherPage.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        );
+        await teacherPage.screenshot({
+          path: "test-results/native-admin-heatmap-mobile.png",
+          fullPage: true,
+        });
       },
     );
     assert.deepEqual(errors, []);

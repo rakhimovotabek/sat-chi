@@ -1,0 +1,59 @@
+.homework-performance {
+  margin-block: 24px;
+}
+.homework-performance > label {
+  display: grid;
+  gap: 8px;
+  max-width: 300px;
+  margin-block: 16px;
+}
+.homework-performance select {
+  min-height: 44px;
+  padding: 8px;
+  color: inherit;
+  background: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.question-heatmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-block: 20px;
+}
+.heatmap-cell {
+  display: grid;
+  gap: 6px;
+  min-height: 88px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: inherit;
+  background: var(--accent-soft);
+  text-align: start;
+  font-variant-numeric: tabular-nums;
+}
+.heatmap-cell.high {
+  background: #dcefe9;
+  color: #154d3c;
+}
+.heatmap-cell.middle {
+  background: #fff0c7;
+  color: #654500;
+}
+.heatmap-cell.low {
+  background: #fbe5e8;
+  color: #7b2032;
+}
+.heatmap-cell[aria-pressed="true"] {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+.heatmap-detail {
+  padding-block: 16px;
+  border-block: 1px solid var(--border);
+  margin-block: 16px;
+}
+.homework-performance details {
+  margin-block: 20px;
+}

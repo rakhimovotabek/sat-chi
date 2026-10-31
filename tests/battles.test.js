@@ -219,7 +219,7 @@ test("full 2v2, 3v3 and twenty-player games persist accurate team and individual
     assert.equal(b.state, "FINISHED");
   }
 });
-test("Meaning Rush and Reverse Meaning use actual published word-definition pairs", async (t) => {
+test("three vocabulary modes use published words and reject impossible pools before creation", async (t) => {
   const { db, role, call } = await learningDatabase();
   t.after(() => db.close());
   const action = (a, d = {}) =>
@@ -250,7 +250,29 @@ test("Meaning Rush and Reverse Meaning use actual published word-definition pair
   await db.query("update vocabulary_books set published=true where id=$1", [
     bid,
   ]);
-  for (const mode of ["meaning-rush", "reverse-meaning"]) {
+  const secondSet = (
+    await db.query(
+      "insert into vocabulary_sets(book_id,title)values($1,'Second original topic')returning id",
+      [bid],
+    )
+  ).rows[0].id;
+  await db.query(
+    "update vocabulary_words set set_id=$1 where set_id=$2 and word in('ample','novel')",
+    [secondSet, sid],
+  );
+  await role(student);
+  await assert.rejects(
+    () =>
+      action("create", {
+        category: "Vocabulary",
+        capacity: 2,
+        questionCount: 5,
+        seconds: 60,
+        filters: { book: bid, mode: "typed-word" },
+      }),
+    /Only 4 eligible vocabulary/,
+  );
+  for (const mode of ["meaning-rush", "reverse-meaning", "typed-word"]) {
     await role(student);
     let b = await action("create", {
       category: "Vocabulary",
@@ -258,7 +280,7 @@ test("Meaning Rush and Reverse Meaning use actual published word-definition pair
       questionCount: 1,
       seconds: 60,
       public: true,
-      filters: { book: bid, set: sid, mode },
+      filters: { book: bid, sets: [sid, secondSet], mode },
     });
     const id = b.id;
     await action("ready", { id });
@@ -276,12 +298,20 @@ test("Meaning Rush and Reverse Meaning use actual published word-definition pair
       (p) => p[mode === "meaning-rush" ? 0 : 1] === b.question.question_text,
     );
     assert.ok(pair);
-    assert.equal(b.question.options.length, 4);
-    assert.equal(new Set(b.question.options).size, 4);
-    const answer = b.question.options.indexOf(
-      pair[mode === "meaning-rush" ? 1 : 0],
-    );
-    assert.ok(answer >= 0);
+    let answer;
+    if (mode === "typed-word") {
+      assert.equal(b.question.question_type, "vocabulary-typed");
+      assert.equal(b.question.options.length, 0);
+      assert.equal(b.question.accepted_answers, undefined);
+      answer = `  ${pair[0].toUpperCase()}  `;
+    } else {
+      assert.equal(b.question.options.length, 4);
+      assert.equal(new Set(b.question.options).size, 4);
+      answer = b.question.options.indexOf(
+        pair[mode === "meaning-rush" ? 1 : 0],
+      );
+      assert.ok(answer >= 0);
+    }
     await action("answer", { id, round: 1, response: String(answer) });
     await role(other);
     b = await action("answer", { id, round: 1, response: String(answer) });
