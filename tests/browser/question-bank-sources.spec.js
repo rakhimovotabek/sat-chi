@@ -28,7 +28,7 @@ test("SAT'chi remains default; independent filters, volume and mode survive swit
   await page
     .getByRole("button", { name: "Expand Algebra skills", exact: true })
     .click();
-  await source(page, "College Board").click();
+  await source(page, "SBank").click();
   expect(await page.evaluate(() => window.bankSwitchMarker)).toBe(
     "same-document",
   );
@@ -55,12 +55,20 @@ test("SAT'chi remains default; independent filters, volume and mode survive swit
   await expect(
     page.getByRole("button", { name: "Collapse Algebra skills", exact: true }),
   ).toHaveAttribute("aria-expanded", "true");
-  await source(page, "College Board").click();
+  await source(page, "SBank").click();
   await page.reload();
-  await expect(source(page, "College Board")).toHaveAttribute(
-    "aria-pressed",
-    "true",
+  await expect(source(page, "SBank")).toHaveAttribute("aria-pressed", "true");
+  await expect(source(page, "SBank")).toHaveAttribute(
+    "aria-controls",
+    "bank-source-college-board",
   );
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem(
+        "satchi.bank.d0000000-0000-0000-0000-000000000010.source",
+      ),
+    ),
+  ).toBe("college-board");
   await expect(
     page.getByRole("button", { name: "Reading & Writing", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
@@ -73,7 +81,7 @@ test("SAT'chi remains default; independent filters, volume and mode survive swit
   ).toHaveAttribute("aria-pressed", "true");
 });
 
-test("College Board has accurate domains and skills, unavailable counts and no SAT'chi data requests", async ({
+test("SBank has accurate domains and skills, unavailable counts and no SAT'chi data requests", async ({
   page,
 }) => {
   const store = await learningFixture(page);
@@ -81,7 +89,7 @@ test("College Board has accurate domains and skills, unavailable counts and no S
   await expect(
     page.getByRole("heading", { name: "3 questions match" }),
   ).toBeVisible();
-  await source(page, "College Board").click();
+  await source(page, "SBank").click();
   const requests = store.requests.length;
   for (const [section, domains] of Object.entries(COLLEGE_BOARD_TAXONOMY)) {
     await page.getByRole("button", { name: section, exact: true }).click();
@@ -107,7 +115,7 @@ test("College Board has accurate domains and skills, unavailable counts and no S
     page.getByRole("combobox", { name: "Marked for review" }),
   ).toBeDisabled();
   await expect(
-    page.getByRole("link", { name: "Open official Question Bank" }),
+    page.getByRole("link", { name: "College Board official Question Bank" }),
   ).toHaveAttribute("href", COLLEGE_BOARD_URL);
   await expect(
     page.getByRole("heading", { name: "Matching questions" }),
@@ -149,7 +157,7 @@ test("source switching leaves saved answers and marks intact and SAT'chi starts 
     .getByRole("link", { name: "Question Bank", exact: true })
     .first()
     .click();
-  await source(page, "College Board").click();
+  await source(page, "SBank").click();
   await source(page, "SAT'chi Bank").click();
   expect(progress()).toEqual(snapshot);
   await page.goto(practiceUrl);
@@ -162,8 +170,8 @@ test("source switching leaves saved answers and marks intact and SAT'chi starts 
   ).toBeVisible();
 });
 
-for (const width of [1440, 390, 320])
-  test(`source selector and College Board layout fit ${width}px`, async ({
+for (const width of [1366, 768, 390, 320])
+  test(`source selector and SBank layout fit ${width}px`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize({ width, height: 1000 });
@@ -171,7 +179,7 @@ for (const width of [1440, 390, 320])
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto("/question-bank");
-    await source(page, "College Board").click();
+    await source(page, "SBank").click();
     await expect(
       page.getByRole("heading", { name: "Local practice unavailable" }),
     ).toBeVisible();
@@ -180,7 +188,7 @@ for (const width of [1440, 390, 320])
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-    const selected = source(page, "College Board");
+    const selected = source(page, "SBank");
     await selected.focus();
     await page.keyboard.press("Tab");
     await page.keyboard.press("Shift+Tab");
@@ -191,11 +199,11 @@ for (const width of [1440, 390, 320])
     const bounds = await selected.boundingBox();
     expect(bounds.height).toBeGreaterThanOrEqual(48);
     await page.screenshot({
-      path: `local-imports/college-board-${width}.png`,
+      path: `local-imports/sbank-${width}.png`,
       fullPage: true,
     });
-    await testInfo.attach("College Board layout", {
-      path: `local-imports/college-board-${width}.png`,
+    await testInfo.attach("SBank layout", {
+      path: `local-imports/sbank-${width}.png`,
       contentType: "image/png",
     });
     expect(errors).toEqual([]);

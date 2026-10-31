@@ -24,9 +24,9 @@ Commands:
 
 Components use two-space indentation and PascalCase names. ESLint and Prettier are project-local: run `npm run lint`, `npm run format`, or the scoped `npm run format:check`. Browser verification uses `npm run test:e2e`; the complete unit/database suite uses `npm test`.
 
-The Question Bank has separate **SAT'chi Bank** and **College Board** source controls.
-College Board currently provides public classification filters and an official-site
-link; local practice remains disabled until appropriately authorized content is
+The Question Bank has separate **SAT'chi Bank** and **SBank** source controls.
+SBank retains its legacy collection identifier and provides public classification
+filters plus an optional, attributed College Board official-site link; local practice remains disabled until appropriately authorized content is
 available. No Desktop PDF question content is bundled. See the
 [PDF/source verification report](docs/college-board-integration.md) and
 [authorized-import architecture](docs/authorized-question-bank-architecture.md).

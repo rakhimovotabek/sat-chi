@@ -46,16 +46,18 @@ The native deletion suite uses fixture Storage/Edge transport, which deletion do
 not call. No full historical suite claim. Direct archived-recurring resume remains
 rejected until explicit Restore to paused, preserving the old safety contract.
 
-**Next:** SBank rename. Current source key/DOM IDs/storage suffix `college-board`
-must stay intact. `QuestionBank.jsx` has a separate licensed-content-unavailable
-workspace with public classification labels, unavailable counts and optional
-College Board official link; it never queries SAT'chi rows or enables practice.
-Rename its visible source/category/headings to SBank without inventing licensed
-content or merging collections. Update `tests/browser/question-bank-sources.spec.js`
-and current README/docs. Preserve actual College Board attribution for external
-resources and taxonomy, rather than claiming third-party content is original.
+SBank rename is verified. Visible source selector/headings/details now say **SBank**;
+`college-board` source value/DOM ID/per-account storage keys stay intact. Existing
+SAT'chi Bank and SBank state remain independent; unavailable licensed content is
+not queried, merged or assigned fake counts. College Board external link/taxonomy
+attribution remains accurate and optional. No third-party import occurred.
+Seven source-browser scenarios pass, including saved answers/marks, old-key
+persistence, independent filters, keyboard focus and1366/768/390/320px. Lint/build
+and detector pass. Logs `/tmp/satchi-sbank-browser.log`,
+`/tmp/satchi-sbank-{lint,build}.log`. This is browser fixture coverage, not a new
+hosted database/content acceptance claim.
 
-Then implement the user's premium full UI/analytics request: primary option3,
+**Next:** implement the user's premium full UI/analytics request: primary option3,
 cohesive four-reference interpretation, clean blue/white light and navy/electric-
 blue dark, distinctive energetic Battles, readable elegant other routes; measured
 counters/rings/charts/microinteractions, reduced-motion, no generic repeated

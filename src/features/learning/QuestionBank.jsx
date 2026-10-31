@@ -43,7 +43,7 @@ export default function QuestionBank({ admin = false }) {
     }
   });
   // Retain each visited workspace, including filters, disclosures and pagination.
-  // College Board never queries the SAT'chi dataset or mounts a practice player.
+  // SBank retains its legacy collection key and never queries the SAT'chi dataset or mounts a practice player.
   const [visited, setVisited] = useState(() => new Set([source]));
   useEffect(() => {
     try {
@@ -65,7 +65,7 @@ export default function QuestionBank({ admin = false }) {
       >
         {[
           ["satchi", "SAT'chi Bank"],
-          ["college-board", "College Board"],
+          ["college-board", "SBank"],
         ].map(([value, label]) => (
           <button
             type="button"
@@ -151,16 +151,13 @@ function BankWorkspace({ admin, source }) {
   return (
     <>
       {collegeBoard && (
-        <aside
-          className="bank-source-notice"
-          aria-label="College Board availability"
-        >
+        <aside className="bank-source-notice" aria-label="SBank availability">
           <div>
-            <h2>Practice with College Board</h2>
+            <h2>SBank</h2>
             <p>
-              Explore SAT domains and skills below. Local practice will be
-              available when an authorized dataset is ready. Question counts are
-              not available.
+              SBank is a separate SAT’chi Bank collection. Explore SAT domains
+              and skills below. Local practice will be available when authorized
+              question content is ready. Question counts are unavailable.
             </p>
           </div>
           <a
@@ -169,7 +166,8 @@ function BankWorkspace({ admin, source }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Open official Question Bank <span aria-hidden="true">↗</span>
+            College Board official Question Bank{" "}
+            <span aria-hidden="true">↗</span>
           </a>
         </aside>
       )}
@@ -376,10 +374,10 @@ function BankWorkspace({ admin, source }) {
             {collegeBoard ? (
               <div className="bank-source-details">
                 <span>Question source</span>
-                <strong>College Board · SAT</strong>
+                <strong>SBank · SAT</strong>
                 <p className="bank-hint">
-                  Official classification. No questions have been imported into
-                  this source.
+                  Public College Board SAT classification. No third-party
+                  questions are bundled in this collection.
                 </p>
               </div>
             ) : (

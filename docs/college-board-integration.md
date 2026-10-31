@@ -1,3 +1,23 @@
+# SBank naming update — 2026-10-31
+
+The visible Question Bank source is now **SBank**, a separate SAT’chi Bank
+collection. The `college-board` identifier, DOM panel ID and stored per-account
+filter namespace remain unchanged for compatibility. The actual external link
+is still explicitly attributed to College Board. No third-party question content
+was imported, merged, relabeled as original or licensed by this UI rename.
+Counts/practice remain unavailable until authorized content exists. The prior
+provenance report below is historical and its College Board attribution remains
+accurate; source-selector labels in that report describe the older UI.
+
+Verification: `npx playwright test tests/browser/question-bank-sources.spec.js
+--workers=1` passes **7/7**, zero skips. Existing answers/marks and independent
+source filters survive switches/reload; the old stored `college-board` key and
+panel ID remain unchanged. SBank issues no SAT'chi question/practice RPCs and
+reports unavailable counts. Keyboard and1366/768/390/320px layout tests pass.
+Lint/build pass. No database schema/data change was needed.
+
+---
+
 # Local College Board Question Bank integration
 
 Reviewed 2026-10-22. This change is local only. No deployment, push, hosted query,
