@@ -29,7 +29,9 @@
     "prepare:platform-previews": "node scripts/books/prepare-platform-previews.js",
     "test:sprint": "node --expose-gc --import ./scripts/testing/release-memory.js --test --test-concurrency=1 tests/universal-book.test.js tests/battles.test.js tests/sat-numeric-response.test.js tests/math-typesetting.test.js tests/embedded-answer-choices.test.js tests/first-attempt-statistics.test.js tests/shared-question-history.test.js tests/book-package.test.js",
     "test:sprint:ui": "playwright test tests/browser/universal-book-preview.spec.js --workers=1",
-    "book:validate": "node scripts/imports/validate-universal.js"
+    "book:validate": "node scripts/imports/validate-universal.js",
+    "test:sprint:native": "node scripts/testing/sprint-native.js",
+    "setup:test-tools": "python3 scripts/testing/setup-native-tools.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

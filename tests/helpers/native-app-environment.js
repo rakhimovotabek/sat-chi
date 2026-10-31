@@ -9,6 +9,10 @@ import { mkdtemp, readFile, readdir, writeFile, rm } from "node:fs/promises";
 import { createWriteStream } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { createClient } from "@supabase/supabase-js";
+import { createImportHandler } from "../../supabase/functions/import-book/handler.js";
+import { assertIsolatedTarget } from "../../scripts/testing/isolated-target.js";
+import { importStorage } from "./import-storage.js";
 import { isolatedAuth } from "./isolated-auth.js";
 const exec = promisify(execFile);
 export const admin = "f1000000-0000-0000-0000-000000000001",
@@ -24,7 +28,10 @@ async function port() {
   await new Promise((r) => server.close(r));
   return value;
 }
-export async function nativeAppEnvironment({ realAuth = null } = {}) {
+export async function nativeAppEnvironment({
+  realAuth = null,
+  extraUsers = false,
+} = {}) {
   const folder = await mkdtemp(join(tmpdir(), "satchi-native-app-"));
   const bin = process.env.SATCHI_TEST_POSTGRES_BIN;
   const dbPort = await port(),
@@ -33,6 +40,7 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
     vitePort = await port();
   const apiUrl = `http://127.0.0.1:${apiPort}`,
     appUrl = `http://127.0.0.1:${vitePort}`;
+  assertIsolatedTarget(apiUrl);
   const secret = randomBytes(48).toString("hex"),
     processes = [],
     streams = [],
@@ -153,7 +161,7 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
       "-l",
       join(folder, "postgres.log"),
       "-o",
-      `-h 127.0.0.1 -p ${dbPort} -k ${folder}`,
+      `-h 127.0.0.1 -p ${dbPort} -k ${folder} -c shared_buffers=32MB -c max_connections=30 -c work_mem=2MB`,
       "-w",
       "start",
     ]);
@@ -268,9 +276,14 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
       user_metadata: {},
       created_at: new Date().toISOString(),
     });
+    if (extraUsers)
+      await sql(
+        `insert into auth.users(id,email)values('${studentB}','studentB@fixture.invalid'),('${studentC}','studentC@fixture.invalid');update public.profiles set onboarding_completed=true where id in('${studentB}','${studentC}');`,
+      );
     if (realAuth)
       authService = await isolatedAuth({
         binary: realAuth,
+        extraUsers,
         dbPort,
         authPort: await port(),
         apiUrl,
@@ -281,6 +294,24 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
         sql,
         waitFor,
       });
+    const worker = createImportHandler({
+      createClient,
+      env: (name) =>
+        ({
+          SUPABASE_URL: apiUrl,
+          SUPABASE_SERVICE_ROLE_KEY: token({ role: "service_role" }),
+        })[name],
+    });
+    const storage = importStorage({
+      folder,
+      files: localAssetFiles,
+      sql,
+      json,
+      as,
+      claims,
+      token,
+      quote,
+    });
     gateway = createServer(async (req, res) => {
       res.setHeader("Access-Control-Allow-Origin", appUrl);
       res.setHeader(
@@ -302,6 +333,20 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
       };
       try {
         const url = new URL(req.url, apiUrl);
+        if (url.pathname === "/functions/v1/import-book") {
+          const response = await worker(
+            new Request(apiUrl + req.url, {
+              method: req.method,
+              headers: req.headers,
+              body: req,
+              duplex: "half",
+            }),
+          );
+          res.writeHead(response.status, Object.fromEntries(response.headers));
+          res.end(Buffer.from(await response.arrayBuffer()));
+          return;
+        }
+        if (await storage(req, res, url)) return;
         if (authService && url.pathname.startsWith("/auth/v1/")) {
           const proxy = httpRequest(
             {
@@ -392,7 +437,13 @@ export async function nativeAppEnvironment({ realAuth = null } = {}) {
             (signed.bucket || "book-package-assets") + "/" + signed.path,
           );
           if (localFile) {
-            res.writeHead(200, { "Content-Type": "image/webp" });
+            res.writeHead(200, {
+              "Content-Type": localFile.endsWith(".png")
+                ? "image/png"
+                : localFile.endsWith(".jpg")
+                  ? "image/jpeg"
+                  : "image/webp",
+            });
             res.end(await readFile(localFile));
             return;
           }

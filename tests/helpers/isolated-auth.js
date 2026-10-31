@@ -4,10 +4,16 @@ import { dirname, join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { userInfo } from "node:os";
-import { admin, student } from "./native-app-environment.js";
+import {
+  admin,
+  student,
+  studentB,
+  studentC,
+} from "./native-app-environment.js";
 
 export async function isolatedAuth({
   binary,
+  extraUsers = false,
   dbPort,
   authPort,
   apiUrl,
@@ -101,6 +107,12 @@ export async function isolatedAuth({
     for (const [id, name] of [
       [admin, "admin"],
       [student, "student"],
+      ...(extraUsers
+        ? [
+            [studentB, "studentB"],
+            [studentC, "studentC"],
+          ]
+        : []),
     ]) {
       const response = await fetch(`http://127.0.0.1:${authPort}/admin/users`, {
         method: "POST",

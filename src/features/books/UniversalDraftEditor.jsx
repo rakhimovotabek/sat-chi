@@ -76,6 +76,7 @@ export default function UniversalDraftEditor({ bookId, published, onSaved }) {
       <label>
         Question record
         <textarea
+          aria-label="Question record"
           rows={16}
           value={text}
           onChange={(e) => setText(e.target.value)}
