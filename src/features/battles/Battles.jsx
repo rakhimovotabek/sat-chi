@@ -11,6 +11,8 @@ import PageHeader from "../../components/PageHeader.jsx";
 import FormattedText from "../../components/FormattedText.jsx";
 import QuestionImage from "../../components/QuestionImage.jsx";
 import Stimulus from "../player/Stimulus.jsx";
+import AnimatedValue from "../../components/AnimatedValue.jsx";
+import Icon from "../../components/Icon.jsx";
 import "./battles.css";
 const storedId = () => {
   try {
@@ -229,12 +231,26 @@ export default function Battles() {
       {!roomId ? (
         <>
           <div className="battle-intro">
-            <h2>Challenge your next opponent.</h2>
-            <p>
-              Earn 100 points for a correct answer. No points for a wrong
-              answer. Team scores add every member’s points. Battle results stay
-              separate from practice and Homework.
-            </p>
+            <div className="arena-emblem" aria-hidden="true">
+              <Icon name="standings" />
+            </div>
+            <div>
+              <h2>Challenge your next opponent.</h2>
+              <p>
+                Earn 100 points for a correct answer. No points for a wrong
+                answer. Team scores add every member’s points. Battle results
+                stay separate from practice and Homework.
+              </p>
+              <div
+                className="arena-formats"
+                aria-label="Supported battle formats"
+              >
+                <span>1 v 1</span>
+                <span>2 v 2</span>
+                <span>3 v 3</span>
+                <span>Math · Reading &amp; Writing · Vocabulary</span>
+              </div>
+            </div>
           </div>
           <div className="battle-home-grid">
             <form
@@ -484,12 +500,14 @@ export default function Battles() {
         </p>
       ) : (
         <>
-          <div className="battle-room-bar">
+          <div className="battle-room-bar" data-state={room.state}>
             <div>
               <h2>{room.category} arena</h2>
               <p>
-                {room.state.replaceAll("_", " ")} · Round {room.round || "—"} /{" "}
-                {room.question_count}
+                <span className="arena-state">
+                  {room.state.replaceAll("_", " ")}
+                </span>{" "}
+                · Round {room.round || "—"} / {room.question_count}
               </p>
             </div>
             <div>
@@ -508,18 +526,38 @@ export default function Battles() {
               </button>
             </div>
           </div>
+          <progress
+            className="battle-round-progress"
+            max={room.question_count || 1}
+            value={
+              room.state === "FINISHED"
+                ? room.question_count
+                : Math.max(
+                    0,
+                    (room.round || 0) -
+                      (room.state === "ROUND_RESULTS" ? 0 : 1),
+                  )
+            }
+            aria-label="Completed battle rounds"
+          />
           <div className="battle-scoreboard">
             {room.members?.map((m) => (
               <div
                 key={m.user_id}
-                className={`battle-player team-${m.team % 2}`}
+                className={`battle-player team-${m.team % 2} ${m.ready ? "is-ready" : ""}`}
+                data-self={m.user_id === room.me}
               >
+                <span className="battle-seat" aria-hidden="true">
+                  {String(m.seat).padStart(2, "0")}
+                </span>
                 <span>
                   Player {m.seat}
                   {m.user_id === room.me ? " · You" : ""}
                   {m.user_id === room.host_id ? " · Host" : ""}
                 </span>
-                <strong>{m.score}</strong>
+                <strong>
+                  <AnimatedValue value={m.score} />
+                </strong>
                 <small>
                   {room.team_size ? `Team ${m.team} · ` : ""}
                   {m.ready ? "Ready" : "Not ready"}
@@ -541,7 +579,7 @@ export default function Battles() {
             </p>
           )}
           {room.state === "LOBBY" && (
-            <section className="card">
+            <section className="card battle-ready-panel">
               <h3>Ready for the challenge?</h3>
               <p>
                 {room.members.length} / {room.capacity} players ·{" "}
@@ -742,7 +780,7 @@ export default function Battles() {
             </section>
           )}
           {room.state === "FINISHED" && (
-            <section className="card">
+            <section className="card battle-final-results">
               <h2>
                 {me?.score === Math.max(...room.members.map((m) => m.score))
                   ? "Top of the arena"

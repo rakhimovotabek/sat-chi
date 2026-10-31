@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { contentFixture, bookId, topicId } from "./helpers/content.js";
 
-test("book explanations unlock on any choice, survive answer changes and navigation, and do not record attempts", async ({
+test("book explanations require a recorded Check, survive answer changes and navigation, and never add checks", async ({
   page,
 }) => {
   const store = await contentFixture(page);
@@ -21,6 +21,8 @@ test("book explanations unlock on any choice, survive answer changes and navigat
   const button = page.getByRole("button", { name: "Explanation", exact: true });
   await expect(button).toHaveCount(0);
   await page.getByRole("radio", { name: "A 2", exact: true }).check();
+  await expect(button).toHaveCount(0);
+  await page.getByRole("button", { name: "Check", exact: true }).click();
   await expect(button).toBeVisible();
   await button.click();
   await expect(
@@ -31,6 +33,7 @@ test("book explanations unlock on any choice, survive answer changes and navigat
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await expect(button).toHaveCount(0);
   await page.getByRole("radio", { name: "B 4", exact: true }).check();
+  await page.getByRole("button", { name: "Check", exact: true }).click();
   await button.click();
   await expect(
     page.getByText("Explanation is not available for this question.", {
@@ -50,6 +53,7 @@ test("book explanations unlock on any choice, survive answer changes and navigat
       /check_bank_answer|finish_book_practice/.test(r.path),
     ),
   ).toBe(false);
+  expect(store.checks).toHaveLength(2);
 });
 
 test("Book Practice checks text answers, marks wrong and correct choices, and restores progress after reload", async ({
@@ -93,8 +97,9 @@ test("Book Practice checks text answers, marks wrong and correct choices, and re
   await expect(explanation).toHaveCount(0);
   await page.getByRole("radio").nth(0).check();
   await expect(check).toBeEnabled();
-  await expect(explanation).toBeVisible();
+  await expect(explanation).toHaveCount(0);
   await check.click();
+  await expect(explanation).toBeVisible();
   await expect(page.locator(".answer-choice").nth(0)).toHaveClass(
     /incorrect-choice/,
   );
@@ -216,7 +221,7 @@ for (const width of [1280, 390]) {
   });
 }
 
-test("book open responses save and resume without inventing choices; explanation remains available after clearing", async ({
+test("unkeyed book open responses save and resume without inventing checks or unlocking explanation", async ({
   page,
 }) => {
   const store = await contentFixture(page);
@@ -236,20 +241,19 @@ test("book open responses save and resume without inventing choices; explanation
   await expect(
     page.getByRole("button", { name: "Explanation", exact: true }),
   ).toHaveCount(0);
-  await page.getByLabel("Your answer", { exact: true }).fill("43/5");
+  await page.getByLabel(/^Your answer/).fill("43/5");
   await expect(
     page.getByRole("button", { name: "Explanation", exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(page.getByRole("status")).toHaveText("All changes saved");
   await page.reload();
-  await expect(page.getByLabel("Your answer", { exact: true })).toHaveValue(
-    "43/5",
-  );
-  await page.getByLabel("Your answer", { exact: true }).fill("");
+  await expect(page.getByLabel(/^Your answer/)).toHaveValue("43/5");
+  await page.getByLabel(/^Your answer/).fill("");
   await expect(
     page.getByRole("button", { name: "Explanation", exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(page.getByRole("radio")).toHaveCount(0);
+  expect(store.checks || []).toHaveLength(0);
 });
 
 test("Bank open responses use response checks, retry and lock solved input without losing Explanation", async ({
@@ -287,29 +291,29 @@ test("Bank open responses use response checks, retry and lock solved input witho
   });
   await page.goto(`/books/${bookId}/topics/${topicId}`);
   await page.getByRole("button", { name: "Start topic practice" }).click();
-  await expect(page.getByLabel("Your answer", { exact: true })).toBeVisible();
+  await expect(page.getByLabel(/^Your answer/)).toBeVisible();
   store.session.kind = "bank";
   await page.reload();
   await expect(
     page.getByRole("button", { name: "Explanation", exact: true }),
   ).toHaveCount(0);
-  await page.getByLabel("Your answer", { exact: true }).fill("wrong");
-  await page.getByRole("button", { name: "Explanation", exact: true }).click();
+  await page.getByLabel(/^Your answer/).fill("wrong");
+  await expect(
+    page.getByRole("button", { name: "Explanation", exact: true }),
+  ).toHaveCount(0);
   expect(store.checks || []).toHaveLength(0);
   await page.getByRole("button", { name: "Check", exact: true }).click();
   await expect(
     page.getByText("That answer is incorrect. Try another choice."),
   ).toBeVisible();
-  await page.getByLabel("Your answer", { exact: true }).fill("43/5");
+  await page.getByLabel(/^Your answer/).fill("43/5");
   await page.getByRole("button", { name: "Check", exact: true }).click();
   await expect(
     page.getByText("Solved. Continue to the next question."),
   ).toBeVisible();
-  await expect(page.getByLabel("Your answer", { exact: true })).toBeDisabled();
+  await expect(page.getByLabel(/^Your answer/)).toBeDisabled();
   await page.reload();
-  await expect(page.getByLabel("Your answer", { exact: true })).toHaveValue(
-    "43/5",
-  );
+  await expect(page.getByLabel(/^Your answer/)).toHaveValue("43/5");
   await expect(
     page.getByRole("button", { name: "Explanation", exact: true }),
   ).toBeVisible();

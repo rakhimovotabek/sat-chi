@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { masteryPercent, vocabularyAccuracy } from "./vocabulary-model.js";
+import AnimatedValue from "../../components/AnimatedValue.jsx";
 export default function VocabularyStats({ data, compact = false }) {
   if (!data) return null;
   const accuracy = vocabularyAccuracy(data);
@@ -24,11 +25,22 @@ export default function VocabularyStats({ data, compact = false }) {
               ["Learned", data.learned],
               ["Mastered", data.mastered],
               ["Starred", data.starred],
-              ["Accuracy", accuracy === null ? "—" : `${accuracy}%`],
-              ["Study time", `${Math.round(data.study_seconds / 60)} min`],
-            ].map(([label, value]) => (
+              ["Accuracy", accuracy, "percent"],
+              [
+                "Study time",
+                Math.round(data.study_seconds / 60),
+                "number",
+                " min",
+              ],
+            ].map(([label, value, format, suffix]) => (
               <div key={label}>
-                <strong>{value}</strong>
+                <strong>
+                  <AnimatedValue
+                    value={value}
+                    format={format}
+                    suffix={suffix}
+                  />
+                </strong>
                 <small>{label}</small>
               </div>
             ))}

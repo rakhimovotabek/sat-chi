@@ -8,6 +8,7 @@ import { getBookCatalog } from "./api.js";
 import BookForm from "./BookForm.jsx";
 import ImportPanel from "./ImportPanel.jsx";
 import UniversalImport from "./UniversalImport.jsx";
+import ProgressRing from "../../components/ProgressRing.jsx";
 export default function Books({ admin = false }) {
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -130,23 +131,29 @@ export default function Books({ admin = false }) {
                   )}
                   {!admin && b.progress && (
                     <div className="book-learning-progress">
-                      <p>
-                        {b.progress.eventually_correct} / {b.progress.total}{" "}
-                        eligible questions solved
-                      </p>
-                      <progress
-                        max={b.progress.total || 1}
-                        value={b.progress.eventually_correct}
-                        aria-label={`${b.title} solved progress`}
+                      <ProgressRing
+                        value={
+                          b.progress.total
+                            ? (100 * b.progress.eventually_correct) /
+                              b.progress.total
+                            : null
+                        }
+                        label={`${b.title} solved progress`}
                       />
-                      <small>
-                        {b.progress.first_accuracy == null
-                          ? "First-attempt accuracy unavailable"
-                          : `${b.progress.first_accuracy}% first-attempt accuracy`}
-                        {b.progress.first_unknown > 0
-                          ? " · partial history"
-                          : ""}
-                      </small>
+                      <div>
+                        <p>
+                          {b.progress.eventually_correct} / {b.progress.total}{" "}
+                          eligible questions solved
+                        </p>
+                        <small>
+                          {b.progress.first_accuracy == null
+                            ? "First-attempt accuracy unavailable"
+                            : `${b.progress.first_accuracy}% first-attempt accuracy`}
+                          {b.progress.first_unknown > 0
+                            ? " · partial history"
+                            : ""}
+                        </small>
+                      </div>
                     </div>
                   )}
                   <span className="book-browse-label">

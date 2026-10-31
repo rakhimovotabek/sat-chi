@@ -1,5 +1,6 @@
 import ActivityChart from "./ActivityChart.jsx";
 import AccuracyTrend from "./AccuracyTrend.jsx";
+import AnimatedValue from "../../components/AnimatedValue.jsx";
 import { useEffect, useState } from "react";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
@@ -41,10 +42,11 @@ export default function ProgressActivity() {
     [days, section],
   );
   const data = state.data;
-  const maximum =
-    metric === "accuracy"
-      ? 100
-      : Math.max(1, ...(data?.days || []).map((row) => row.questions));
+  const maximumQuestions = Math.max(
+    1,
+    ...(data?.days || []).map((row) => row.questions),
+  );
+  const maximum = metric === "accuracy" ? 100 : maximumQuestions;
   return (
     <section
       className="card learning-panel progress-activity"
@@ -89,15 +91,6 @@ export default function ProgressActivity() {
       <ContentState {...state} onRetry={state.reload} />
       {data && !state.loading && !state.error && (
         <>
-          <p className="progress-summary" role="status">
-            {section || "All subjects"} · Last {days} days · {data.timezone}:{" "}
-            {data.questions} distinct graded questions · {data.known} known
-            first results ·{" "}
-            {data.accuracy == null
-              ? "No accuracy data"
-              : `${data.accuracy}% first-attempt accuracy`}{" "}
-            · {data.corrected} later corrected
-          </p>
           {data.questions ? (
             <>
               {metric === "accuracy-trend" ? (
@@ -136,6 +129,43 @@ export default function ProgressActivity() {
                   </div>
                 </>
               )}
+              <div className="activity-calendar">
+                <div className="section-heading">
+                  <h3>Question heatmap</h3>
+                  <span>First graded dates · {data.timezone}</span>
+                </div>
+                <ActivityChart
+                  key={`heatmap:${days}:${section}`}
+                  className="activity-heatmap"
+                  role="group"
+                  label="Daily question heatmap. Exact dates and counts are in Daily values and sample sizes."
+                >
+                  {data.days.map((row) => (
+                    <span
+                      key={row.day}
+                      data-chart-cell="true"
+                      aria-label={`${row.day}: ${row.questions} distinct questions`}
+                      title={`${row.day}: ${row.questions} distinct questions`}
+                      data-level={
+                        row.questions === 0
+                          ? 0
+                          : Math.ceil((row.questions / maximumQuestions) * 4)
+                      }
+                    />
+                  ))}
+                </ActivityChart>
+                <div className="heatmap-legend" aria-hidden="true">
+                  <span>{data.days[0]?.day}</span>
+                  <span>
+                    No questions <i data-level="0" />
+                    <i data-level="1" />
+                    <i data-level="2" />
+                    <i data-level="3" />
+                    <i data-level="4" /> More
+                  </span>
+                  <span>{data.days.at(-1)?.day}</span>
+                </div>
+              </div>
               <details>
                 <summary>Daily values and sample sizes</summary>
                 <div className="table-scroll">
@@ -181,6 +211,35 @@ export default function ProgressActivity() {
               start your record.
             </p>
           )}
+          <div className="activity-summary-cards">
+            <div>
+              <small>Distinct questions first graded</small>
+              <strong>
+                <AnimatedValue value={data.questions} />
+              </strong>
+            </div>
+            <div>
+              <small>First-attempt accuracy</small>
+              <strong>
+                <AnimatedValue value={data.accuracy} format="percent" />
+              </strong>
+            </div>
+            <div>
+              <small>Later corrected</small>
+              <strong>
+                <AnimatedValue value={data.corrected} />
+              </strong>
+            </div>
+          </div>
+          <p className="progress-summary" role="status">
+            {section || "All subjects"} · Last {days} days · {data.timezone}:{" "}
+            {data.questions} distinct graded questions · {data.known} known
+            first results ·{" "}
+            {data.accuracy == null
+              ? "No accuracy data"
+              : `${data.accuracy}% first-attempt accuracy`}{" "}
+            · {data.corrected} later corrected
+          </p>
           <p className="empty-copy">
             Accuracy excludes unknown first results. A day without known results
             has no accuracy value. This chart excludes Battles, vocabulary and

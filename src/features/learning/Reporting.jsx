@@ -22,6 +22,9 @@ import VocabularyStats from "./VocabularyStats.jsx";
 import { StudentBookAnalytics } from "./StudentBookAnalytics.jsx";
 import SatCountdown from "./SatCountdown.jsx";
 import DashboardInsights from "./DashboardInsights.jsx";
+import AnimatedValue from "../../components/AnimatedValue.jsx";
+import ProgressRing from "../../components/ProgressRing.jsx";
+import Icon from "../../components/Icon.jsx";
 function VocabularyOverview() {
   const state = useContent(() => vocabSummary());
   return (
@@ -42,10 +45,13 @@ export function MetricCards({ data, compact = false }) {
             ["Questions attempted", data.attempted],
             [
               "First-attempt accuracy",
-              percent(data.first_correct, data.first_known),
+              data.first_known
+                ? (100 * data.first_correct) / data.first_known
+                : null,
+              "percent",
             ],
             ["Eventually correct", data.eventually_correct ?? "—"],
-            ["Total study time", formatTime(data.study_seconds)],
+            ["Total study time", data.study_seconds || 0, "duration"],
           ]
         : [
             ["Questions attempted", data.attempted],
@@ -53,24 +59,35 @@ export function MetricCards({ data, compact = false }) {
             ["Incorrect on first attempt", data.first_incorrect ?? "—"],
             [
               "First-attempt accuracy",
-              percent(data.first_correct, data.first_known),
+              data.first_known
+                ? (100 * data.first_correct) / data.first_known
+                : null,
+              "percent",
             ],
             ["Eventually correct", data.eventually_correct ?? "—"],
             ["Currently correct", data.now_correct ?? "—"],
             ["Unknown first results", data.first_unknown ?? "—"],
-            ["Total study time", formatTime(data.study_seconds)],
+            ["Total study time", data.study_seconds || 0, "duration"],
             [
               "One-time homework completed",
-              `${data.homework_completed} / ${data.homework_total}`,
+              data.homework_completed,
+              "number",
+              ` / ${data.homework_total}`,
             ],
             ["Vocabulary mastered", data.vocabulary_known],
-            ["Current streak", `${data.streak || 0} days`],
-            ["Longest streak", `${data.longest_streak || 0} days`],
+            ["Current streak", data.streak || 0, "number", " days"],
+            ["Longest streak", data.longest_streak || 0, "number", " days"],
           ]
-      ).map(([name, value]) => (
+      ).map(([name, value, format, suffix]) => (
         <article className="card metric-card" key={name}>
           <small>{name}</small>
-          <strong>{value}</strong>
+          <strong>
+            <AnimatedValue
+              value={value === "—" ? null : value}
+              format={format}
+              suffix={suffix}
+            />
+          </strong>
         </article>
       ))}
     </div>
@@ -110,12 +127,14 @@ export function StudentDashboard() {
     state = useContent(() => metrics());
   return (
     <>
-      <PageHeader
-        title="Your SAT journey starts here."
-        eyebrow="Make progress, every day"
-        description={`Welcome back, ${profile.display_name || profile.username || "learner"}. Build your next focused study session.`}
-      />
-      <SatCountdown />
+      <div className="dashboard-welcome">
+        <PageHeader
+          title="Your SAT journey starts here."
+          eyebrow="Make progress, every day"
+          description={`Welcome back, ${profile.display_name || profile.username || "learner"}. Build your next focused study session.`}
+        />
+        <SatCountdown />
+      </div>
       <section className="dashboard-start">
         <div className="welcome-copy">
           <h2>Keep your study plan moving</h2>
@@ -164,12 +183,45 @@ export function Progress() {
       <PageHeader
         title="Progress"
         eyebrow="Your learning record"
-        description="First-attempt accuracy uses recorded initial results across distinct questions. Corrections count separately toward mastery. Unknown historical first results are excluded from accuracy."
+        description="Your saved learning record, across Books, Question Bank and Homework."
       />
       <ContentState {...state} onRetry={state.reload} />
       {state.data && (
         <>
+          <section
+            className="progress-overview card"
+            aria-label="All-time learning overview"
+          >
+            <div>
+              <h2>Your learning, measured.</h2>
+              <p>
+                All-time results across distinct questions. Repeated checks do
+                not add to your question count.
+              </p>
+              <Link className="progress-practice-link" to="/question-bank">
+                Build your next session →
+              </Link>
+            </div>
+            <div className="accuracy-highlight">
+              <ProgressRing
+                value={
+                  state.data.first_known
+                    ? (100 * state.data.first_correct) / state.data.first_known
+                    : null
+                }
+                label="All-time first-attempt accuracy"
+              />
+              <div>
+                <strong>First-attempt accuracy</strong>
+                <small>
+                  {state.data.first_known || 0} known first results ·{" "}
+                  {state.data.first_unknown || 0} unknown
+                </small>
+              </div>
+            </div>
+          </section>
           <ProgressActivity />
+          <h2 className="metrics-heading">Your all-time snapshot</h2>
           <MetricCards data={state.data} />
           <VocabularyOverview />
           <PracticeAnalytics />
@@ -321,21 +373,32 @@ export function AdminDashboard({ results = false }) {
             ].map(([label, n]) => (
               <article className="card metric-card" key={label}>
                 <small>{label}</small>
-                <strong>{n}</strong>
+                <strong>
+                  <AnimatedValue value={n} />
+                </strong>
               </article>
             ))}
           </div>
-          <div className="learning-tabs">
-            <Link className="button" to="/admin/homework">
-              Manage homework
+          <nav
+            className="admin-quick-actions"
+            aria-label="Administration quick actions"
+          >
+            <Link to="/admin/homework">
+              <Icon name="homework" />
+              <strong>Manage homework</strong>
+              <small>Assignments, submissions &amp; results →</small>
             </Link>
-            <Link className="button button-secondary" to="/admin/groups">
-              Manage groups
+            <Link to="/admin/groups">
+              <Icon name="groups" />
+              <strong>Manage groups</strong>
+              <small>Organize students &amp; access →</small>
             </Link>
-            <Link className="button button-secondary" to="/admin/imports">
-              Import status
+            <Link to="/admin/imports">
+              <Icon name="books" />
+              <strong>Import status</strong>
+              <small>Review your content pipeline →</small>
             </Link>
-          </div>
+          </nav>
           <Activity rows={state.data.activity} />
         </>
       )}

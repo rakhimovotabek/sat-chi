@@ -1912,3 +1912,6 @@ html[data-theme="dark"].night-light
 [data-page="homework"] .content-container > .button {
   margin-bottom: 22px;
 }
+@media (prefers-reduced-motion: reduce) {
+  input,select,textarea { transition: none; }
+}

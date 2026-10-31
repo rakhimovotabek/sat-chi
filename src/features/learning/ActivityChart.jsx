@@ -62,6 +62,29 @@ export default function ActivityChart({
               { duration: 750, easing: "cubic-bezier(.16,1,.3,1)" },
             ),
           ),
+          ...[...node.querySelectorAll("[data-chart-ring]")].map((ring) =>
+            ring.animate(
+              [
+                { strokeDashoffset: "100" },
+                { strokeDashoffset: ring.dataset.chartRing },
+              ],
+              { duration: 750, easing: "cubic-bezier(.16,1,.3,1)" },
+            ),
+          ),
+          ...[...node.querySelectorAll("[data-chart-cell]")].map((cell, i) =>
+            cell.animate(
+              [
+                { opacity: 0, transform: "scale(.85)" },
+                { opacity: 1, transform: "scale(1)" },
+              ],
+              {
+                duration: 280,
+                delay: Math.min(i * 12, 450),
+                fill: "backwards",
+                easing: "ease-out",
+              },
+            ),
+          ),
         );
         Promise.all(animations.map((animation) => animation.finished))
           .then(() => {

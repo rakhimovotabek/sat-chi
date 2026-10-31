@@ -115,7 +115,8 @@ test("admin previews and imports a complete book from a JSON file", async ({
 }) => {
   const store = await contentFixture(page, "admin", { empty: true });
   await page.goto("/admin/books");
-  await page.getByRole("button", { name: "JSON import" }).click();
+  await page.getByRole("button", { name: "Import Book", exact: true }).click();
+  await page.getByText("Legacy JSON import", { exact: true }).click();
   const payload = {
     schemaVersion: 1,
     kind: "book",
