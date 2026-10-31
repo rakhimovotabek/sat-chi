@@ -1,0 +1,53 @@
+{
+  "question_id": "original-vertical",
+  "book_id": "original-authorized-math",
+  "source_reference": "Original synthetic 2+2 question, authored by SATchi",
+  "rights": {
+    "authorized": true,
+    "evidence": "Original synthetic test content"
+  },
+  "review": {
+    "status": "approved",
+    "reviewer": "Synthetic fixture author",
+    "mapping_verified": true,
+    "clean_stem_verified": true
+  },
+  "source": {
+    "path": "vertical.png",
+    "sha256": "44112e6e47a0fa6261278451d25ed02c5924f866046077f322dd224ad378e371"
+  },
+  "stem": [
+    0,
+    0,
+    600,
+    70
+  ],
+  "option_labels_in_images": true,
+  "options": {
+    "A": [
+      0,
+      70,
+      600,
+      70
+    ],
+    "B": [
+      0,
+      140,
+      600,
+      70
+    ],
+    "C": [
+      0,
+      210,
+      600,
+      70
+    ],
+    "D": [
+      0,
+      280,
+      600,
+      70
+    ]
+  },
+  "correct_choice": "B"
+}

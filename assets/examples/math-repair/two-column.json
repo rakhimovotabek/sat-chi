@@ -1,0 +1,53 @@
+{
+  "question_id": "original-two-column",
+  "book_id": "original-authorized-math",
+  "source_reference": "Original synthetic 2+2 question, authored by SATchi",
+  "rights": {
+    "authorized": true,
+    "evidence": "Original synthetic test content"
+  },
+  "review": {
+    "status": "approved",
+    "reviewer": "Synthetic fixture author",
+    "mapping_verified": true,
+    "clean_stem_verified": true
+  },
+  "source": {
+    "path": "two-column.png",
+    "sha256": "df8c13be02c8dd58721a1aea1f7e990ecbaa31b82f11ec0cbf3b9406200c92b6"
+  },
+  "stem": [
+    0,
+    0,
+    600,
+    70
+  ],
+  "option_labels_in_images": true,
+  "options": {
+    "A": [
+      0,
+      70,
+      300,
+      70
+    ],
+    "B": [
+      300,
+      70,
+      300,
+      70
+    ],
+    "C": [
+      0,
+      140,
+      300,
+      70
+    ],
+    "D": [
+      300,
+      140,
+      300,
+      70
+    ]
+  },
+  "correct_choice": "B"
+}
