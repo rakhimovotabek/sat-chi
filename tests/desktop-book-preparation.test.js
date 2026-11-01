@@ -1,7 +1,16 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {mkdtemp,readFile,rm}from'node:fs/promises';import os from'node:os';import path from'node:path';import {execFileSync}from'node:child_process';import{validatePackage}from'../supabase/functions/_shared/universal-package.js';
-test('Desktop converter preserves keys, independent crops, source order, cover and unpublished review records',async(t)=>{
- const root=await mkdtemp(path.join(os.tmpdir(),'desktop-book-'));t.after(()=>rm(root,{recursive:true,force:true}));
- execFileSync('python3',['-c',`import zipfile,json,struct,zlib,pathlib
+import test from "node:test";
+import assert from "node:assert/strict";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { execFileSync } from "node:child_process";
+import { validatePackage } from "../supabase/functions/_shared/universal-package.js";
+test("Desktop converter preserves keys, independent crops, source order, cover and unpublished review records", async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "desktop-book-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  execFileSync("python3", [
+    "-c",
+    `import zipfile,json,struct,zlib,pathlib
 r=pathlib.Path(${JSON.stringify(root)})
 def png(color):
  def chunk(t,b):return struct.pack('!I',len(b))+t+b+struct.pack('!I',zlib.crc32(t+b)&0xffffffff)
@@ -12,8 +21,27 @@ m={'book_id':'fixture-book','title':'Fixture book','description':'Test-only book
 with zipfile.ZipFile(r/'fixture.zip','w')as z:
  z.writestr('manifest.json',json.dumps(m));z.writestr('questions.jsonl','\\n'.join(json.dumps(x)for x in [q,held]));z.writestr('lessons.json','[]')
  for i,n in enumerate(['stem','A','B','C','D','cover','admin-review']):z.writestr('assets/'+n+'.png',png(i+1))
-`]);
- execFileSync('python3',['scripts/imports/prepare-desktop-books.py',root+'/fixture.zip','--output',root+'/prepared']);
- const m=JSON.parse(await readFile(root+'/prepared/manifest.json')),qs=JSON.parse(await readFile(root+'/prepared/questions.json')),held=JSON.parse(await readFile(root+'/prepared/review.json'));
- validatePackage(m,qs);assert.equal(qs.length,1);assert.equal(held.length,1);assert.equal(qs[0].answer,1);assert.equal(qs[0].sourceOrder,7);assert.equal(qs[0].source.original.source_page,3);assert.equal(m.bankSource,'satchi');assert.equal(held[0].reviewStatus,'pending');assert.equal(m.assetDigests[m.book.cover].length,64);assert.equal(new Set(qs[0].options.map(o=>o.image)).size,4);assert.equal(Object.keys(m.assetDigests).length,7);assert.equal(qs[0].explanationImage,null);
+`,
+  ]);
+  execFileSync("python3", [
+    "scripts/imports/prepare-desktop-books.py",
+    root + "/fixture.zip",
+    "--output",
+    root + "/prepared",
+  ]);
+  const m = JSON.parse(await readFile(root + "/prepared/manifest.json")),
+    qs = JSON.parse(await readFile(root + "/prepared/questions.json")),
+    held = JSON.parse(await readFile(root + "/prepared/review.json"));
+  validatePackage(m, qs);
+  assert.equal(qs.length, 1);
+  assert.equal(held.length, 1);
+  assert.equal(qs[0].answer, 1);
+  assert.equal(qs[0].sourceOrder, 7);
+  assert.equal(qs[0].source.original.source_page, 3);
+  assert.equal(m.bankSource, "satchi");
+  assert.equal(held[0].reviewStatus, "pending");
+  assert.equal(m.assetDigests[m.book.cover].length, 64);
+  assert.equal(new Set(qs[0].options.map((o) => o.image)).size, 4);
+  assert.equal(Object.keys(m.assetDigests).length, 7);
+  assert.equal(qs[0].explanationImage, null);
 });

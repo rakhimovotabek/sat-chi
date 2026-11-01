@@ -1,3 +1,9 @@
+## Seven Desktop books published — 2026-11-02
+
+User authorized autonomous import, commit, push and deployment. All seven requested books are published: Tense36, Subject–Verb Agreement60, Modifiers28, Punctuation287, Finite/Non-Finite Verbs91, Transition286, College Panda834. **1,622 total published;262 held (261 Math +1 Modifiers)**. 9,670 private images exist,0 missing. Sources/authors/classifications/keys/order and review material preserved. SBank unchanged1,922/1,844. No new schema migration (107 through20261101000100).
+
+27 actual live checks passed on both hosts,0 browser runtime errors; full stored-key/image mapping audit passed. Private review detail/image checks2 passed. Disposable profiles inactive/sessions revoked/history retained; real student records untouched. Source registration timeout resolved with bounded review pre-seeding, not timeout increases or disabled protections. See [exact import/report limits](desktop-books-20261102.md). Resume from actual Git/provider state; do not repeat the completed imports or discard262 review candidates. Final exact hosting SHA/artifact evidence is private `books-20261102/final-host-verification.json` and the release response.
+
 ## Production release completed — Premium interface and Battles 2 (2026-11-01)
 
 User authorized pushing/deploying the local sprint. Feature code `e0c25f6` is live on Netlify and Vercel after safe production migration `20261101000100_battle_competition.sql` (107 total). Fresh post-SBank backup restored/rehearsed successfully; all 66 protected table fingerprints match; historical scoring/data retained. Both sites passed18 live browser checks with0 page errors/failed API requests; authenticated RPCs and full SBank counts passed. Disposable verification sessions revoked/profiles inactive, history retained.
