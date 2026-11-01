@@ -49,3 +49,5 @@ createRoot(document.getElementById("root")).render(
     </BrowserRouter>
   </StrictMode>,
 );
+
+import "./styles/premium.css";

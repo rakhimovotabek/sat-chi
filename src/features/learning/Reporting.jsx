@@ -129,15 +129,17 @@ export function StudentDashboard() {
     <>
       <div className="dashboard-welcome">
         <PageHeader
-          title="Your SAT journey starts here."
-          eyebrow="Make progress, every day"
+          title={`Make your next move, ${profile.display_name || profile.username || "learner"}.`}
           description={`Welcome back, ${profile.display_name || profile.username || "learner"}. Build your next focused study session.`}
         />
         <SatCountdown />
       </div>
       <section className="dashboard-start">
         <div className="welcome-copy">
-          <h2>Keep your study plan moving</h2>
+          <h2>
+            A little focus. A stronger tomorrow.
+            <span className="dashboard-signature">Simply Lovely!</span>
+          </h2>
           <p>
             {profile.target_sat_score
               ? `Your target: ${profile.target_sat_score}. `

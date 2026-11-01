@@ -1,3 +1,4 @@
+import CreatorSignature from "../components/CreatorSignature.jsx";
 import {
   LearningToolsContext,
   PracticeHeadingContext,
@@ -125,7 +126,7 @@ export default function AppShell({ workspace, navigation }) {
             </div>
             <footer className="content-footer">
               <span>SAT’chi</span>
-              <span>Built for focused learning.</span>
+              <CreatorSignature />
             </footer>
           </main>
         </div>

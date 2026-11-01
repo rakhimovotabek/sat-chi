@@ -1,3 +1,4 @@
+import AnimatedValue from "../../components/AnimatedValue.jsx";
 import { Link } from "react-router";
 import useContent from "../books/useContent.js";
 import ContentState from "../books/ContentState.jsx";
@@ -25,6 +26,20 @@ export default function DashboardInsights({ metrics }) {
         <ContentState {...state} onRetry={state.reload} />
         {data && (
           <>
+            <div className="dashboard-daily-focus">
+              <div>
+                <strong>
+                  <AnimatedValue value={data.days.at(-1)?.questions ?? 0} />
+                </strong>
+                <span>questions checked today</span>
+              </div>
+              <div>
+                <strong>
+                  <AnimatedValue value={metrics.streak || 0} />
+                </strong>
+                <span>day study streak</span>
+              </div>
+            </div>
             <p className="empty-copy">
               Distinct questions checked per day · last 7 days · {data.timezone}
             </p>
