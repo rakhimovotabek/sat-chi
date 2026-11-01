@@ -36,7 +36,7 @@ const jobs = roots.flatMap((root) =>
     (v) => ({ ...v, root }),
   ),
 );
-jobs.sort((a,b)=>a.file.localeCompare(b.file));
+jobs.sort((a, b) => a.file.localeCompare(b.file));
 // Full raster/CRC audit was completed offline. The Edge handler repeats ZIP,
 // raster and digest validation before creating each remote draft.
 for (const root of roots) {
@@ -91,8 +91,27 @@ process.on("SIGINT", () => {
 });
 let position = 0,
   completed = 0;
-async function worker() {
+async function permitted(id) {
+  while (!stopping) {
+    let limit = 2;
+    try {
+      if (process.env.SATCHI_IMPORT_CONTROL)
+        limit = Number(
+          fs.readFileSync(process.env.SATCHI_IMPORT_CONTROL, "utf8"),
+        );
+    } catch {
+      /* fail to conservative concurrency */
+    }
+    if (!Number.isInteger(limit) || limit < 1 || limit > 4) limit = 2;
+    if (id < limit || position >= jobs.length) return true;
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  return false;
+}
+async function worker(id) {
   while (position < jobs.length && !stopping) {
+    if (!(await permitted(id))) return;
+    if (position >= jobs.length) return;
     const job = jobs[position++];
     if (
       state[job.sha256]?.status === "draft" ||
@@ -114,6 +133,7 @@ async function worker() {
     let last = -1,
       stalls = 0;
     while (current.status === "importing" && !stopping) {
+      if (!(await permitted(id))) return;
       current = await invoke({ jobId: current.id });
       const cursor = current.asset_cursor + current.question_cursor;
       if (cursor === last && ++stalls > 3)
@@ -128,7 +148,8 @@ async function worker() {
       persist();
     }
     if (stopping) return;
-    if (current.status !== "draft") throw new Error("Unexpected import state");
+    if (!["draft", "published"].includes(current.status))
+      throw new Error("Unexpected import state");
     completed++;
     console.log(
       JSON.stringify({
@@ -142,7 +163,7 @@ async function worker() {
   }
 }
 try {
-  await Promise.all(Array.from({ length: 2 }, () => worker()));
+  await Promise.all(Array.from({ length: 4 }, (_, id) => worker(id)));
 } finally {
   sdk.auth.stopAutoRefresh();
   sdk.realtime.disconnect();

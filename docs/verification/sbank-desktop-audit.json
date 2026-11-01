@@ -2011,13 +2011,19 @@
       },
       "manifest_author": "College Board (question metadata and rationales in supplied export)",
       "source_pdf_included": false,
-      "imported": 0,
-      "published": 0,
+      "imported": 1922,
+      "published": 1922,
       "limits": [
         "Asset decoding/CRC and declared role checks do not independently verify visual crop boundaries or source answers.",
         "Passages are embedded in stem images; separate text is absent.",
         "Duplicate comparison covers these archives, not the existing production database."
-      ]
+      ],
+      "production_review_ids": [
+        "sbank-math-f8ff3249",
+        "sbank-math-dd3a910a",
+        "sbank-math-c048055c"
+      ],
+      "production_status": "published_except_explicit_review_records"
     },
     {
       "file": "sbank-rw.zip",
@@ -3945,14 +3951,32 @@
       },
       "manifest_author": "College Board (question metadata and rationales in supplied export)",
       "source_pdf_included": false,
-      "imported": 0,
-      "published": 0,
+      "imported": 1844,
+      "published": 1844,
       "limits": [
         "Asset decoding/CRC and declared role checks do not independently verify visual crop boundaries or source answers.",
         "Passages are embedded in stem images; separate text is absent.",
         "Duplicate comparison covers these archives, not the existing production database."
-      ]
+      ],
+      "production_review_ids": [
+        "sbank-rw-e3bbf2bf"
+      ],
+      "production_status": "published_except_explicit_review_records"
     }
   ],
-  "cross_package_source_id_overlap": []
+  "cross_package_source_id_overlap": [],
+  "production_verification": {
+    "published_total": 3766,
+    "review_total": 4,
+    "registered_assets": 20644,
+    "missing_storage_objects": 0,
+    "migration_count": 106,
+    "latest_migration": "20261031001800",
+    "live_browser_checks": 16,
+    "live_browser_page_errors": 0,
+    "repeat_import_question_delta": 0,
+    "original_bank_counts_unchanged": true,
+    "original_book_catalog_unchanged": true,
+    "report": "docs/sbank-desktop-import.md"
+  }
 }
