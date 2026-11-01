@@ -1,3 +1,5 @@
+> Released with user authorization on 2026-11-01. See [production release report](production-release-20261101.md). The local-only language below records the original development boundary and is superseded for this completed release.
+
 # Premium interface and Battles 2 — local development
 
 Base: production `da06e30`. Branch: `feature/premium-battles-2`.

@@ -1,3 +1,9 @@
+## Production release completed — Premium interface and Battles 2 (2026-11-01)
+
+User authorized pushing/deploying the local sprint. Feature code `e0c25f6` is live on Netlify and Vercel after safe production migration `20261101000100_battle_competition.sql` (107 total). Fresh post-SBank backup restored/rehearsed successfully; all 66 protected table fingerprints match; historical scoring/data retained. Both sites passed18 live browser checks with0 page errors/failed API requests; authenticated RPCs and full SBank counts passed. Disposable verification sessions revoked/profiles inactive, history retained.
+
+See [production release evidence and limits](production-release-20261101.md). The following report-only commit is pushed/published too; its exact final provider/asset confirmation lives in private `premium-battles-20261101/final-host-verification.json` and the release response. Do not repeat backups, migrations, imports or completed tests. Prior local-only restrictions below are historical and superseded by the user's explicit deployment authorization.
+
 ## Active local sprint — Premium interface and Battles 2
 
 Local milestones `52d9751` and `ac02f71` on branch `feature/premium-battles-2`, based on verified production `da06e30`. Current task supersedes previous release authorization: **no push, deployment, production migration, student writes or SBank-content edits**. See [implementation/verification report](premium-battles-2.md) and [visual review](premium-battles-visual-review.md).
