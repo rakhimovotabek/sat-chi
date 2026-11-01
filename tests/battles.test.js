@@ -1,3 +1,4 @@
+// Timed legacy fixtures retain scoring_version=1; battles-competition covers new v2 rooms.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { learningDatabase, student, other, admin } from "./helpers/database.js";
@@ -56,7 +57,7 @@ test("two authenticated players complete a synchronized battle with private keys
     /permission denied/,
   );
   await db.exec(
-    `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+    `reset role;update battles set scoring_version=1,deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
   );
   await role(student);
   b = await action("state", { id });
@@ -84,7 +85,7 @@ test("two authenticated players complete a synchronized battle with private keys
   assert.equal(b.state, "ROUND_RESULTS");
   assert.equal(b.review.answer, 1);
   await db.exec(
-    `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+    `reset role;update battles set scoring_version=1,deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
   );
   await role(student);
   b = await action("state", { id });
@@ -189,7 +190,7 @@ test("full 2v2, 3v3 and twenty-player games persist accurate team and individual
     await role(users[0]);
     await action("start", { id });
     await db.exec(
-      `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+      `reset role;update battles set scoring_version=1,deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
     );
     for (let i = 0; i < capacity; i++) {
       await role(users[i]);
@@ -212,7 +213,7 @@ test("full 2v2, 3v3 and twenty-player games persist accurate team and individual
       );
     }
     await db.exec(
-      `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+      `reset role;update battles set scoring_version=1,deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
     );
     await role(users[0]);
     b = await action("state", { id });
@@ -290,7 +291,7 @@ test("three vocabulary modes use published words and reject impossible pools bef
     await role(student);
     await action("start", { id });
     await db.exec(
-      `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+      `reset role;update battles set scoring_version=1,deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
     );
     await role(student);
     b = await action("state", { id });

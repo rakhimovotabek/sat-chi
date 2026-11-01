@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+import BattleLeaderboard, { playerName } from "./BattleLeaderboard.jsx";
 import Filters from "../learning/Filters.jsx";
 import BattleVocabularyFilters from "./BattleVocabularyFilters.jsx";
 import BattleHostControls from "./BattleHostControls.jsx";
@@ -31,6 +33,32 @@ async function rpc(action, data = {}) {
   );
   if (error) throw backendError(error, "Battles");
   return result;
+}
+function resultTitle(room) {
+  const me = room.members.find((m) => m.user_id === room.me);
+  const contenders =
+    room.team_size > 0
+      ? [1, 2].map((team) => ({
+          id: team,
+          score: room.members
+            .filter((m) => m.team === team)
+            .reduce((sum, m) => sum + m.score, 0),
+        }))
+      : room.members.map((m) => ({ id: m.user_id, score: m.score }));
+  const best = Math.max(...contenders.map((c) => c.score));
+  const winners = contenders.filter((c) => c.score === best);
+  if (!winners.some((c) => c.id === (room.team_size > 0 ? me?.team : room.me)))
+    return "Battle completed";
+  return winners.length > 1 ? "A shared victory" : "Top of the arena";
+}
+function RoundScore({ room }) {
+  const points = room.review?.points;
+  if (points == null) return null;
+  return (
+    <p key={room.round} className="battle-score-flash">
+      +{points} Battle pts{points > 100 ? ` · ${points - 100} speed bonus` : ""}
+    </p>
+  );
 }
 export default function Battles() {
   const actionPending = useRef(false),
@@ -195,8 +223,8 @@ export default function Battles() {
   return (
     <div className="battles">
       <PageHeader
-        title="Battles"
-        description="Same questions. Shared arena. Bring your best thinking."
+        title="Your next challenge starts here."
+        description="One arena. Shared questions. A little friendly rivalry."
       />
       {(error || syncError) && (
         <p className="form-error" role="alert">
@@ -237,9 +265,10 @@ export default function Battles() {
             <div>
               <h2>Challenge your next opponent.</h2>
               <p>
-                Earn 100 points for a correct answer. No points for a wrong
-                answer. Team scores add every member’s points. Battle results
-                stay separate from practice and Homework.
+                Earn 100 Battle points for a correct answer, plus up to 50 speed
+                points in timed rounds. Incorrect answers earn zero. Team scores
+                add every member’s points. Battle results stay separate from
+                practice and Homework.
               </p>
               <div
                 className="arena-formats"
@@ -251,6 +280,16 @@ export default function Battles() {
                 <span>Math · Reading &amp; Writing · Vocabulary</span>
               </div>
             </div>
+          </div>
+          <div className="battle-hub-actions">
+            <a className="button button-secondary" href="#battle-leaderboard">
+              View rankings
+            </a>
+            <span>
+              {catalog?.history.filter((h) => h.state === "FINISHED").length ??
+                0}{" "}
+              completed matches in recent history
+            </span>
           </div>
           <div className="battle-home-grid">
             <form
@@ -266,6 +305,13 @@ export default function Battles() {
               }}
             >
               <h2>Create Battle</h2>
+              <p className="battle-scoring-note">
+                Correct answers earn 100 Battle points. Timed rounds add up to
+                50 speed points, based on when the server accepts your final
+                submission. Untimed rounds: 100 points. Incorrect or unanswered:
+                zero. Answers lock on Submit; Battle points are separate from
+                study XP.
+              </p>
               <label>
                 Category
                 <select aria-label="Category" {...field("category")}>
@@ -474,6 +520,7 @@ export default function Battles() {
               )}
             </section>
           </div>
+          <BattleLeaderboard />
           <section className="card">
             <h2>My Battle History</h2>
             {catalog?.history.length ? (
@@ -547,20 +594,25 @@ export default function Battles() {
                 className={`battle-player team-${m.team % 2} ${m.ready ? "is-ready" : ""}`}
                 data-self={m.user_id === room.me}
               >
-                <span className="battle-seat" aria-hidden="true">
-                  {String(m.seat).padStart(2, "0")}
+                <span className="battle-avatar" aria-hidden="true">
+                  {playerName(m).slice(0, 2).toUpperCase()}
                 </span>
-                <span>
-                  Player {m.seat}
+                <span className="battle-player-name">
+                  {playerName(m, room.members)}
                   {m.user_id === room.me ? " · You" : ""}
                   {m.user_id === room.host_id ? " · Host" : ""}
                 </span>
                 <strong>
                   <AnimatedValue value={m.score} />
+                  <span className="battle-points"> Battle pts</span>
                 </strong>
                 <small>
                   {room.team_size ? `Team ${m.team} · ` : ""}
-                  {m.ready ? "Ready" : "Not ready"}
+                  {room.state === "LOBBY"
+                    ? m.ready
+                      ? "Ready"
+                      : "Not ready"
+                    : "In the arena"}
                   {Date.parse(room.serverNow) - Date.parse(m.last_seen) > 30000
                     ? " · Away"
                     : ""}
@@ -586,7 +638,10 @@ export default function Battles() {
                 {room.seconds
                   ? `${room.seconds} seconds per question`
                   : "Untimed questions"}{" "}
-                · Correct answer: 100 points
+                ·{" "}
+                {room.scoring_version === 2 && room.seconds > 0
+                  ? "Correct: 100 + up to 50 speed points"
+                  : "Correct answer: 100 Battle points"}
               </p>
               {room.total_seconds > 0 && (
                 <p>
@@ -753,6 +808,7 @@ export default function Battles() {
               {room.review && (
                 <div role="status">
                   <h4>Round completed</h4>
+                  <RoundScore room={room} />
                   {q.question_type === "vocabulary-matching" ? (
                     <MatchingPairs
                       question={q}
@@ -781,11 +837,30 @@ export default function Battles() {
           )}
           {room.state === "FINISHED" && (
             <section className="card battle-final-results">
-              <h2>
-                {me?.score === Math.max(...room.members.map((m) => m.score))
-                  ? "Top of the arena"
-                  : "Battle completed"}
-              </h2>
+              <h2>{resultTitle(room)}</h2>
+              <ol
+                className="battle-result-standings"
+                aria-label="Final Battle standings"
+              >
+                {room.members.map((member) => (
+                  <li key={member.user_id}>
+                    <span className="battle-avatar" aria-hidden="true">
+                      {playerName(member).slice(0, 2).toUpperCase()}
+                    </span>
+                    <div>
+                      <strong>{playerName(member, room.members)}</strong>
+                      <small>
+                        {member.correct ?? "—"} / {room.question_count} correct
+                        · {member.speed_bonus ?? 0} speed bonus
+                      </small>
+                    </div>
+                    <strong>{member.score} pts</strong>
+                  </li>
+                ))}
+              </ol>
+              <Link className="primary-link" to="/battles/leaderboard">
+                See Battle rankings →
+              </Link>
               <p>
                 {room.history.filter((h) => h.correct).length} /{" "}
                 {room.question_count} correct · {me?.score} points

@@ -1,3 +1,4 @@
+import { playerName } from "./BattleLeaderboard.jsx";
 import { useEffect, useState } from "react";
 import BattleMatchLimit from "./BattleMatchLimit.jsx";
 
@@ -105,7 +106,7 @@ export default function BattleHostControls({ room, busy, onControl }) {
               <option value="">Choose a player</option>
               {room.members.map((member) => (
                 <option key={member.user_id} value={member.user_id}>
-                  Player {member.seat} · Team {member.team}
+                  {playerName(member, room.members)} · Team {member.team}
                 </option>
               ))}
             </select>
@@ -125,7 +126,7 @@ export default function BattleHostControls({ room, busy, onControl }) {
                 )
                 .map((member) => (
                   <option key={member.user_id} value={member.user_id}>
-                    Player {member.seat} · Team {member.team}
+                    {playerName(member, room.members)} · Team {member.team}
                   </option>
                 ))}
             </select>
@@ -145,7 +146,7 @@ export default function BattleHostControls({ room, busy, onControl }) {
           .map((member) => (
             <li key={member.user_id}>
               <span>
-                Player {member.seat}
+                {playerName(member, room.members)}
                 {room.team_size ? ` · Team ${member.team}` : ""}
               </span>
               {removing === member.user_id ? (
@@ -161,7 +162,7 @@ export default function BattleHostControls({ room, busy, onControl }) {
                         setRemoving(null);
                     }}
                   >
-                    Confirm remove Player {member.seat}
+                    Confirm remove {playerName(member, room.members)}
                   </button>
                   <button
                     className="button button-secondary"
@@ -177,7 +178,7 @@ export default function BattleHostControls({ room, busy, onControl }) {
                   disabled={busy}
                   onClick={() => setRemoving(member.user_id)}
                 >
-                  Remove Player {member.seat}
+                  Remove {playerName(member, room.members)}
                 </button>
               )}
             </li>

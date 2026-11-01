@@ -1,3 +1,4 @@
+// Timed legacy fixtures retain scoring_version=1; battles-competition covers new v2 rooms.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { learningDatabase, student, other } from "./helpers/database.js";
@@ -26,7 +27,7 @@ test("whole-match deadlines close answers and save exact scores without client t
     30000,
   );
   await db.exec(
-    `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+    `reset role;update battles set scoring_version=1,deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
   );
   await role(student);
   room = await action("state", {

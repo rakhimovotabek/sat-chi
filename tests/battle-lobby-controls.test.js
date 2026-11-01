@@ -1,3 +1,4 @@
+// Timed legacy fixtures retain scoring_version=1; battles-competition covers new v2 rooms.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { learningDatabase, student, other, admin } from "./helpers/database.js";
@@ -100,7 +101,7 @@ test("host lobby changes preserve balance, reset readiness and enforce removals 
     /Lobby is closed/,
   );
   await db.exec(
-    `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+    `reset role;update battles set scoring_version=1,deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
   );
   await role(student);
   await action("state", { id });
@@ -110,7 +111,7 @@ test("host lobby changes preserve balance, reset readiness and enforce removals 
       await action("answer", { id, round, response: "1" });
     }
     await db.exec(
-      `reset role;update battles set deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
+      `reset role;update battles set scoring_version=1,deadline=clock_timestamp()-interval '1 second'where id='${id}'`,
     );
     await role(student);
     room = await action("state", { id });

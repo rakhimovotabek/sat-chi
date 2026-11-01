@@ -54,6 +54,7 @@ export async function contentFixture(
       {
         id: bookId,
         title: "SAT Book",
+        bank_source: "satchi",
         description: "A test-fixture library.",
         category: "Math",
         published: true,
