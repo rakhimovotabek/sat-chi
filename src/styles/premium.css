@@ -713,3 +713,10 @@ h2 .dashboard-signature {
   margin-bottom: 0;
   letter-spacing: 0;
 }
+@media (prefers-reduced-motion: reduce) {
+  .battles .battle-choice,
+  .homework-card,
+  .vocabulary-selection .selected-set-chips button {
+    transition: none;
+  }
+}

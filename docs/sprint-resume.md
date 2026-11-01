@@ -1,3 +1,11 @@
+## Active local sprint — Premium interface and Battles 2
+
+Local milestones `52d9751` and `ac02f71` on branch `feature/premium-battles-2`, based on verified production `da06e30`. Current task supersedes previous release authorization: **no push, deployment, production migration, student writes or SBank-content edits**. See [implementation/verification report](premium-battles-2.md) and [visual review](premium-battles-visual-review.md).
+
+Implemented landing replacement, creator footer, personalized Dashboard/Simply Lovely signature, saved daily counters, Battle identities/host controls/results, dedicated real leaderboard and versioned server speed scoring. New additive migration `20261101000100_battle_competition.sql` is tested locally only. Historical rooms remain scoring v1; new rooms use v2. Leaderboard ranks completed competitive results, excludes games missing any final-round submission, uses UTC creation-date periods and returns top 100. No new production changes.
+
+Verified: 2 new SQL competition cases; 10 combined SQL Battle regression cases (including the first competition case); real PostgreSQL/Auth/PostgREST two-client/two-browser match, timed scoring, replay, reconnect and persisted standings; 18 focused browser checks; corrected final theme/viewport captures; lint/build. Independent visual review disposition: ship for 30 final captures. Books save/mark/resume/grade/review 1/1 and Homework/Dashboard preservation 2/2 passed. Exact evidence and limits are in the report. Continue from actual HEAD/status, not older release instructions below.
+
 ## SBank production import complete — 2026-11-01
 
 Published **3,766 questions**: Math 1,922 and Reading & Writing 1,844. No eligible imports remain. Four source records are held in existing Content Review (three Math duplicates and one unverified R&W option mapping), with all source assets retained. See [final SBank report](sbank-desktop-import.md) for exact inventory, tests, migrations and remaining review IDs.
